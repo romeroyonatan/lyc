@@ -30,3 +30,7 @@
 
 # Debug files
 *.dSYM/
+
+# Codigo generado
+Final.asm
+intermedia.txt
