@@ -49,6 +49,28 @@
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
 
 
+#define BLOCK_SIZE 4096 //tamano del bloque de disco (unidad minima que puedo
+                       // leer del disco
+#define FIN_BUFF1 BLOCK_SIZE + 1
+#define FIN_BUFF2 2 * BLOCK_SIZE + 1
+
+struct s_entrada {
+    // buffer de entrada, donde copio los caracteres leidos del archivo. Lo
+    // divido en 2 para que sea mas manejable.
+    // buffIn [*               EOF*                 EOF]
+    // 	       ^	           ^                    ^
+    //         buff1           buff2                Guarda
+    char buffIn[2*BLOCK_SIZE + 2], // los 2 bytes adicionales sirven de guarda
+                                   // para almanecenar los EOF adicionales
+    	*buff1, // primera parte del buffer
+	    *buff2; // ultima parte del buffer sumando
+	                    				  // la guarda
+    int i; // indice del caracter leido
+    // archivo de entrada
+    FILE *entrada;
+};
+
+
 //Funciones de la matriz
 int op_suma();
 int op_menos();
@@ -89,6 +111,8 @@ int nada();
 int yylex();
 int get_evento(char);
 int esPalabraRes();
+void init(struct s_entrada *s);
+int es_fin(struct s_entrada *s);
 
 int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
 //        0     |  1    |  2    |  3    |  4    |  5    |  6    |  7    |  8    |  9    | 10    | 11    | 12    | 13    | 14    | 15    | 16    | 17    | 18    |  19   | 20    | 21    |  22  |    23  |   24  |
@@ -199,6 +223,8 @@ int NroPalabrasRes[CANTPR]={
 	OR
 };
 
+    struct s_entrada s_entrada;
+    struct s_entrada *s = &s_entrada;// XXX:temporal
 /*---------------------------------------------*/
 int main()
 {
@@ -220,7 +246,9 @@ int main()
         printf("No se puede crear el archivo asembler.asm");
         exit(2);
     }
-    while(!feof(entrada))
+
+    init(&s_entrada);
+    while(!es_fin(&s_entrada))
     {
         tipo_token = yylex();
         printf("%s\n",token);
@@ -426,22 +454,44 @@ int yylex()
 {
     int estado=0;
     int estado_final=QFIN;
+
+
     while(estado!=estado_final)
     {
-        //char caracter;
-        if(fscanf(entrada,"%c",&caracter)!=EOF)
+        if(s->buffIn[s->i] != EOF)
         {
-            //printf("%c",caracter);
+	        caracter = s->buffIn[s->i];
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
+	        s->i++;
         }
-        else
-            estado=estado_final;
+        else 
+	    {
+	        // si llegamos al final de la primera parte del buffer, leemos la
+	        // segunda
+	        if (s->i == FIN_BUFF1)
+	        {
+            	fread(s->buff2, sizeof(char), BLOCK_SIZE, s->entrada);
+	            s->i++;	
+                
+	        }
+	        // si llegamos al final de la segunda parte del buffer, leemos la
+	        // primera
+	        else if (s->i == FIN_BUFF2) 
+	        {
+            	fread(s->buff1, sizeof(char), BLOCK_SIZE, s->entrada);
+	            s->i=0;
+	        }
+	        // leimos el EOF de fin de archivo. Nada mas por hacer
+	        else
+                estado=estado_final;
+	    }
     }
-    if(!feof(entrada))
+    // XXX:no se que hace todavia, traduje lo que decia el codigo de elias
+    if(s->buffIn[s->i] != EOF)
     {
-        fseek(entrada,-sizeof(char),SEEK_CUR);
+	   //s->i--;
     }
     return tipo_token;
 }
@@ -542,4 +592,23 @@ int esPalabraRes()
     }
 
     return -1;
+}
+
+/* Inicializa la estructura para leer el archivo fuente de forma optimizada*/
+void init(struct s_entrada *s) {
+    s->entrada = entrada;
+    // leo un bloque de disco del archivo y lo almaceno en el buffer
+    fread(s->buffIn, sizeof(char), BLOCK_SIZE, s->entrada);
+    // inserto las guardas
+    s->buffIn[FIN_BUFF1] = EOF;
+    s->buffIn[FIN_BUFF2] = EOF;
+    s->buff1 = s->buffIn;
+    s->buff2 = s->buffIn + FIN_BUFF1 + 1; // un byte mas despues de la primera
+                                          // parte
+    s->i = 0;
+}
+
+/* Verifica si se leyo todo el archivo de entrada */
+int es_fin(struct s_entrada *s) {
+    return (s->buffIn[s->i] == EOF && s->i != FIN_BUFF1 && s->i != FIN_BUFF2);
 }
