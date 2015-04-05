@@ -58,13 +58,13 @@ struct s_entrada {
     // buffer de entrada, donde copio los caracteres leidos del archivo. Lo
     // divido en 2 para que sea mas manejable.
     // buffIn [*               EOF*                 EOF]
-    // 	       ^	           ^                    ^
+    //         ^               ^                    ^
     //         buff1           buff2                Guarda
     char buffIn[2*BLOCK_SIZE + 2], // los 2 bytes adicionales sirven de guarda
                                    // para almanecenar los EOF adicionales
-    	*buff1, // primera parte del buffer
-	    *buff2; // ultima parte del buffer sumando
-	                    				  // la guarda
+        *buff1, // primera parte del buffer
+        *buff2; // ultima parte del buffer sumando
+                                          // la guarda
     int i; // indice del caracter leido
     // archivo de entrada
     FILE *entrada;
@@ -117,71 +117,71 @@ int es_fin(struct s_entrada *s);
 int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
 //        0     |  1    |  2    |  3    |  4    |  5    |  6    |  7    |  8    |  9    | 10    | 11    | 12    | 13    | 14    | 15    | 16    | 17    | 18    |  19   | 20    | 21    |  22  |    23  |   24  |
 //        +     |  -    |  *    |  /    | Let   | Dig   |  =    |  <    |  >    |  ?    |  :    |  !    |  "    |  .    |  ;    |  car  | (     |   )   |  ,    | tab   |blanco | enter |  EOF |    {   |   }   |
-/*E0*/	{	3	,	15	,	16	,	17	,	1	,	24	,	5	,	9	,	11	,	27	,	26	,	21	,	23	,	-1	,	2	,	-1	,	18	,	19	,	20	,	0	,	0	,	0	,QFIN	,    7  ,   8   },
-/*E1*/	{QFIN	,QFIN	,QFIN	,QFIN	,	1	,	1	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E2*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E3*/	{	4	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E4*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E5*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	6	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E6*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E7*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E8*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E9*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	10	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E10*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E11*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	12	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E12*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E13*/	{QFIN	,	14	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E14*/	{	14	,	15	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,	14	,     14,   14  },
-/*E15*/	{	0	,	14	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,	0	,   0   ,   0   },
-/*E16*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E17*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E18*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E19*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E20*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E21*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	22	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E22*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E23*/	{	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,28 	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,	23	,   23  ,   23  },
-/*E24*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	24	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	25	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E25*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,	25	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E26*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E27*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E28*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   },
-/*E29*/	{QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN	,QFIN   ,QFIN   }
+/*E0*/  {   3   ,   15  ,   16  ,   17  ,   1   ,   24  ,   5   ,   9   ,   11  ,   27  ,   26  ,   21  ,   23  ,   -1  ,   2   ,   -1  ,   18  ,   19  ,   20  ,   0   ,   0   ,   0   ,QFIN   ,    7  ,   8   },
+/*E1*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,   1   ,   1   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E2*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E3*/  {   4   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E4*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E5*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   6   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E6*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E7*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E8*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E9*/  {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   10  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E10*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E11*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   12  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E12*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E13*/ {QFIN   ,   14  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E14*/ {   14  ,   15  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,   14  ,     14,   14  },
+/*E15*/ {   0   ,   14  ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   ,   0   },
+/*E16*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E17*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E18*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E19*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E20*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E21*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   22  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E22*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E23*/ {   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,28     ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  ,   23  },
+/*E24*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   24  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   25  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E25*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,   25  ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E26*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E27*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E28*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   },
+/*E29*/ {QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   ,QFIN   }
 };
 
 int (*proceso[CANT_FILAS][CANT_COLUMNAS])()={
-//        0     	|  1    	|  2    	|  3    	|  4    	|  5    	|  6    	|  7    	|  8    	|  9    	| 10    	| 11    	| 12    	| 13    	| 14    	| 15    	| 16    	| 17    	| 18    	|  19   	| 20    	| 21    	|  22  	|    23     |   24      |
-//        +     	|  -    	|  *    	|  /    	| Let   	| Dig   	|  =    	|  <    	|  >    	|  ?    	|  :    	|  !    	|  "    	|  .    	|  ;    	|  car  	| (     	|   )   	|  ,    	| tab   	|blanco 	| enter 	|  EOF 	|    {      |   }       |
-/*E0*/	{op_suma		,op_menos	,op_mul		,op_div		,inic_id	,inic_cte	,op_asig	,op_menor	,op_mayor	,nada		,dos_puntos	,op_negar	,inic_string,error		,puntoycoma	,error		,par_abre	,par_cierra	,coma		,nada		,nada		,salto_linea,error	,llave_abre ,llave_cierra},
-/*E1*/	{fin_id		,fin_id		,fin_id		,fin_id		,cont_id	,cont_id	,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,fin_id		,error	,nada       ,nada        },
-/*E2*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E3*/	{op_concaten,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E4*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E5*/	{nada		,nada		,nada		,nada		,nada		,nada		,op_igualdad,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E6*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E7*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E8*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E9*/	{nada		,nada		,nada		,nada		,nada		,nada		,op_menor_ig,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E10*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E11*/	{nada		,nada		,nada		,nada		,nada		,nada		,op_mayor_ig,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E12*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E13*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E14*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E15*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E16*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E17*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E18*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E19*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E20*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E21*/	{nada		,nada		,nada		,nada		,nada		,nada		,op_distinto,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E22*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E23*/	{cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,fin_string	,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,error	,nada       ,nada        },
-/*E24*/	{fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,cont_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,cont_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,error	,nada       ,nada        },
-/*E25*/	{fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,cont_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,fin_cte	,error	,nada       ,nada        },
-/*E26*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E27*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E28*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        },
-/*E29*/	{nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,nada		,error	,nada       ,nada        }
+//        0         |  1        |  2        |  3        |  4        |  5        |  6        |  7        |  8        |  9        | 10        | 11        | 12        | 13        | 14        | 15        | 16        | 17        | 18        |  19       | 20        | 21        |  22   |    23     |   24      |
+//        +         |  -        |  *        |  /        | Let       | Dig       |  =        |  <        |  >        |  ?        |  :        |  !        |  "        |  .        |  ;        |  car      | (         |   )       |  ,        | tab       |blanco     | enter     |  EOF  |    {      |   }       |
+/*E0*/  {op_suma        ,op_menos   ,op_mul     ,op_div     ,inic_id    ,inic_cte   ,op_asig    ,op_menor   ,op_mayor   ,nada       ,dos_puntos ,op_negar   ,inic_string,error      ,puntoycoma ,error      ,par_abre   ,par_cierra ,coma       ,nada       ,nada       ,salto_linea,error  ,llave_abre ,llave_cierra},
+/*E1*/  {fin_id     ,fin_id     ,fin_id     ,fin_id     ,cont_id    ,cont_id    ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,fin_id     ,error  ,nada       ,nada        },
+/*E2*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E3*/  {op_concaten,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E4*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E5*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,op_igualdad,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E6*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E7*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E8*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E9*/  {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,op_menor_ig,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E10*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E11*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,op_mayor_ig,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E12*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E13*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E14*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E15*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E16*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E17*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E18*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E19*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E20*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E21*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,op_distinto,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E22*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E23*/ {cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,fin_string ,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,error  ,nada       ,nada        },
+/*E24*/ {fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,cont_cte   ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,cont_cte   ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,error  ,nada       ,nada        },
+/*E25*/ {fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,cont_cte   ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,fin_cte    ,error  ,nada       ,nada        },
+/*E26*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E27*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E28*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        },
+/*E29*/ {nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,nada       ,error  ,nada       ,nada        }
 };
 
 /*----------VARIABLES GLOBALES-----------------*/
@@ -202,9 +202,9 @@ char palabrasRes[CANTPR][LARGOMAX]={
     {"int"},
     {"string"},
     {"main"},
-	{"else"},
-	{"and"},
-	{"or"}
+    {"else"},
+    {"and"},
+    {"or"}
 };
 
 
@@ -218,9 +218,9 @@ int NroPalabrasRes[CANTPR]={
     INT,
     STRING,
     MAIN,
-	ELSE,
-	AND,
-	OR
+    ELSE,
+    AND,
+    OR
 };
 
     struct s_entrada s_entrada;
@@ -235,7 +235,7 @@ int main()
         printf("No se puede abrir el archivo entrada.txt\n");
         exit(1);
     }
-	 //Apertura del archivo de salida
+     //Apertura del archivo de salida
     if((salida = fopen("intermedia.txt", "w"))==NULL)
     {
         printf("No se puede crear el archivo intermedia.txt");
@@ -467,30 +467,30 @@ int yylex()
             s->i++;
         }
         else 
-	    {
-	        // si llegamos al final de la primera parte del buffer, leemos la
-	        // segunda
-	        if (s->i == FIN_BUFF1)
-	        {
+        {
+            // si llegamos al final de la primera parte del buffer, leemos la
+            // segunda
+            if (s->i == FIN_BUFF1)
+            {
                 fread(s->buff2, sizeof(char), BLOCK_SIZE, s->entrada);
-                s->i++;	
-	        }
-	        // si llegamos al final de la segunda parte del buffer, leemos la
-	        // primera
-	        else if (s->i == FIN_BUFF2) 
-	        {
+                s->i++; 
+            }
+            // si llegamos al final de la segunda parte del buffer, leemos la
+            // primera
+            else if (s->i == FIN_BUFF2) 
+            {
                 fread(s->buff1, sizeof(char), BLOCK_SIZE, s->entrada);
                 s->i=0;
-	        }
-	        // leimos el EOF de fin de archivo. Nada mas por hacer
-	        else
+            }
+            // leimos el EOF de fin de archivo. Nada mas por hacer
+            else
                 estado=estado_final;
-	    }
+        }
     }
     // XXX:no se que hace todavia, traduje lo que decia el codigo de elias
     if(s->buffIn[s->i] != EOF)
     {
-	   //s->i--;
+       //s->i--;
     }
     return tipo_token;
 }
