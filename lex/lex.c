@@ -460,11 +460,11 @@ int yylex()
     {
         if(s->buffIn[s->i] != EOF)
         {
-	        caracter = s->buffIn[s->i];
+            caracter = s->buffIn[s->i];
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
-	        s->i++;
+            s->i++;
         }
         else 
 	    {
