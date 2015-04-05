@@ -472,16 +472,15 @@ int yylex()
 	        // segunda
 	        if (s->i == FIN_BUFF1)
 	        {
-            	fread(s->buff2, sizeof(char), BLOCK_SIZE, s->entrada);
-	            s->i++;	
-                
+                fread(s->buff2, sizeof(char), BLOCK_SIZE, s->entrada);
+                s->i++;	
 	        }
 	        // si llegamos al final de la segunda parte del buffer, leemos la
 	        // primera
 	        else if (s->i == FIN_BUFF2) 
 	        {
-            	fread(s->buff1, sizeof(char), BLOCK_SIZE, s->entrada);
-	            s->i=0;
+                fread(s->buff1, sizeof(char), BLOCK_SIZE, s->entrada);
+                s->i=0;
 	        }
 	        // leimos el EOF de fin de archivo. Nada mas por hacer
 	        else
