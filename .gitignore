@@ -32,5 +32,6 @@
 *.dSYM/
 
 # Codigo generado
-Final.asm
-intermedia.txt
+bin/
+test/Final.asm
+test/intermedia.txt
