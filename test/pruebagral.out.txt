@@ -1,0 +1,71 @@
+<PR: while>
+<PR: if>
+<PR: const>
+<PR: declare>
+<PR: enddeclare>
+<PR: real>
+<PR: int>
+<PR: string>
+<PR: main>
+<PR: else>
+<PR: and>
+<PR: or>
+<PR: put>
+<PR: get>
+<PR: endif>
+<OP_ASIGNACION>
+<DOS_PUNTOS>
+<PUNTO_Y_COMA>
+<LLAVE_ABRE>
+<LLAVE_CIERRA>
+<OP_SUMA>
+<OP_MULTIPLICACION>
+<OP_DIVISION>
+<CONCATENAR>
+<OP_ASIGNACION>
+<OP_MENOR>
+<OP_MAYOR>
+<OP_MAYOR_IGUAL>
+<OP_MENOR_IGUAL>
+<DISTINTO>
+<PARENTESIS_ABRE>
+<PARENTESIS_CIERRA>
+<OP_NEGAR>
+<OP_RESTA>
+<PUNTO>
+<IGUALDAD>
+<CTE: 65535>
+<CTE: 2015>
+<REAL: 2015.04>
+<REAL: 0.4>
+<REAL: 15.>
+<REAL: 0.0>
+<REAL: 0.0>
+<REAL: 0.0>
+<REAL: 34028234663852885981170418348451692544.>
+<REAL: 30.0000000000000000000000000000000000000117549435082228750796873653722224567781>
+<STRING: @constante string>
+<STRING: cadena de 30 caracteres 12345>
+<STRING: >
+<STRING: while>
+<STRING: +>
+<STRING: 1>
+<ID: camelCase>
+<ID: underscore_variable>
+<ID: letras_y_numeros123>
+<ID: 1c2015>
+<ID: While>
+<ID: Main>
+<ID: iF>
+entero demasiado largo en linea 72
+string demasiado largo en linea 73
+Error en linea 74
+<ID: arroba>
+Error en linea 75
+<ID: numeral>
+<ID: pal>
+Error en linea 76
+<ID: bra>
+Error en linea 77
+Error en linea 78
+Error en linea 79
