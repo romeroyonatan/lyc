@@ -228,38 +228,40 @@ int main()
     }
 
     while(!feof(pruebagral)){
-
+        *archivo='\0';
         //Leo la linea con el nombre del archivo a analizar.
         fgets(archivo,50,pruebagral);
         if(strstr(archivo, "\n")){
             archivo[strlen(archivo) - 1] = '\0';
         }
-        strcpy(archivo_entrada,archivo);
-        strcat(archivo_entrada,".txt");
+        if (*archivo) {
+            strcpy(archivo_entrada,archivo);
+            strcat(archivo_entrada,".txt");
 
-        //Apertura del archivo con el programa
-        if((entrada = fopen(archivo_entrada, "r"))!=NULL){
+            //Apertura del archivo con el programa
+            if((entrada = fopen(archivo_entrada, "r"))!=NULL){
 
-            //Apertura del archivo de salida
-            strcat(archivo,"_resultado.txt");
-            if((salida = fopen(archivo, "w"))!=NULL){
+                //Apertura del archivo de salida
+                strcat(archivo,"_resultado.txt");
+                if((salida = fopen(archivo, "w"))!=NULL){
 
-                while(!feof(entrada)){
-                    tipo_token = yylex();
-                    if(*token);
-                      fprintf(salida,"%s\n",token);
-                    limpiar_token();
+                    while(!feof(entrada)){
+                        tipo_token = yylex();
+                        if(*token);
+                            fprintf(salida,"%s\n",token);
+                        limpiar_token();
+                    }
+                    fclose(salida);
+
+                } else {
+                    printf("No se puede crear el archivo %s\n", archivo);
                 }
-                fclose(salida);
+
+                fclose(entrada);
 
             } else {
-                printf("No se puede crear el archivo %s\n",archivo);
+                printf("No se puede abrir el archivo %s\n", archivo_entrada);
             }
-
-            fclose(entrada);
-
-        } else {
-            printf("No se puede abrir el archivo %s\n",archivo_entrada);
         }
     }
 
@@ -274,7 +276,7 @@ int yylex()
     while(estado!=estado_final)
     {
         //char caracter;
-        if(fscanf(entrada,"%c",&caracter)!=EOF)
+        if((caracter=fgetc(entrada)) != EOF)
         {
             //printf("%c",caracter);
             int columna = get_evento(caracter);
@@ -476,7 +478,7 @@ int cont_string()
     longitud++;
     if(longitud==LONG_MAX+1)
     {
-        fprintf(stderr, "String demasiado largo en linea: %d\n",linea);
+        fprintf(salida, "String demasiado largo en linea: %d\n",linea);
         //exit(2);
     }
     strcat(token,&caracter);
