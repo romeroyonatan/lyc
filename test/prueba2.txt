@@ -65,8 +65,10 @@ While
 Main
 iF
 
---/ comentario --/anidado/-- /--
-
+--/ comentario --/anidado/-- aca /--
+--/ comentario
+    multilinea
+/--
 
 --/ errores lexicos /--
 65536
