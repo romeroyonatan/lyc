@@ -134,7 +134,7 @@ int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
 /*E27*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
 /*E28*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
 /*E29*/ {QFIN ,QFIN ,QFIN , 30  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E30*/ { 30  , 30  , 30  , 31  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  ,QFIN   ,QFIN , 30  , 30  },
+/*E30*/ { 30  , 30  , 30  , 31  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30   ,QFIN , 30  , 30  },
 /*E31*/ { 30  , 32  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  ,QFIN   ,QFIN , 30  , 30  },
 /*E32*/ { 30  , 0   , 30  , 31  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  ,QFIN   ,QFIN , 30  , 30  },
 /*E33*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   }
@@ -173,7 +173,7 @@ int (*proceso[CANT_FILAS][CANT_COLUMNAS])()={
 /*E27*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
 /*E28*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
 /*E29*/ {op_menos2  ,op_menos2  ,op_menos2  ,inic_com ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,nada     ,nada   ,op_menos2,op_menos2   },
-/*E30*/ {cont_com ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,error      ,error  ,cont_com   ,cont_com  },
+/*E30*/ {cont_com ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com  ,error  ,cont_com   ,cont_com  },
 /*E31*/ {cont_com ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,error      ,error  ,cont_com   ,cont_com  },
 /*E32*/ {cont_com ,fin_com  ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,error      ,error  ,cont_com   ,cont_com  },
 /*E33*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error    ,nada ,nada       ,nada        }
