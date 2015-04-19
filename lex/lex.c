@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+
 //TOKENS
 #define QFIN 33
 #define OP_SUMA 257
@@ -280,7 +281,6 @@ int yylex()
     {
         if((caracter=fgetc(entrada)) != EOF)
         {
-            if (caracter == '\n') linea++; 
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
@@ -602,13 +602,12 @@ int get_evento(char c)
         //    return 19;
             
         case '\t':
-        case '\n':
         case '\r':
         case ' ':
             return 20;
             
-        //case '\n':
-        //    return 21;
+        case '\n':
+            return 21;
             
         case EOF:
             return 22;
