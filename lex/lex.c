@@ -46,7 +46,7 @@
 
 #define CANT_FILAS 34 //filas de la matriz de estados
 #define CANT_COLUMNAS 25 //columnas de la matriz de estados
-#define CANTPR 12 //cantidad de palabras reservadas
+#define CANTPR 15 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
@@ -198,9 +198,11 @@ char palabrasRes[CANTPR][LARGOMAX]={
     {"int"},
     {"string"},
     {"main"},
-  {"else"},
-  {"and"},
-  {"or"}
+    {"else"},
+    {"and"},
+    {"or"},
+    {"put"},
+    {"get"}
 };
 
 
