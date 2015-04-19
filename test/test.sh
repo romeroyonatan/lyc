@@ -7,11 +7,12 @@ Color_Off='\e[0m'       # Text Reset
 BRed='\e[1;31m'         # Red
 BGreen='\e[1;32m'       # Green
 
+LEX=../bin/lex
 for ENTRADA in "pruebagral.txt"
 do
     SALIDA=$(echo $ENTRADA | cut -d. -f1).out.txt
     echo $SALIDA
-    ./lex $ENTRADA > $OUT
+    $LEX $ENTRADA > $OUT
     diff $OUT $SALIDA > /dev/stderr
     
     if [ $? -eq 0 ]; then

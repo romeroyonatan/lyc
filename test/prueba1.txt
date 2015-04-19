@@ -1,0 +1,11 @@
+--/h/-
+if (a = b)
+65536
+"cadena de 31 caracteres 123456"
+@arroba
+#numeral
+pal@bra
+--/ comentario --/ muy --/ anidado /-- /-- /--
+1c2015
+" una constante que no cierra
+ 

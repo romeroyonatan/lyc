@@ -1,0 +1,37 @@
+Error en linea: 1
+
+<PR: if>
+<PARENTESIS_ABRE>
+<ID: a>
+<OP_ASIGNACION>
+<ID: b>
+<PARENTESIS_CIERRA>
+Error en linea: 2
+<CTE: 65536>
+Error en linea: 3
+<STRING: cadena de 31 caracteres 123456>
+Error en linea: 4
+Error en linea: 5
+<ID: arroba>
+Error en linea: 5
+Error en linea: 6
+<ID: numeral>
+Error en linea: 6
+<ID: pal>
+Error en linea: 7
+<ID: bra>
+Error en linea: 7
+<OP_DIVISION>
+<OP_RESTA>
+<OP_RESTA>
+<OP_DIVISION>
+<OP_RESTA>
+<OP_RESTA>
+Error en linea: 8
+<CTE: 1>
+<ID: c2015>
+Error en linea: 9
+Error en linea: 10
+<STRING:  una constante que no cierra
+ 
+
