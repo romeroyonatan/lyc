@@ -275,10 +275,9 @@ int yylex()
     int estado_final=QFIN;
     while(estado!=estado_final)
     {
-        //char caracter;
         if((caracter=fgetc(entrada)) != EOF)
         {
-            //printf("%c",caracter);
+            if (caracter == '\n') linea++; 
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
@@ -590,14 +589,17 @@ int get_evento(char c)
         case ',':
             return 18;
             
-        case '\t':
-            return 19;
+        //case '\t':
+        //    return 19;
             
+        case '\t':
+        case '\n':
+        case '\r':
         case ' ':
             return 20;
             
-        case '\n':
-            return 21;
+        //case '\n':
+        //    return 21;
             
         case EOF:
             return 22;
