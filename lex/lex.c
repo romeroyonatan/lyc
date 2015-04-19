@@ -49,6 +49,7 @@
 #define CANTPR 12 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
+#define MAX_INT 65535 //largo maximo de los enteros de 16 bit
 
 
 //Funciones de la matriz
@@ -447,19 +448,18 @@ int fin_id()
 int inic_cte()
 {
     limpiar_token();
-    longitud = 1;
     strcpy(token,"<CTE: ");
     strcat(token,&caracter);
     return CTE;
 }
 int cont_cte()
 {
-    longitud++;
     strcat(token,&caracter);
     return CTE;
 }
 int fin_cte()
 {
+
     strcat(token,">");
     return CTE;
 }
@@ -475,17 +475,19 @@ int inic_string()
 int cont_string()
 {
     longitud++;
-    if(longitud==LONG_MAX+1)
-    {
-        fprintf(salida, "String demasiado largo en linea: %d\n",linea);
-        //exit(2);
-    }
+    
     strcat(token,&caracter);
     return STRING;
 }
 
 int fin_string()
 {
+    if(longitud==LONG_MAX+1)
+    {
+        fprintf(salida, "String demasiado largo en linea: %d",linea);
+        *token='\0';
+        return 0;
+    }
     token[9+longitud-1]='>';
     token[9+longitud]='\0';
     return STRING;
