@@ -1,9 +1,11 @@
 digraph {
+    // para compilar
+    // unflatten -f -l 2 doc/automata.gv | dot -Tsvg -o doc/automata.svg
+
     // para que lo dibuje de izquierda a derecha
     rankdir=LR;
     // el ultimo nodo tiene doble circulo por se nodo terminal
     qf[shape=doublecircle];
-    node[bgcolor=red];
 
     q0 -> q1[label="*,{,},(,),/"];
     q0 -> q2[label="letra"];
