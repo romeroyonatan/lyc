@@ -183,7 +183,7 @@ FILE * entrada,*salida,*pruebagral;
 int tipo_token; //numero identificador del token
 int linea =1; //linea por la que esta leyendo
 int longitud; //longitud del string, id o cte
-char token[50]; //Nombre del token identificado
+char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
 char archivo[50]; //linea que se lee del archivo principal
 char archivo_entrada[50]; //nombre del archivo de entrada
