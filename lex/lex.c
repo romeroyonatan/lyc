@@ -545,69 +545,68 @@ int get_evento(char c)
 
         case '+':
             return 0;
-            break;
         case '-':
             return 1;
-            break;
+            
         case '*':
             return 2;
-            break;
+            
         case '/':
             return 3;
-            break;
+            
         case '=':
             return 6;
-            break;
+            
         case '<':
             return 7;
-            break;
+            
         case '>':
             return 8;
-            break;
+            
         case '?':
             return 9;
-            break;
+            
         case ':':
             return 10;
-            break;
+            
         case '!':
             return 11;
-            break;
+            
         case '"':
             return 12;
-            break;
+            
         case '.':
             return 13;
-            break;
+            
         case ';':
             return 14;
-            break;
+            
         case '(':
             return 16;
-            break;
+            
         case ')':
             return 17;
-            break;
+            
         case ',':
             return 18;
-            break;
+            
         case '\t':
             return 19;
-            break;
+            
         case ' ':
             return 20;
-            break;
+            
         case '\n':
             return 21;
-            break;
+            
         case EOF:
             return 22;
         case '{':
             return 23;
-            break;
+            
         case '}':
             return 24;
-            break;
+            
         default:
             return 15;
     }
