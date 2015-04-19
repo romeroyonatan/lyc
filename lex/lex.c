@@ -448,7 +448,6 @@ int fin_id()
 int inic_cte()
 {
     limpiar_token();
-    strcpy(token,"<CTE: ");
     strcat(token,&caracter);
     return CTE;
 }
@@ -459,8 +458,14 @@ int cont_cte()
 }
 int fin_cte()
 {
-
-    strcat(token,">");
+    int cte = atoi(token);
+    if(cte > MAX_INT)
+    {
+        fprintf(salida, "Entero sobrepasa limite maximo en linea: %d",linea);
+        *token='\0';
+        return 0;
+    }
+    sprintf(token,"<CTE:%d>", cte);
     return CTE;
 }
 int inic_string()
