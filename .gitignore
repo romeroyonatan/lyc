@@ -35,4 +35,4 @@
 bin/
 test/Final.asm
 test/intermedia.txt
-test/lex
+test/prueba*_resultado.txt
