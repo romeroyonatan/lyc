@@ -465,7 +465,7 @@ int fin_cte()
         *token='\0';
         return 0;
     }
-    sprintf(token,"<CTE:%d>", cte);
+    sprintf(token,"<CTE: %d>", cte);
     return CTE;
 }
 int inic_string()
