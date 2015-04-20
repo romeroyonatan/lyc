@@ -73,8 +73,8 @@
 #define T_corchete_cierra   24
 /****************************/
 
-#define CANT_FILAS 39 //filas de la matriz de estados
-#define CANT_COLUMNAS 25 //columnas de la matriz de estados
+#define CANT_ESTADOS 39 //filas de la matriz de estados
+#define CANT_TERMINALES 25 //columnas de la matriz de estados
 #define CANTPR 15 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
@@ -136,8 +136,8 @@ void a_minuscula (char*);
  
 
 
-int nuevo_estado[CANT_FILAS][CANT_COLUMNAS];
-int (*proceso[CANT_FILAS][CANT_COLUMNAS])();
+int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
+int (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 
 /*----------VARIABLES GLOBALES-----------------*/
 
@@ -187,13 +187,13 @@ int main()
 {
     int i,j;
     /* lleno la matriz de proximo estado */
-    for (i=0; i<CANT_FILAS; i++) 
-        for (j=0; j<CANT_COLUMNAS; j++)
+    for (i=0; i<CANT_ESTADOS; i++) 
+        for (j=0; j<CANT_TERMINALES; j++)
             nuevo_estado[i][j] = QFIN;
 
     /* lleno la matriz de proceso */
-    for (i=0; i<CANT_FILAS; i++) 
-        for (j=0; j<CANT_COLUMNAS; j++)
+    for (i=0; i<CANT_ESTADOS; i++) 
+        for (j=0; j<CANT_TERMINALES; j++)
             proceso[i][j] = nada;
      
     nuevo_estado[0][T_mas] = 3;
@@ -230,7 +230,7 @@ int main()
     nuevo_estado[15][T_menos] = 29;
     nuevo_estado[21][T_igual] = 22;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[23][i] = 23;
     nuevo_estado[23][T_comillas] = 28;
     nuevo_estado[23][T_EOF] = QFIN;
@@ -240,43 +240,43 @@ int main()
     nuevo_estado[25][T_digito] = 25;
     nuevo_estado[29][T_barra] = 30;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[30][i] = 30;
     nuevo_estado[30][T_menos] = 34;
     nuevo_estado[30][T_barra] = 31;
     nuevo_estado[30][T_EOF] = QFIN;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[31][i] = 30;
     nuevo_estado[31][T_menos] = 32;
     nuevo_estado[31][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[32][i] = 30;
     nuevo_estado[32][T_menos] = 0;
     nuevo_estado[32][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
     
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[34][i] = 30;
     nuevo_estado[34][T_menos] = 35;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[35][i] = 30;
     nuevo_estado[35][T_menos] = 35;
     nuevo_estado[35][T_barra] = 36;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[36][i] = 36;
     nuevo_estado[36][T_barra] = 37;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[37][i] = 36;
     nuevo_estado[37][T_menos] = 38;
     nuevo_estado[37][T_barra] = 37;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[38][i] = 36;
     nuevo_estado[38][T_barra] = 37;
     nuevo_estado[38][T_menos] = 30;
@@ -303,7 +303,7 @@ int main()
     proceso[0][T_corchete_abre] = llave_abre;
     proceso[0][T_corchete_cierra] = llave_cierra;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[1][i] = fin_id;
     proceso[1][T_letra] = cont_id;
     proceso[1][T_digito] = cont_id;
@@ -314,36 +314,36 @@ int main()
     proceso[11][T_igual] = op_mayor_ig;
     proceso[21][T_igual] = op_distinto;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[23][i] = cont_string;
     proceso[23][T_comillas] = fin_string;
     proceso[23][T_EOF] = error;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[24][i] = fin_cte;
     proceso[24][T_digito] = cont_cte;
     proceso[24][T_punto] = cont_real;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[25][i] = fin_real;
     proceso[25][T_digito] = cont_real;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[29][i] = op_menos2;
     proceso[29][T_barra] = inic_com;
     proceso[29][T_EOF] = nada;
     proceso[29][T_newline] = nada;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[30][i] = cont_com;
     proceso[30][T_EOF] = error;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[31][i] = cont_com;
     proceso[31][T_EOF] = error;
     //proceso[31][T_newline] = error;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[32][i] = cont_com;
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
