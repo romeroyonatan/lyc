@@ -36,3 +36,7 @@ bin/
 test/Final.asm
 test/intermedia.txt
 test/prueba*_resultado.txt
+
+
+# archivos vim
+*.swp
