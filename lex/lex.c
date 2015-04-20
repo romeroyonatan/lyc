@@ -73,7 +73,7 @@
 #define T_corchete_cierra   24
 /****************************/
 
-#define CANT_FILAS 34 //filas de la matriz de estados
+#define CANT_FILAS 39 //filas de la matriz de estados
 #define CANT_COLUMNAS 25 //columnas de la matriz de estados
 #define CANTPR 15 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
@@ -242,12 +242,14 @@ int main()
 
     for(i = 0; i < CANT_COLUMNAS; i++)
         nuevo_estado[30][i] = 30;
+    nuevo_estado[30][T_menos] = 34;
     nuevo_estado[30][T_barra] = 31;
     nuevo_estado[30][T_EOF] = QFIN;
 
     for(i = 0; i < CANT_COLUMNAS; i++)
         nuevo_estado[31][i] = 30;
     nuevo_estado[31][T_menos] = 32;
+    nuevo_estado[31][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
 
     for(i = 0; i < CANT_COLUMNAS; i++)
@@ -255,7 +257,29 @@ int main()
     nuevo_estado[32][T_menos] = 0;
     nuevo_estado[32][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
+    
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[34][i] = 30;
+    nuevo_estado[34][T_menos] = 35;
 
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[35][i] = 30;
+    nuevo_estado[35][T_menos] = 35;
+    nuevo_estado[35][T_barra] = 36;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[36][i] = 36;
+    nuevo_estado[36][T_barra] = 37;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[37][i] = 36;
+    nuevo_estado[37][T_menos] = 38;
+    nuevo_estado[37][T_barra] = 37;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[38][i] = 36;
+    nuevo_estado[38][T_barra] = 37;
+    nuevo_estado[38][T_menos] = 30;
 
     proceso[0][T_mas] = op_suma;
     proceso[0][T_menos] = op_menos;
@@ -317,13 +341,13 @@ int main()
     for(i = 0; i < CANT_COLUMNAS; i++)
         proceso[31][i] = cont_com;
     proceso[31][T_EOF] = error;
-    proceso[31][T_newline] = error;
+    //proceso[31][T_newline] = error;
 
     for(i = 0; i < CANT_COLUMNAS; i++)
         proceso[32][i] = cont_com;
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
-    proceso[32][T_newline] = error;
+    //proceso[32][T_newline] = error;
 
     //Apertura del archivo que contiene los casos a ejecutar
     if((pruebagral = fopen("pruebagral.txt", "r"))==NULL){
