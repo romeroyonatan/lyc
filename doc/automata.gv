@@ -4,7 +4,7 @@ digraph {
 
     rankdir=LR;
     node [fillcolor="#FCFCA9", style=filled];
-    fin [shape=doublecircle];
+    fin [label="fin*", shape=doublecircle];
 
     0->3  [label="+"];
     0->15 [label="-"];
@@ -29,75 +29,75 @@ digraph {
     0->8 [label="}"];
     
     1->1 [label="letra, digito"];
-    1->fin [label="caracter"];
+    1->fin [label="CAR"];
 
-    2->fin [label="caracter"];
+    2->fin [label="CAR"];
 
     3->4 [label="+"];
-    3->fin [label="caracter"];
+    3->fin [label="CAR"];
 
-    4->fin [label="caracter"];
+    4->fin [label="CAR"];
 
     5->6 [label="="];
-    5->fin [label="caracter"];
+    5->fin [label="CAR"];
 
-    6->fin [label="caracter"];
-    7->fin [label="caracter"];
-    8->fin [label="caracter"];
+    6->fin [label="CAR"];
+    7->fin [label="CAR"];
+    8->fin [label="CAR"];
 
     9->10 [label="="];
-    9->fin [label="caracter"];
+    9->fin [label="CAR"];
 
-    10->fin [label="caracter"];
+    10->fin [label="CAR"];
 
     11->12 [label="="];
-    11->fin [label="caracter"];
+    11->fin [label="CAR"];
 
-    12->fin [label="caracter"];
+    12->fin [label="CAR"];
 
     //13->14 [label="-"];
-    //13->fin [label="caracter"];
+    //13->fin [label="CAR"];
 
-    //14->14 [label="caracter - {-}"];
+    //14->14 [label="CAR - {-}"];
     //14->15 [label="-"];
 
     15->29 [label="-"];
-    15->fin [label="caracter"];
+    15->fin [label="CAR"];
 
-    16->fin [label="caracter"];
-    17->fin [label="caracter"];
-    18->fin [label="caracter"];
-    18->fin [label="caracter"];
-    20->fin [label="caracter"];
+    16->fin [label="CAR"];
+    17->fin [label="CAR"];
+    18->fin [label="CAR"];
+    18->fin [label="CAR"];
+    20->fin [label="CAR"];
 
     21->22 [label="="];
-    21->fin [label="caracter"];
+    21->fin [label="CAR"];
 
-    22->fin [label="caracter"];
+    22->fin [label="CAR"];
 
-    23->23 [label="caracter - {\"}"];
+    23->23 [label="CAR - {\"}"];
     23->28 [label="\""];
 
     24->24 [label="digito, ."];
-    24->fin [label="caracter"];
+    24->fin [label="CAR"];
     
     25->25 [label="digito"];
-    25->fin [label="caracter"];
+    25->fin [label="CAR"];
 
-    26->fin [label="caracter"];
-    27->fin [label="caracter"];
-    28->fin [label="caracter"];
+    26->fin [label="CAR"];
+    27->fin [label="CAR"];
+    28->fin [label="CAR"];
 
     29->30 [label="/"];
-    29->fin [label="caracter"];
+    29->fin [label="CAR"];
 
-    30->30 [label="caracter"];
+    30->30 [label="CAR"];
     30->31 [label="/"];
 
-    31->30 [label="caracter - {-}"];
+    31->30 [label="CAR - {-}"];
     31->32 [label="-"];
 
-    32->30 [label="caracter - {-, /}"];
+    32->30 [label="CAR - {-, /}"];
     32->31 [label="/"];
     32->fin [label="-"];
     //32->0 [label="-"];
