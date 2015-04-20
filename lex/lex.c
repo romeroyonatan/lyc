@@ -111,6 +111,9 @@ int coma();
 int inic_id();
 int cont_id();
 int fin_id();
+int inic_real();
+int cont_real();
+int fin_real();
 int inic_cte();
 int cont_cte();
 int fin_cte();
@@ -266,7 +269,7 @@ int main()
     proceso[0][T_dospuntos] = dos_puntos;
     proceso[0][T_exclamacion] = op_negar;
     proceso[0][T_comillas] = inic_string;
-    proceso[0][T_punto] = inic_cte;
+    proceso[0][T_punto] = inic_real;
     proceso[0][T_pyc] = puntoycoma;
     proceso[0][T_parentesis_abre] = par_abre;
     proceso[0][T_parentesis_cierra] = par_cierra;
@@ -295,11 +298,11 @@ int main()
     for(i = 0; i < CANT_COLUMNAS; i++)
         proceso[24][i] = fin_cte;
     proceso[24][T_digito] = cont_cte;
-    proceso[24][T_punto] = cont_cte;
+    proceso[24][T_punto] = cont_real;
 
     for(i = 0; i < CANT_COLUMNAS; i++)
-        proceso[25][i] = fin_cte;
-    proceso[25][T_digito] = cont_cte;
+        proceso[25][i] = fin_real;
+    proceso[25][T_digito] = cont_real;
 
     for(i = 0; i < CANT_COLUMNAS; i++)
         proceso[29][i] = op_menos2;
