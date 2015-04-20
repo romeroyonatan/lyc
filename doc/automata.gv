@@ -67,7 +67,7 @@ digraph {
     16->fin [label="CAR"];
     17->fin [label="CAR"];
     18->fin [label="CAR"];
-    18->fin [label="CAR"];
+    19->fin [label="CAR"];
     20->fin [label="CAR"];
 
     21->22 [label="="];
