@@ -1,6 +1,6 @@
 digraph {
     // para generar grafico en svg
-    // unflatten -f -l 2 doc/automata.gv | dot -Tsvg -o doc/automata.svg
+    // dot -Tsvg -o doc/automata.svg doc/automata.gv
 
     rankdir=LR;
     node [fillcolor="#FCFCA9", style=filled];
@@ -24,7 +24,7 @@ digraph {
     0->18 [label="("];
     0->19 [label=")"];
     0->20 [label=","];
-    0->0 [label="tab, espacio, enter"];
+    //0->0 [label="tab, espacio, enter"];
     0->7 [label="{"];
     0->8 [label="}"];
     
@@ -55,11 +55,11 @@ digraph {
 
     12->fin [label="caracter"];
 
-    13->14 [label="-"];
-    13->fin [label="caracter"];
+    //13->14 [label="-"];
+    //13->fin [label="caracter"];
 
-    14->14 [label="caracter - {-}"];
-    14->15 [label="-"];
+    //14->14 [label="caracter - {-}"];
+    //14->15 [label="-"];
 
     15->29 [label="-"];
     15->fin [label="caracter"];
@@ -99,5 +99,6 @@ digraph {
 
     32->30 [label="caracter - {-, /}"];
     32->31 [label="/"];
-    32->0 [label="-"];
+    32->fin [label="-"];
+    //32->0 [label="-"];
 }
