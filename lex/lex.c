@@ -100,7 +100,8 @@ int nada();
 int yylex();
 int get_evento(char);
 int esPalabraRes();
-
+void a_minuscula (char*);
+ 
 int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
 //        0     |  1    |  2    |  3    |  4    |  5    |  6    |  7    |  8    |  9    | 10    | 11    | 12    | 13    | 14    | 15    | 16    | 17    | 18    |  19   | 20    | 21    |  22  |    23  |   24  |
 //        +     |  -    |  *    |  /    | Let   | Dig   |  =    |  <    |  >    |  ?    |  :    |  !    |  "    |  .    |  ;    |  car  | (     |   )   |  ,    | tab   |blanco | enter |  EOF |    {   |   }   |
@@ -626,8 +627,8 @@ int esPalabraRes()
 {
     char aux[30];
     int i;
-    //XXX: Sin efecto. Hay que hacer que toda la palabra pase a minuscula
-    tolower(*token);
+    // pasamos todo el token a minuscula 
+    a_minuscula(token); 
     for(i=0;i<CANTPR;i++)
     {
         if(strcmp(palabrasRes[i],token)==0)
@@ -639,3 +640,12 @@ int esPalabraRes()
     return -1;
 }
 
+void a_minuscula (char *palabra) 
+{
+    char *tmp = palabra;
+    while (*tmp) 
+    {
+        *tmp = tolower(*tmp);
+        tmp++;
+    }
+}
