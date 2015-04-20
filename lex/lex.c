@@ -143,7 +143,7 @@ int (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 
 FILE * entrada,*salida,*pruebagral;
 int tipo_token; //numero identificador del token
-int linea =1; //linea por la que esta leyendo
+int linea = 0; //linea por la que esta leyendo
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
@@ -356,6 +356,8 @@ int main()
     }
 
     while(!feof(pruebagral)){
+        // limpio variables con las que voy a trabajar
+        linea=0;
         *archivo='\0';
         //Leo la linea con el nombre del archivo a analizar.
         fgets(archivo,50,pruebagral);
@@ -405,7 +407,7 @@ int yylex()
     {
         if((caracter=fgetc(entrada)) != EOF)
         {
-            if(caracter == '\n') linea++;
+            if (caracter == '\n') linea++;
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
