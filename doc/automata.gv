@@ -1,87 +1,103 @@
 digraph {
-    // para compilar
+    // para generar grafico en svg
     // unflatten -f -l 2 doc/automata.gv | dot -Tsvg -o doc/automata.svg
 
-    // para que lo dibuje de izquierda a derecha
     rankdir=LR;
-    // el ultimo nodo tiene doble circulo por se nodo terminal
-    qf[shape=doublecircle];
+    node [fillcolor="#FCFCA9", style=filled];
+    fin [shape=doublecircle];
 
-    q0 -> q1[label="*,{,},(,),/"];
-    q0 -> q2[label="letra"];
-    q0 -> q3;
-    q0 -> q4[label="digito"];
-    q0 -> q5[label="-"];
-    q0 -> q10[label="="];
-    q0 -> q13[label="<"];
-    q0 -> q15[label=">"];
-    q0 -> q17[label="&"];
-    q0 -> q19[label="/"];
-    q0 -> q21[label="/"];
-    q0 -> q23[label="\""];
-    q0 -> q25[label="+"];
-
-    q1 -> qf[label="caracter"];
-
-    q2 -> q2[label="letra, digito"];
-    q2 -> qf[label="caracter - {letra,digito}"];
-
-    q3 -> q3[label="digito"];
-    q3 -> qf[label="caracter - {digito}"];
-
-    q4 -> q4[label="digito"];
-    q4 -> q3[label="."];
-    q4 -> qf[label="caracter - {digito}"];
-
-    q5 -> qf[label="caracter - {-}"];
-    q5 -> q6[label="-"];
-
-    q6 -> q7[label="/"];
-
-    q7 -> q7[label="caracter - {/}"];
-    q7 -> q8[label="/"];
-
-    q8 -> q9[label="-"];
-    q8 -> q7[label="caracter - {/}"];
-
-    q9 -> q7[label="caracter - {-}"];
-    q9 -> q0;
-
-    q10 -> qf[label="caracter - {=}"];
-    q10 -> q12[label="="];
-
-    q12 -> qf[label="caracter"];
-
-    q13 -> qf[label="caracter - {=}"];
-    q13 -> q14[label="="];
-
-    q14 -> qf[label="caracter"];
-
-    q15 -> qf[label="caracter - {=}"];
-    q15 -> q16[label="="];
-
-    q16 -> qf[label="caracter"];
+    0->3  [label="+"];
+    0->15 [label="-"];
+    0->16 [label="*"];
+    0->17 [label="/"];
+    0->1 [label="letra"];
+    0->24 [label="digito"];
+    0->5 [label="="];
+    0->9 [label="<"];
+    0->11 [label=">"];
+    0->27 [label="?"]; 
+    0->26 [label=":"];
+    0->21 [label="!"];
+    0->23 [label="\""];
+    0->25 [label="."];
+    0->2 [label=";"];
+    0->18 [label="("];
+    0->19 [label=")"];
+    0->20 [label=","];
+    0->0 [label="tab, espacio, enter"];
+    0->7 [label="{"];
+    0->8 [label="}"];
     
-    q17 -> q18[label="&"];
+    1->1 [label="letra, digito"];
+    1->fin [label="caracter"];
 
-    q18 -> qf[label="caracter"];
+    2->fin [label="caracter"];
 
-    q19 -> q20[label="/"];
+    3->4 [label="+"];
+    3->fin [label="caracter"];
 
-    q20 -> qf[label="caracter"];
+    4->fin [label="caracter"];
 
-    q21 -> qf[label="caracter - {=}"];
-    q21 -> q22[label="="];
+    5->6 [label="="];
+    5->fin [label="caracter"];
 
-    q22 -> qf[label="caracter"];
+    6->fin [label="caracter"];
+    7->fin [label="caracter"];
+    8->fin [label="caracter"];
 
-    q23 -> q23[label="letra, digito"];
-    q23 -> q24[label="\""];
+    9->10 [label="="];
+    9->fin [label="caracter"];
 
-    q24 -> qf[label="caracter"];
+    10->fin [label="caracter"];
 
-    q25 -> qf[label="caracter - {+}"];
-    q25 -> q26[label="+"];
+    11->12 [label="="];
+    11->fin [label="caracter"];
 
-    q26 -> qf[label="caracter"];
+    12->fin [label="caracter"];
+
+    13->14 [label="-"];
+    13->fin [label="caracter"];
+
+    14->14 [label="caracter - {-}"];
+    14->15 [label="-"];
+
+    15->29 [label="-"];
+    15->fin [label="caracter"];
+
+    16->fin [label="caracter"];
+    17->fin [label="caracter"];
+    18->fin [label="caracter"];
+    18->fin [label="caracter"];
+    20->fin [label="caracter"];
+
+    21->22 [label="="];
+    21->fin [label="caracter"];
+
+    22->fin [label="caracter"];
+
+    23->23 [label="caracter - {\"}"];
+    23->28 [label="\""];
+
+    24->24 [label="digito, ."];
+    24->fin [label="caracter"];
+    
+    25->25 [label="digito"];
+    25->fin [label="caracter"];
+
+    26->fin [label="caracter"];
+    27->fin [label="caracter"];
+    28->fin [label="caracter"];
+
+    29->30 [label="/"];
+    29->fin [label="caracter"];
+
+    30->30 [label="caracter"];
+    30->31 [label="/"];
+
+    31->30 [label="caracter - {-}"];
+    31->32 [label="-"];
+
+    32->30 [label="caracter - {-, /}"];
+    32->31 [label="/"];
+    32->0 [label="-"];
 }
