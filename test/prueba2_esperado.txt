@@ -12,7 +12,6 @@
 <PR: or>
 <PR: put>
 <PR: get>
-<PR: endif>
 <OP_ASIGNACION>
 <DOS_PUNTOS>
 <PUNTO_Y_COMA>
@@ -32,7 +31,7 @@
 <PARENTESIS_CIERRA>
 <OP_NEGAR>
 <OP_RESTA>
-<PUNTO>
+<REAL: 0.0>
 <IGUALDAD>
 <CTE: 65535>
 <CTE: 2015>
@@ -51,21 +50,20 @@
 <STRING: +>
 <STRING: 1>
 <ID: camelCase>
-<ID: underscore_variable>
-<ID: letras_y_numeros123>
-<ID: 1c2015>
+<ID: variabledeunos30caracteres123>
 <PR: while>
 <PR: main>
 <PR: if>
-entero demasiado largo en linea 72
-string demasiado largo en linea 73
-Error en linea 74
+Entero sobrepasa limite maximo en linea: 73
+String demasiado largo en linea: 74
+Error en linea: 75
 <ID: arroba>
-Error en linea 75
+Error en linea: 76
 <ID: numeral>
 <ID: pal>
-Error en linea 76
+Error en linea: 77
 <ID: bra>
-Error en linea 77
-Error en linea 78
-Error en linea 79
+Error en linea: 78
+<CTE: 1>
+<ID: c2015>
+Error en linea: 80

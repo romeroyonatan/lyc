@@ -57,10 +57,9 @@ get
 
 --/ id /--
 camelCase
-underscore_variable
-letras_y_numeros123
+variabledeunos30caracteres123
 
---/ son id porque somos case sensitive /--
+--/ son PR porque somos case in-sensitive /--
 While
 Main
 iF
