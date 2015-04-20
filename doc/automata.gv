@@ -78,7 +78,8 @@ digraph {
     23->23 [label="CAR - {\"}"];
     23->28 [label="\""];
 
-    24->24 [label="digito, ."];
+    24->24 [label="digito"];
+    24->25 [label="."];
     24->fin [label="CAR"];
     
     25->25 [label="digito"];
