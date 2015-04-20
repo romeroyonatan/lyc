@@ -127,7 +127,7 @@ int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
 /*E20*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
 /*E21*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 22  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
 /*E22*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E23*/ { 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  ,28   , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  ,   23  ,   23  },
+/*E23*/ { 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  ,28   , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , QFIN  ,   23  ,   23  },
 /*E24*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 24  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 25  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
 /*E25*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 25  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
 /*E26*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
@@ -281,6 +281,7 @@ int yylex()
     {
         if((caracter=fgetc(entrada)) != EOF)
         {
+            if(caracter == '\n') linea++;
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
@@ -302,7 +303,7 @@ int yylex()
 
 void limpiar_token()
 {
-  token[0] = '\0';
+  *token = '\0';
 }
 int inic_com()
 {
@@ -415,36 +416,37 @@ int coma()
 int inic_id()
 {
     limpiar_token();
-    longitud = 1;
-    strcpy(token,"<ID: ");
     strcat(token,&caracter);
     return ID;
 }
 int cont_id()
 {
-    longitud++;
-    if(longitud>LONG_MAX)
-    {
-        printf("identificador demasiado largo en linea: %d",linea);
-        exit(2);
-    }
+    
     strcat(token,&caracter);
     return ID;
 }
 int fin_id()
 {
     int i;
-    i=esPalabraRes();
-    if(i!=-1)
+    char tmp[LONG_MAX + 1];
+    *tmp = '\0';
+    if (strlen(token) > LONG_MAX)
     {
-        limpiar_token();
-        strcpy(token,"<PR: ");
-        strcat(token,palabrasRes[i]);
-        strcat(token,">");
+        printf("identificador demasiado largo en linea: %d",linea);
+        exit(2);
+    } 
+    i = esPalabraRes();
+    if(i != -1)
+    {
+        strcpy(tmp, palabrasRes[i]);
+        sprintf(token, "<PR: %s>", tmp);
         return NroPalabrasRes[i];
     }
     else
-        strcat(token,">");
+    {
+        strcpy(tmp, token);
+        sprintf(token, "<ID: %s>", tmp);
+    }
     return ID;
 }
 int inic_cte()
@@ -473,30 +475,27 @@ int fin_cte()
 int inic_string()
 {
     limpiar_token();
-    longitud = 1;
-    strcpy(token,"<STRING: ");
     //strcat(token,&caracter);
     return STRING;
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int cont_string()
 {
-    longitud++;
-    
     strcat(token,&caracter);
     return STRING;
 }
 
 int fin_string()
 {
-    if(longitud==LONG_MAX+1)
+    char tmp[LONG_MAX + 1];
+    if (strlen(token) == LONG_MAX)
     {
-        fprintf(salida, "String demasiado largo en linea: %d",linea);
+        fprintf(salida, "String demasiado largo en linea: %d", linea);
         *token='\0';
         return 0;
     }
-    token[9+longitud-1]='>';
-    token[9+longitud]='\0';
+    strcpy(tmp, token);
+    sprintf(token, "<STRING: %s>", tmp);
     return STRING;
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -507,7 +506,7 @@ int punto()
 }
 int salto_linea()
 {
-    linea++;
+    //linea++;
 }
 int op_concaten()
 {
@@ -536,6 +535,7 @@ int error()
 {
     //printf("Error en linea: %d\n",linea);
     fprintf(salida,"Error en linea: %d\n",linea);
+    *token = '\0'; // como es un error, descarto el contenido de token
 }
 
 
@@ -630,7 +630,7 @@ int esPalabraRes()
     tolower(*token);
     for(i=0;i<CANTPR;i++)
     {
-        if(strcmp(palabrasRes[i],&token[5])==0)
+        if(strcmp(palabrasRes[i],token)==0)
         {
             return i;
         }
