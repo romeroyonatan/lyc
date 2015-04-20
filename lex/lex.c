@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <float.h>
 
 //TOKENS
 #define QFIN 33
@@ -101,6 +102,7 @@ int yylex();
 int get_evento(char);
 int esPalabraRes();
 void a_minuscula (char*);
+int cte_es_real(char *);
  
 int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
 //        0     |  1    |  2    |  3    |  4    |  5    |  6    |  7    |  8    |  9    | 10    | 11    | 12    | 13    | 14    | 15    | 16    | 17    | 18    |  19   | 20    | 21    |  22  |    23  |   24  |
@@ -463,14 +465,23 @@ int cont_cte()
 }
 int fin_cte()
 {
-    int cte = atoi(token);
-    if(cte > MAX_INT)
+    float cte = atof(token);
+    char tmp [strlen(token)];
+    if(cte_es_real(token)==0 && cte > MAX_INT)
     {
         fprintf(salida, "Entero sobrepasa limite maximo en linea: %d",linea);
         *token='\0';
         return 0;
     }
-    sprintf(token,"<CTE: %d>", cte);
+    if(cte_es_real(token)==1&& cte > FLT_MAX)
+    {
+        fprintf(salida, "Real sobrepasa limite maximo en linea: %d",linea);
+        *token='\0';
+        return 0;
+    }
+
+    strcpy(tmp,token);
+    sprintf(token,"<CTE: %s>", tmp);
     return CTE;
 }
 int inic_string()
@@ -648,4 +659,12 @@ void a_minuscula (char *palabra)
         *tmp = tolower(*tmp);
         tmp++;
     }
+}
+
+int cte_es_real(char *tmp)
+{
+    int i=0;
+    if(strstr(tmp,".")!=NULL)
+            return 1;
+    return 0;
 }
