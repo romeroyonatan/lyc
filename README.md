@@ -2,8 +2,10 @@
 TP Lenguajes y compiladores UNLaM 
 
 # Organizacion de archivos
-## Carpeta bin
-Binario generados durante el make
+## Carpeta doc
+Documentacion del proyecto.
+
+Tip: Para generar el automata finito a partir del archivo [automata.gv](doc/automata.gv) se necesita el programa graphviz
 ## Carpeta lex
 Codigo fuente del analizador lexico
 ![Automata](doc/automata.png)
