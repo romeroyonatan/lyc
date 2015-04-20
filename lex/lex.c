@@ -44,6 +44,33 @@
 #define COM 301
 //////////////////////////////
 
+/* Terminales */
+#define T_mas               0
+#define T_menos             1
+#define T_asterisco         2
+#define T_barra             3
+#define T_letra             4
+#define T_digito            5
+#define T_igual             6
+#define T_menor             7
+#define T_mayor             8
+#define T_pregunta          9
+#define T_dospuntos         10
+#define T_exclamacion       11
+#define T_comillas          12
+#define T_punto             13
+#define T_pyc               14
+#define T_CAR               15
+#define T_parentesis_abre   16
+#define T_parentesis_cierra 17
+#define T_coma              18
+#define T_tab               19
+#define T_espacio           20
+#define T_newline           21
+#define T_EOF               22
+#define T_corchete_abre     23
+#define T_corchete_cierra   24
+/****************************/
 
 #define CANT_FILAS 34 //filas de la matriz de estados
 #define CANT_COLUMNAS 25 //columnas de la matriz de estados
@@ -102,83 +129,10 @@ int get_evento(char);
 int esPalabraRes();
 void a_minuscula (char*);
  
-int nuevo_estado[CANT_FILAS][CANT_COLUMNAS]={
-//        0     |  1    |  2    |  3    |  4    |  5    |  6    |  7    |  8    |  9    | 10    | 11    | 12    | 13    | 14    | 15    | 16    | 17    | 18    |  19   | 20    | 21    |  22  |    23  |   24  |
-//        +     |  -    |  *    |  /    | Let   | Dig   |  =    |  <    |  >    |  ?    |  :    |  !    |  "    |  .    |  ;    |  car  | (     |   )   |  ,    | tab   |blanco | enter |  EOF |    {   |   }   |
-/*E0*/  { 3 , 15  , 16  , 17  , 1 , 24  , 5 , 9 , 11  , 27  , 26  , 21  , 23  , 25  , 2 , 0 , 18  , 19  , 20  , 0 , 0 , 0 ,QFIN ,    7  ,   8   },
-/*E1*/  {QFIN ,QFIN ,QFIN ,QFIN , 1 , 1 ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E2*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E3*/  { 4 ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E4*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E5*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 6 ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E6*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E7*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E8*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E9*/  {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 10  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E10*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E11*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 12  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E12*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E13*/ {QFIN , 14  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E14*/ { 14  ,  15 , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  , 14  ,     14,   14  },
-/*E15*/ {QFIN ,  29 ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E16*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E17*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E18*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E19*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E20*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E21*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 22  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E22*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E23*/ { 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  ,28   , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , 23  , QFIN  ,   23  ,   23  },
-/*E24*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 24  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 25  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E25*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN , 25  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E26*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E27*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E28*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E29*/ {QFIN ,QFIN ,QFIN , 30  ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   },
-/*E30*/ { 30  , 30  , 30  , 31  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30   ,QFIN , 30  , 30  },
-/*E31*/ { 30  , 32  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  ,QFIN   ,QFIN , 30  , 30  },
-/*E32*/ { 30  , 0   , 30  , 31  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  , 30  ,QFIN   ,QFIN , 30  , 30  },
-/*E33*/ {QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN ,QFIN   ,QFIN   }
-};
 
-int (*proceso[CANT_FILAS][CANT_COLUMNAS])()={
-//        0       |  1      |  2      |  3      |  4      |  5      |  6      |  7      |  8      |  9      | 10      | 11      | 12      | 13      | 14      | 15      | 16      | 17      | 18      |  19     | 20      | 21      |  22   |    23     |   24      |
-//        +       |  -      |  *      |  /      | Let     | Dig     |  =      |  <      |  >      |  ?      |  :      |  !      |  "      |  .      |  ;      |  car    | (       |   )     |  ,      | tab     |blanco   | enter   |  EOF  |    {      |   }       |
-/*E0*/  {op_suma  ,op_menos ,op_mul   ,op_div   ,inic_id  ,inic_cte ,op_asig  ,op_menor ,op_mayor ,nada   ,dos_puntos ,op_negar ,inic_string,inic_cte ,puntoycoma ,error    ,par_abre ,par_cierra ,coma   ,nada   ,nada   ,salto_linea,nada ,llave_abre ,llave_cierra},
-/*E1*/  {fin_id   ,fin_id   ,fin_id   ,fin_id   ,cont_id  ,cont_id  ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id   ,fin_id ,nada       ,nada        },
-/*E2*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E3*/  {op_concaten,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E4*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E5*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,op_igualdad,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E6*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E7*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E8*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E9*/  {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,op_menor_ig,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E10*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E11*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,op_mayor_ig,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E12*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E13*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E14*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E15*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E16*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E17*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E18*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E19*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error  ,nada       ,nada        },
-/*E20*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E21*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,op_distinto,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E22*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E23*/ {cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,fin_string ,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,cont_string,error  ,nada       ,nada        },
-/*E24*/ {fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,cont_cte ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,cont_cte ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte,nada       ,nada        },
-/*E25*/ {fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,cont_cte ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte  ,fin_cte,nada       ,nada        },
-/*E26*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E27*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E28*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada ,nada       ,nada        },
-/*E29*/ {op_menos2  ,op_menos2  ,op_menos2  ,inic_com ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,op_menos2  ,nada     ,nada   ,op_menos2,op_menos2   },
-/*E30*/ {cont_com ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com  ,error  ,cont_com   ,cont_com  },
-/*E31*/ {cont_com ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,error      ,error  ,cont_com   ,cont_com  },
-/*E32*/ {cont_com ,fin_com  ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,cont_com ,cont_com ,cont_com,  cont_com  ,cont_com ,cont_com ,error      ,error  ,cont_com   ,cont_com  },
-/*E33*/ {nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,nada   ,error    ,nada ,nada       ,nada        }
-};
+
+int nuevo_estado[CANT_FILAS][CANT_COLUMNAS];
+int (*proceso[CANT_FILAS][CANT_COLUMNAS])();
 
 /*----------VARIABLES GLOBALES-----------------*/
 
@@ -226,6 +180,146 @@ int NroPalabrasRes[CANTPR]={
 /*---------------------------------------------*/
 int main()
 {
+    int i,j;
+    /* lleno la matriz de proximo estado */
+    for (i=0; i<CANT_FILAS; i++) 
+        for (j=0; j<CANT_COLUMNAS; j++)
+            nuevo_estado[i][j] = QFIN;
+
+    /* lleno la matriz de proceso */
+    for (i=0; i<CANT_FILAS; i++) 
+        for (j=0; j<CANT_COLUMNAS; j++)
+            proceso[i][j] = nada;
+     
+    nuevo_estado[0][T_mas] = 3;
+    nuevo_estado[0][T_menos] = 15;
+    nuevo_estado[0][T_asterisco] = 16;
+    nuevo_estado[0][T_barra] = 17;
+    nuevo_estado[0][T_letra] = 1;
+    nuevo_estado[0][T_digito] = 24;
+    nuevo_estado[0][T_igual] = 5;
+    nuevo_estado[0][T_menor] = 9;
+    nuevo_estado[0][T_mayor] = 11;
+    nuevo_estado[0][T_pregunta] = 27;
+    nuevo_estado[0][T_dospuntos] = 26;
+    nuevo_estado[0][T_exclamacion] = 21;
+    nuevo_estado[0][T_comillas] = 23;
+    nuevo_estado[0][T_punto] = 25;
+    nuevo_estado[0][T_pyc] = 2;
+    nuevo_estado[0][T_parentesis_abre] = 18;
+    nuevo_estado[0][T_parentesis_cierra] = 19;
+    nuevo_estado[0][T_coma] = 20;
+    nuevo_estado[0][T_corchete_abre] = 7;
+    nuevo_estado[0][T_corchete_cierra] = 8;
+    nuevo_estado[0][T_CAR] = 0;
+    nuevo_estado[0][T_tab] = 0;
+    nuevo_estado[0][T_espacio] = 0;
+    nuevo_estado[0][T_newline] = 0;
+
+    nuevo_estado[1][T_letra] = 1;
+    nuevo_estado[1][T_digito] = 1;
+    nuevo_estado[3][T_mas] = 4;
+    nuevo_estado[5][T_igual] = 6;
+    nuevo_estado[9][T_igual] = 10;
+    nuevo_estado[11][T_igual] = 12;
+    nuevo_estado[15][T_menos] = 29;
+    nuevo_estado[21][T_igual] = 22;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[23][i] = 23;
+    nuevo_estado[23][T_comillas] = 28;
+    nuevo_estado[23][T_EOF] = QFIN;
+
+    nuevo_estado[24][T_digito] = 24;
+    nuevo_estado[24][T_punto] = 25;
+    nuevo_estado[25][T_digito] = 25;
+    nuevo_estado[29][T_barra] = 30;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[30][i] = 30;
+    nuevo_estado[30][T_barra] = 31;
+    nuevo_estado[30][T_EOF] = QFIN;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[31][i] = 30;
+    nuevo_estado[31][T_menos] = 32;
+    nuevo_estado[31][T_EOF] = QFIN;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        nuevo_estado[32][i] = 30;
+    nuevo_estado[32][T_menos] = 0;
+    nuevo_estado[32][T_barra] = 31;
+    nuevo_estado[31][T_EOF] = QFIN;
+
+
+    proceso[0][T_mas] = op_suma;
+    proceso[0][T_menos] = op_menos;
+    proceso[0][T_asterisco] = op_mul;
+    proceso[0][T_barra] = op_div;
+    proceso[0][T_letra] = inic_id;
+    proceso[0][T_digito] = inic_cte;
+    proceso[0][T_igual] = op_asig;
+    proceso[0][T_menor] = op_menor;
+    proceso[0][T_mayor] = op_mayor;
+    proceso[0][T_dospuntos] = dos_puntos;
+    proceso[0][T_exclamacion] = op_negar;
+    proceso[0][T_comillas] = inic_string;
+    proceso[0][T_punto] = inic_cte;
+    proceso[0][T_pyc] = puntoycoma;
+    proceso[0][T_parentesis_abre] = par_abre;
+    proceso[0][T_parentesis_cierra] = par_cierra;
+    proceso[0][T_coma] = coma;
+    proceso[0][T_newline] = salto_linea;
+    proceso[0][T_CAR] = error;
+    proceso[0][T_corchete_abre] = llave_abre;
+    proceso[0][T_corchete_cierra] = llave_cierra;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[1][i] = fin_id;
+    proceso[1][T_letra] = cont_id;
+    proceso[1][T_digito] = cont_id;
+
+    proceso[3][T_mas] = op_concaten;
+    proceso[5][T_igual] = op_igualdad;
+    proceso[9][T_igual] = op_menor_ig;
+    proceso[11][T_igual] = op_mayor_ig;
+    proceso[21][T_igual] = op_distinto;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[23][i] = cont_string;
+    proceso[23][T_comillas] = fin_string;
+    proceso[23][T_EOF] = error;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[24][i] = fin_cte;
+    proceso[24][T_digito] = cont_cte;
+    proceso[24][T_punto] = cont_cte;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[25][i] = fin_cte;
+    proceso[25][T_digito] = cont_cte;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[29][i] = op_menos2;
+    proceso[29][T_barra] = inic_com;
+    proceso[29][T_EOF] = nada;
+    proceso[29][T_newline] = nada;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[30][i] = cont_com;
+    proceso[30][T_EOF] = error;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[31][i] = cont_com;
+    proceso[31][T_EOF] = error;
+    proceso[31][T_newline] = error;
+
+    for(i = 0; i < CANT_COLUMNAS; i++)
+        proceso[32][i] = cont_com;
+    proceso[32][T_menos] = fin_com;
+    proceso[32][T_EOF] = error;
+    proceso[32][T_newline] = error;
+
     //Apertura del archivo que contiene los casos a ejecutar
     if((pruebagral = fopen("pruebagral.txt", "r"))==NULL){
         printf("No se puede abrir el archivo pruebagral.txt\n");
