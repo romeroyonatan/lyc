@@ -489,7 +489,7 @@ int cont_string()
 int fin_string()
 {
     char tmp[LONG_MAX + 1];
-    if (strlen(token) == LONG_MAX)
+    if (strlen(token) > LONG_MAX)
     {
         fprintf(salida, "String demasiado largo en linea: %d", linea);
         *token='\0';
