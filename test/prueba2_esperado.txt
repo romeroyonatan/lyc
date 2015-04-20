@@ -54,9 +54,9 @@
 <ID: underscore_variable>
 <ID: letras_y_numeros123>
 <ID: 1c2015>
-<ID: While>
-<ID: Main>
-<ID: iF>
+<PR: while>
+<PR: main>
+<PR: if>
 entero demasiado largo en linea 72
 string demasiado largo en linea 73
 Error en linea 74
