@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <float.h>
 
 //TOKENS
 #define QFIN 33
@@ -51,6 +52,7 @@
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
+#define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
 
 
 //Funciones de la matriz
@@ -473,6 +475,29 @@ int fin_cte()
     sprintf(token,"<CTE: %d>", cte);
     return CTE;
 }
+int inic_real()
+{
+    limpiar_token();
+    strcat(token,&caracter);
+    return REAL;
+}
+int cont_real()
+{
+    strcat(token,&caracter);
+    return REAL;
+}
+int fin_real()
+{
+    float cte = atof(token);
+    if(cte > MAX_REAL)
+    {
+        fprintf(salida, "Real sobrepasa limite maximo en linea: %d",linea);
+        *token='\0';
+        return -1;
+    }
+    sprintf(token,"<REAL: %f>", cte);
+    return REAL;
+}
 int inic_string()
 {
     limpiar_token();
@@ -625,13 +650,14 @@ int get_evento(char c)
 
 int esPalabraRes()
 {
-    char aux[30];
+    char aux[LONG_MAX];
     int i;
+    strcpy(aux, token);
     // pasamos todo el token a minuscula 
-    a_minuscula(token); 
+    a_minuscula(aux); 
     for(i=0;i<CANTPR;i++)
     {
-        if(strcmp(palabrasRes[i],token)==0)
+        if(strcmp(palabrasRes[i],aux)==0)
         {
             return i;
         }
