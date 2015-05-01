@@ -721,10 +721,12 @@ int nada()
 int error()
 {
     char _elementos_esperados[300] = {'\0'};
+    /* como es un error, descarto el contenido de token */
+    *token = '\0';
 
     // en caso de un fin de archivo inesperado muestro mensaje y salgo
     if (caracter == EOF) {
-        fprintf (salida, "Fin de archivo inesperado");
+        fprintf (salida, "Fin de archivo inesperado \n");
         return ERROR;
     }
 
@@ -735,8 +737,6 @@ int error()
  \"%c\"\n", linea, caracter);
     // muestro elementos esperados
     fprintf (salida, "Elementos esperados: %s\n", _elementos_esperados);
-    /* como es un error, descarto el contenido de token */
-    *token = '\0';
     return ERROR;
 }
 
