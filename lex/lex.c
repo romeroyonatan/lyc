@@ -43,6 +43,7 @@
 #define LLAVE_ABRE 299
 #define LLAVE_CIERRA 300
 #define COM 301
+#define ERROR -1
 //////////////////////////////
 
 /* Terminales */
@@ -80,6 +81,7 @@
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
+#define MAX_BUFF_LINEA 80// tamano maximo del buffer de linea
 
 
 //Funciones de la matriz
@@ -130,9 +132,11 @@ int nada();
 //////////////////////////
 
 int yylex();
+char proximo_caracter();
 int get_evento(char);
 int esPalabraRes();
 void a_minuscula (char*);
+void add_to_buffer(char _caracter);
  
 
 
@@ -166,6 +170,8 @@ char palabrasRes[CANTPR][LARGOMAX]={
     {"get"}
 };
 
+char buff_linea[MAX_BUFF_LINEA];
+int buff_linea_len;
 
 int NroPalabrasRes[CANTPR]={
     WHILE,
@@ -341,13 +347,11 @@ int main()
     for(i = 0; i < CANT_TERMINALES; i++)
         proceso[31][i] = cont_com;
     proceso[31][T_EOF] = error;
-    //proceso[31][T_newline] = error;
 
     for(i = 0; i < CANT_TERMINALES; i++)
         proceso[32][i] = cont_com;
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
-    //proceso[32][T_newline] = error;
 
     //Apertura del archivo que contiene los casos a ejecutar
     if((pruebagral = fopen("pruebagral.txt", "r"))==NULL){
@@ -357,7 +361,8 @@ int main()
 
     while(!feof(pruebagral)){
         // limpio variables con las que voy a trabajar
-        linea=0;
+        linea = 0;
+        buff_linea_len = 0;
         *archivo='\0';
         //Leo la linea con el nombre del archivo a analizar.
         fgets(archivo,50,pruebagral);
@@ -377,7 +382,7 @@ int main()
 
                     while(!feof(entrada)){
                         tipo_token = yylex();
-                        if(*token);
+                        if(*token)
                             fprintf(salida,"%s\n",token);
                         limpiar_token();
                     }
@@ -405,18 +410,17 @@ int yylex()
     int estado_final=QFIN;
     while(estado!=estado_final)
     {
-        if((caracter=fgetc(entrada)) != EOF)
+        if ((caracter = proximo_caracter()) != EOF)
         {
-            if (caracter == '\n') linea++;
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
         }
         else
         {
-            /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+            /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
             tipo_token = (proceso [estado] [22]) ();
-            /*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+            /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
             estado=estado_final;
         }
     }
@@ -426,6 +430,20 @@ int yylex()
     }
     return tipo_token;
 }
+
+char proximo_caracter()
+{
+    char _caracter;
+    // obtengo caracter desde el archivo de entrada
+    _caracter = fgetc(entrada);
+    // salto de linea
+    if (_caracter == '\n') linea++;
+    // agrego al buffer
+    add_to_buffer(_caracter); 
+    // devuelvo caracter leido
+    return _caracter;  
+}
+
 
 void limpiar_token()
 {
@@ -558,7 +576,7 @@ int fin_id()
     *tmp = '\0';
     if (strlen(token) > LONG_MAX)
     {
-        printf("identificador demasiado largo en linea: %d",linea);
+        printf("identificador demasiado largo en linea: %d", linea);
         exit(2);
     } 
     i = esPalabraRes();
@@ -591,7 +609,7 @@ int fin_cte()
     int cte = atoi(token);
     if(cte > MAX_INT)
     {
-        fprintf(salida, "Entero sobrepasa limite maximo en linea: %d",linea);
+        fprintf(salida, "Entero sobrepasa limite maximo en linea: %d\n", linea);
         *token='\0';
         return 0;
     }
@@ -614,7 +632,7 @@ int fin_real()
     float cte = atof(token);
     if(cte > MAX_REAL)
     {
-        fprintf(salida, "Real sobrepasa limite maximo en linea: %d",linea);
+        fprintf(salida, "Real sobrepasa limite maximo en linea: %d", linea);
         *token='\0';
         return -1;
     }
@@ -627,7 +645,7 @@ int inic_string()
     //strcat(token,&caracter);
     return STRING;
 }
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int cont_string()
 {
     strcat(token,&caracter);
@@ -637,9 +655,9 @@ int cont_string()
 int fin_string()
 {
     char tmp[LONG_MAX + 1];
-    if (strlen(token) > LONG_MAX)
+    if (strlen(token) > LONG_MAX - 1)
     {
-        fprintf(salida, "String demasiado largo en linea: %d", linea);
+        fprintf(salida, "String demasiado largo en linea: %d\n", linea);
         *token='\0';
         return 0;
     }
@@ -647,7 +665,7 @@ int fin_string()
     sprintf(token, "<STRING: %s>", tmp);
     return STRING;
 }
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int punto()
 {
     strcpy(token,"<PUNTO>");
@@ -682,11 +700,41 @@ int nada()
 
 int error()
 {
-    //printf("Error en linea: %d\n",linea);
-    fprintf(salida,"Error en linea: %d\n",linea);
+    char _caracter = caracter;
+    fprintf(salida, "Error lexico en linea: %d, cerca del elemento inesperado:\ 
+ \"%c\"\n", linea, caracter);
+    // termino de leer la linea
+    //while (_caracter != '\n' && _caracter != EOF)
+    //{
+    //    _caracter = fgetc(entrada);
+    //    if(_caracter != '\n') add_to_buffer(_caracter);
+    //}
+
+    //fprintf(salida, "%d \"%s\"\n", linea, buff_linea);
     *token = '\0'; // como es un error, descarto el contenido de token
+    *buff_linea = '\0'; // como es un error, descarto el contenido del buffer
+
+    return ERROR;
 }
 
+void add_to_buffer(char _caracter)
+{
+    if (_caracter == '\n')
+    {
+        buff_linea_len = 0;
+        *buff_linea = '\0';
+    }
+    else
+    {
+        // verifico que no haga overflow del buffer
+        if (buff_linea_len == MAX_BUFF_LINEA - 1)
+            buff_linea_len = 0;
+        // agrego caracter al buffer
+        *(buff_linea + buff_linea_len) = _caracter;
+        *(buff_linea + buff_linea_len + 1) = '\0';
+        buff_linea_len++;
+    }
+}
 
 int get_evento(char c)
 {
