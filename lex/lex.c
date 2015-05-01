@@ -43,6 +43,7 @@
 #define LLAVE_ABRE 299
 #define LLAVE_CIERRA 300
 #define COM 301
+#define ERROR -1
 //////////////////////////////
 
 /* Terminales */
@@ -73,8 +74,8 @@
 #define T_corchete_cierra   24
 /****************************/
 
-#define CANT_FILAS 39 //filas de la matriz de estados
-#define CANT_COLUMNAS 25 //columnas de la matriz de estados
+#define CANT_ESTADOS 39 //filas de la matriz de estados
+#define CANT_TERMINALES 25 //columnas de la matriz de estados
 #define CANTPR 15 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
@@ -89,7 +90,9 @@ int cont_com();
 int fin_com();
 int op_suma();
 int op_menos();
-int op_menos2();
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+int op_menos2();//lo puse para el caso de ---/
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int op_mul();
 int op_div();
 int op_asig();
@@ -128,24 +131,27 @@ int nada();
 //////////////////////////
 
 int yylex();
+char proximo_caracter();
+void get_elementos_esperados(char*);
 int get_evento(char);
 int esPalabraRes();
 void a_minuscula (char*);
 
-
-
-int nuevo_estado[CANT_FILAS][CANT_COLUMNAS];
-int (*proceso[CANT_FILAS][CANT_COLUMNAS])();
+int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
+int (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 
 /*----------VARIABLES GLOBALES-----------------*/
 
-FILE *salida,*entrada;
+FILE * entrada,*salida,*pruebagral;
 int tipo_token; //numero identificador del token
-int linea =1; //linea por la que esta leyendo
+int linea = 0; //linea por la que esta leyendo
+int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
-char palabrasRes[CANTPR][LARGOMAX]={
+char archivo[50]; //linea que se lee del archivo principal
+char archivo_entrada[50]; //nombre del archivo de entrada
+const char palabrasRes[CANTPR][LARGOMAX]={
     {"while"},
     {"if"},
     {"const"},
@@ -162,6 +168,7 @@ char palabrasRes[CANTPR][LARGOMAX]={
     {"get"}
 };
 
+const char *terminal[CANT_TERMINALES];
 
 int NroPalabrasRes[CANTPR]={
     WHILE,
@@ -183,15 +190,15 @@ int main()
 {
     int i,j;
     /* lleno la matriz de proximo estado */
-    for (i=0; i<CANT_FILAS; i++)
-        for (j=0; j<CANT_COLUMNAS; j++)
+    for (i=0; i<CANT_ESTADOS; i++) 
+        for (j=0; j<CANT_TERMINALES; j++)
             nuevo_estado[i][j] = QFIN;
 
     /* lleno la matriz de proceso */
-    for (i=0; i<CANT_FILAS; i++)
-        for (j=0; j<CANT_COLUMNAS; j++)
+    for (i=0; i<CANT_ESTADOS; i++) 
+        for (j=0; j<CANT_TERMINALES; j++)
             proceso[i][j] = nada;
-
+     
     nuevo_estado[0][T_mas] = 3;
     nuevo_estado[0][T_menos] = 15;
     nuevo_estado[0][T_asterisco] = 16;
@@ -226,7 +233,7 @@ int main()
     nuevo_estado[15][T_menos] = 29;
     nuevo_estado[21][T_igual] = 22;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[23][i] = 23;
     nuevo_estado[23][T_comillas] = 28;
     nuevo_estado[23][T_EOF] = QFIN;
@@ -236,43 +243,43 @@ int main()
     nuevo_estado[25][T_digito] = 25;
     nuevo_estado[29][T_barra] = 30;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[30][i] = 30;
     nuevo_estado[30][T_menos] = 34;
     nuevo_estado[30][T_barra] = 31;
     nuevo_estado[30][T_EOF] = QFIN;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[31][i] = 30;
     nuevo_estado[31][T_menos] = 32;
     nuevo_estado[31][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[32][i] = 30;
     nuevo_estado[32][T_menos] = 0;
     nuevo_estado[32][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
-
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[34][i] = 30;
     nuevo_estado[34][T_menos] = 35;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[35][i] = 30;
     nuevo_estado[35][T_menos] = 35;
     nuevo_estado[35][T_barra] = 36;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[36][i] = 36;
     nuevo_estado[36][T_barra] = 37;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[37][i] = 36;
     nuevo_estado[37][T_menos] = 38;
     nuevo_estado[37][T_barra] = 37;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[38][i] = 36;
     nuevo_estado[38][T_barra] = 37;
     nuevo_estado[38][T_menos] = 30;
@@ -299,7 +306,7 @@ int main()
     proceso[0][T_corchete_abre] = llave_abre;
     proceso[0][T_corchete_cierra] = llave_cierra;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[1][i] = fin_id;
     proceso[1][T_letra] = cont_id;
     proceso[1][T_digito] = cont_id;
@@ -310,86 +317,111 @@ int main()
     proceso[11][T_igual] = op_mayor_ig;
     proceso[21][T_igual] = op_distinto;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[23][i] = cont_string;
     proceso[23][T_comillas] = fin_string;
     proceso[23][T_EOF] = error;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[24][i] = fin_cte;
     proceso[24][T_digito] = cont_cte;
     proceso[24][T_punto] = cont_real;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[25][i] = fin_real;
     proceso[25][T_digito] = cont_real;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[29][i] = op_menos2;
     proceso[29][T_barra] = inic_com;
     proceso[29][T_EOF] = nada;
     proceso[29][T_newline] = nada;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[30][i] = cont_com;
     proceso[30][T_EOF] = error;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[31][i] = cont_com;
     proceso[31][T_EOF] = error;
-    //proceso[31][T_newline] = error;
 
-    for(i = 0; i < CANT_COLUMNAS; i++)
+    for(i = 0; i < CANT_TERMINALES; i++)
         proceso[32][i] = cont_com;
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
-    //proceso[32][T_newline] = error;
 
+    terminal[T_mas] =               "+"; 
+    terminal[T_menos] =             "-";
+    terminal[T_asterisco] =         "*";  
+    terminal[T_barra] =             "/"; 
+    terminal[T_letra] =             "letra";   
+    terminal[T_digito] =            "digito";   
+    terminal[T_igual] =             "="; 
+    terminal[T_menor] =             "<"; 
+    terminal[T_mayor] =             ">"; 
+    terminal[T_pregunta] =          "?"; 
+    terminal[T_dospuntos] =         ":"; 
+    terminal[T_exclamacion] =       "!"; 
+    terminal[T_comillas] =          "\""; 
+    terminal[T_punto] =             "."; 
+    terminal[T_pyc] =               ";"; 
+    terminal[T_CAR] =               "caracter"; 
+    terminal[T_parentesis_abre] =   "("; 
+    terminal[T_parentesis_cierra] = ")"; 
+    terminal[T_coma] =              ","; 
+    terminal[T_tab] =               "tab"; 
+    terminal[T_espacio] =           "espacio"; 
+    terminal[T_newline] =           "nueva linea"; 
+    terminal[T_EOF] =               "EOF"; 
+    terminal[T_corchete_abre] =     "["; 
+    terminal[T_corchete_cierra] =   "]"; 
+    
 
-    //------------------------------------------------------//
-
-    //Apertura del archivo con el lote de pruebas
-    if((entrada = fopen("pruebagral.txt", "r"))==NULL){
-        printf("No se puede abrir el archivo pruebagral.txt\n");
-        exit(1);
-    }
-
-    if((salida = fopen("pruebagral_resultado.txt", "w"))!=NULL){
-
-        while(!feof(entrada)){
-            tipo_token = yylex();
-            if(*token){
-                fprintf(salida,"%s\n",token);
+    //Apertura del archivo con el programa
+    if ((entrada = fopen("pruebagral.txt", "r")) != NULL) {
+   
+        //Apertura del archivo de salida
+        //if((salida = fopen("pruebagral_resultado.txt", "w"))!=NULL){
+        if((salida = stdout)!=NULL){
+   
+            while(!feof(entrada)){
+                tipo_token = yylex();
+                if(*token)
+                    fprintf(salida,"%s\n",token);
+                limpiar_token();
             }
-            limpiar_token();
-        }
-        fclose(salida);
 
+            fclose(salida);
+   
+        } else 
+            printf("No se puede crear el archivo pruebagral_resultado.txt\n");
+   
+        fclose(entrada);
+   
     } else {
-        printf("No se puede crear el archivo pruebagral_resultado.txt\n");
+        printf("No se puede abrir el archivo pruebagral.txt\n");
     }
 
-    fclose(entrada);
     return 0;
 }
 
 int yylex()
 {
-    int estado=0;
-    int estado_final=QFIN;
-    while(estado!=estado_final)
+    estado=0;
+    while(estado != QFIN)
     {
-        if((caracter=fgetc(entrada)) != EOF)
+        if ((caracter = proximo_caracter()) != EOF)
         {
-            if(caracter == '\n') linea++;
             int columna = get_evento(caracter);
             tipo_token = (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
         }
         else
         {
+            /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
             tipo_token = (proceso [estado] [22]) ();
-            estado=estado_final;
+            /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
+            estado=QFIN;
         }
     }
     if(!feof(entrada))
@@ -398,6 +430,18 @@ int yylex()
     }
     return tipo_token;
 }
+
+char proximo_caracter()
+{
+    char _caracter;
+    // obtengo caracter desde el archivo de entrada
+    _caracter = fgetc(entrada);
+    // salto de linea
+    if (_caracter == '\n') linea++;
+    // devuelvo caracter leido
+    return _caracter;  
+}
+
 
 void limpiar_token()
 {
@@ -426,12 +470,14 @@ int op_menos()
     strcpy(token,"<OP_RESTA>");
     return OP_MENOS;
 }
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int op_menos2()
 {
     fseek(entrada,-sizeof(char),SEEK_CUR);
     strcpy(token,"<OP_RESTA>");
     return OP_MENOS;
 }
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int op_mul()
 {
     strcpy(token,"<OP_MULTIPLICACION>");
@@ -517,7 +563,7 @@ int inic_id()
 }
 int cont_id()
 {
-
+    
     strcat(token,&caracter);
     return ID;
 }
@@ -528,9 +574,9 @@ int fin_id()
     *tmp = '\0';
     if (strlen(token) > LONG_MAX)
     {
-        printf("identificador demasiado largo en linea: %d",linea);
+        printf("identificador demasiado largo en linea: %d", linea);
         exit(2);
-    }
+    } 
     i = esPalabraRes();
     if(i != -1)
     {
@@ -561,7 +607,7 @@ int fin_cte()
     int cte = atoi(token);
     if(cte > MAX_INT)
     {
-        fprintf(salida, "Entero sobrepasa limite maximo en linea: %d",linea);
+        fprintf(stderr, "Entero sobrepasa limite maximo en linea: %d\n", linea);
         *token='\0';
         return 0;
     }
@@ -584,7 +630,7 @@ int fin_real()
     float cte = atof(token);
     if(cte > MAX_REAL)
     {
-        fprintf(salida, "Real sobrepasa limite maximo en linea: %d",linea);
+        fprintf(salida, "Real sobrepasa limite maximo en linea: %d", linea);
         *token='\0';
         return -1;
     }
@@ -594,8 +640,10 @@ int fin_real()
 int inic_string()
 {
     limpiar_token();
+    //strcat(token,&caracter);
     return STRING;
 }
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int cont_string()
 {
     strcat(token,&caracter);
@@ -605,9 +653,9 @@ int cont_string()
 int fin_string()
 {
     char tmp[LONG_MAX + 1];
-    if (strlen(token) > LONG_MAX)
+    if (strlen(token) > LONG_MAX - 1)
     {
-        fprintf(salida, "String demasiado largo en linea: %d", linea);
+        fprintf(stderr, "String demasiado largo en linea: %d\n", linea);
         *token='\0';
         return 0;
     }
@@ -615,6 +663,7 @@ int fin_string()
     sprintf(token, "<STRING: %s>", tmp);
     return STRING;
 }
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 int punto()
 {
     strcpy(token,"<PUNTO>");
@@ -649,10 +698,37 @@ int nada()
 
 int error()
 {
-    fprintf(salida,"Error en linea: %d\n",linea);
-    *token = '\0'; // como es un error, descarto el contenido de token
+    char _elementos_esperados[300] = {'\0'};
+    /* como es un error, descarto el contenido de token */
+    *token = '\0';
+
+    // en caso de un fin de archivo inesperado muestro mensaje y salgo
+    if (caracter == EOF) {
+        fprintf (stderr, "Error linea %d: Fin de archivo inesperado \n", linea);
+        return ERROR;
+    }
+
+    // obtengo elementos esperados
+    get_elementos_esperados (_elementos_esperados); 
+    // muestro mensaje de error 
+    fprintf (stderr, "Error linea %d, cerca del elemento inesperado:\ 
+ \"%c\"\n", linea, caracter);
+    // muestro elementos esperados
+    fprintf (stderr, ">>>> Elementos esperados: %s\n", _elementos_esperados);
+    return ERROR;
 }
 
+void get_elementos_esperados(char *esperados)
+{
+    int i;
+    for (i = 0; i < CANT_TERMINALES; i++)
+        /* busco los terminales que no me deriven en un error, evitando EOF */
+        if (i != T_EOF && proceso [estado][i] != error) {
+            /* agrego elemento a la lista de terminales esperados */
+            strcat (esperados, terminal[i]);
+            strcat (esperados, " ");
+        }
+}
 
 int get_evento(char c)
 {
@@ -670,68 +746,68 @@ int get_evento(char c)
             return 0;
         case '-':
             return 1;
-
+            
         case '*':
             return 2;
-
+            
         case '/':
             return 3;
-
+            
         case '=':
             return 6;
-
+            
         case '<':
             return 7;
-
+            
         case '>':
             return 8;
-
+            
         case '?':
             return 9;
-
+            
         case ':':
             return 10;
-
+            
         case '!':
             return 11;
-
+            
         case '"':
             return 12;
-
+            
         case '.':
             return 13;
-
+            
         case ';':
             return 14;
-
+            
         case '(':
             return 16;
-
+            
         case ')':
             return 17;
-
+            
         case ',':
             return 18;
-
+            
         //case '\t':
         //    return 19;
-
+            
         case '\t':
         case '\r':
         case ' ':
             return 20;
-
+            
         case '\n':
             return 21;
-
+            
         case EOF:
             return 22;
         case '{':
             return 23;
-
+            
         case '}':
             return 24;
-
+            
         default:
             return 15;
     }
@@ -742,8 +818,8 @@ int esPalabraRes()
     char aux[LONG_MAX];
     int i;
     strcpy(aux, token);
-    // pasamos todo el token a minuscula
-    a_minuscula(aux);
+    // pasamos todo el token a minuscula 
+    a_minuscula(aux); 
     for(i=0;i<CANTPR;i++)
     {
         if(strcmp(palabrasRes[i],aux)==0)
@@ -755,14 +831,12 @@ int esPalabraRes()
     return -1;
 }
 
-void a_minuscula (char *palabra)
+void a_minuscula (char *palabra) 
 {
     char *tmp = palabra;
-    while (*tmp)
+    while (*tmp) 
     {
         *tmp = tolower(*tmp);
         tmp++;
     }
 }
-
-
