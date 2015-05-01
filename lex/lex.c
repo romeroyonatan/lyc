@@ -354,8 +354,8 @@ int main()
     terminal[T_menos] =             "-";
     terminal[T_asterisco] =         "*";  
     terminal[T_barra] =             "/"; 
-    terminal[T_letra] =             "letra";   
-    terminal[T_digito] =            "digito";   
+    terminal[T_letra] =             "a-z A-Z";   
+    terminal[T_digito] =            "0-9";   
     terminal[T_igual] =             "="; 
     terminal[T_menor] =             "<"; 
     terminal[T_mayor] =             ">"; 
