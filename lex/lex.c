@@ -524,6 +524,7 @@ int dos_puntos()
 int op_negar()
 {
     strcpy(token,"<OP_NEGAR>");
+    return 0;
 }
 int puntoycoma()
 {
@@ -672,6 +673,7 @@ int punto()
 int salto_linea()
 {
     //linea++;
+    return 0;
 }
 int op_concaten()
 {
@@ -693,7 +695,7 @@ int op_distinto()
 }
 int nada()
 {
-
+    return 0;
 }
 
 int error()
@@ -711,8 +713,8 @@ int error()
     // obtengo elementos esperados
     get_elementos_esperados (_elementos_esperados); 
     // muestro mensaje de error 
-    fprintf (stderr, "Error linea %d, cerca del elemento inesperado:\ 
- \"%c\"\n", linea, caracter);
+    fprintf (stderr, "Error linea %d, cerca del elemento inesperado: '%c'\n",
+                    linea, caracter);
     // muestro elementos esperados
     fprintf (stderr, ">>>> Elementos esperados: %s\n", _elementos_esperados);
     return ERROR;
