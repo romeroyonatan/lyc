@@ -81,7 +81,6 @@
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
-#define MAX_BUFF_LINEA 80// tamano maximo del buffer de linea
 
 
 //Funciones de la matriz
@@ -133,12 +132,10 @@ int nada();
 
 int yylex();
 char proximo_caracter();
+void get_elementos_esperados(char*);
 int get_evento(char);
 int esPalabraRes();
 void a_minuscula (char*);
-void add_to_buffer(char _caracter);
- 
-
 
 int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
 int (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
@@ -148,12 +145,13 @@ int (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 FILE * entrada,*salida,*pruebagral;
 int tipo_token; //numero identificador del token
 int linea = 0; //linea por la que esta leyendo
+int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
 char archivo[50]; //linea que se lee del archivo principal
 char archivo_entrada[50]; //nombre del archivo de entrada
-char palabrasRes[CANTPR][LARGOMAX]={
+const char palabrasRes[CANTPR][LARGOMAX]={
     {"while"},
     {"if"},
     {"const"},
@@ -170,8 +168,7 @@ char palabrasRes[CANTPR][LARGOMAX]={
     {"get"}
 };
 
-char buff_linea[MAX_BUFF_LINEA];
-int buff_linea_len;
+const char *terminal[CANT_TERMINALES];
 
 int NroPalabrasRes[CANTPR]={
     WHILE,
@@ -353,6 +350,33 @@ int main()
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
 
+    terminal[T_mas] =               "+"; 
+    terminal[T_menos] =             "-";
+    terminal[T_asterisco] =         "*";  
+    terminal[T_barra] =             "/"; 
+    terminal[T_letra] =             "letra";   
+    terminal[T_digito] =            "digito";   
+    terminal[T_igual] =             "="; 
+    terminal[T_menor] =             "<"; 
+    terminal[T_mayor] =             ">"; 
+    terminal[T_pregunta] =          "?"; 
+    terminal[T_dospuntos] =         ":"; 
+    terminal[T_exclamacion] =       "!"; 
+    terminal[T_comillas] =          "\""; 
+    terminal[T_punto] =             "."; 
+    terminal[T_pyc] =               ";"; 
+    terminal[T_CAR] =               "caracter"; 
+    terminal[T_parentesis_abre] =   "("; 
+    terminal[T_parentesis_cierra] = ")"; 
+    terminal[T_coma] =              ","; 
+    terminal[T_tab] =               "tab"; 
+    terminal[T_espacio] =           "espacio"; 
+    terminal[T_newline] =           "nueva linea"; 
+    terminal[T_EOF] =               "EOF"; 
+    terminal[T_corchete_abre] =     "["; 
+    terminal[T_corchete_cierra] =   "]"; 
+    
+
     //Apertura del archivo que contiene los casos a ejecutar
     if((pruebagral = fopen("pruebagral.txt", "r"))==NULL){
         printf("No se puede abrir el archivo pruebagral.txt\n");
@@ -362,7 +386,6 @@ int main()
     while(!feof(pruebagral)){
         // limpio variables con las que voy a trabajar
         linea = 0;
-        buff_linea_len = 0;
         *archivo='\0';
         //Leo la linea con el nombre del archivo a analizar.
         fgets(archivo,50,pruebagral);
@@ -406,9 +429,8 @@ int main()
 
 int yylex()
 {
-    int estado=0;
-    int estado_final=QFIN;
-    while(estado!=estado_final)
+    estado=0;
+    while(estado != QFIN)
     {
         if ((caracter = proximo_caracter()) != EOF)
         {
@@ -421,7 +443,7 @@ int yylex()
             /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
             tipo_token = (proceso [estado] [22]) ();
             /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
-            estado=estado_final;
+            estado=QFIN;
         }
     }
     if(!feof(entrada))
@@ -438,8 +460,6 @@ char proximo_caracter()
     _caracter = fgetc(entrada);
     // salto de linea
     if (_caracter == '\n') linea++;
-    // agrego al buffer
-    add_to_buffer(_caracter); 
     // devuelvo caracter leido
     return _caracter;  
 }
@@ -700,40 +720,36 @@ int nada()
 
 int error()
 {
-    char _caracter = caracter;
-    fprintf(salida, "Error lexico en linea: %d, cerca del elemento inesperado:\ 
+    char _elementos_esperados[300] = {'\0'};
+
+    // en caso de un fin de archivo inesperado muestro mensaje y salgo
+    if (caracter == EOF) {
+        fprintf (salida, "Fin de archivo inesperado");
+        return ERROR;
+    }
+
+    // obtengo elementos esperados
+    get_elementos_esperados (_elementos_esperados); 
+    // muestro mensaje de error 
+    fprintf (salida, "Error lexico en linea: %d, cerca del elemento inesperado:\ 
  \"%c\"\n", linea, caracter);
-    // termino de leer la linea
-    //while (_caracter != '\n' && _caracter != EOF)
-    //{
-    //    _caracter = fgetc(entrada);
-    //    if(_caracter != '\n') add_to_buffer(_caracter);
-    //}
-
-    //fprintf(salida, "%d \"%s\"\n", linea, buff_linea);
-    *token = '\0'; // como es un error, descarto el contenido de token
-    *buff_linea = '\0'; // como es un error, descarto el contenido del buffer
-
+    // muestro elementos esperados
+    fprintf (salida, "Elementos esperados: %s\n", _elementos_esperados);
+    /* como es un error, descarto el contenido de token */
+    *token = '\0';
     return ERROR;
 }
 
-void add_to_buffer(char _caracter)
+void get_elementos_esperados(char *esperados)
 {
-    if (_caracter == '\n')
-    {
-        buff_linea_len = 0;
-        *buff_linea = '\0';
-    }
-    else
-    {
-        // verifico que no haga overflow del buffer
-        if (buff_linea_len == MAX_BUFF_LINEA - 1)
-            buff_linea_len = 0;
-        // agrego caracter al buffer
-        *(buff_linea + buff_linea_len) = _caracter;
-        *(buff_linea + buff_linea_len + 1) = '\0';
-        buff_linea_len++;
-    }
+    int i;
+    for (i = 0; i < CANT_TERMINALES; i++)
+        /* busco los terminales que no me deriven en un error, evitando EOF */
+        if (i != T_EOF && proceso [estado][i] != error) {
+            /* agrego elemento a la lista de terminales esperados */
+            strcat (esperados, terminal[i]);
+            strcat (esperados, " ");
+        }
 }
 
 int get_evento(char c)
