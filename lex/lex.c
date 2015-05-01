@@ -726,17 +726,17 @@ int error()
 
     // en caso de un fin de archivo inesperado muestro mensaje y salgo
     if (caracter == EOF) {
-        fprintf (salida, "Fin de archivo inesperado \n");
+        fprintf (stderr, "Fin de archivo inesperado \n");
         return ERROR;
     }
 
     // obtengo elementos esperados
     get_elementos_esperados (_elementos_esperados); 
     // muestro mensaje de error 
-    fprintf (salida, "Error lexico en linea: %d, cerca del elemento inesperado:\ 
+    fprintf (stderr, "Error lexico en linea: %d, cerca del elemento inesperado:\ 
  \"%c\"\n", linea, caracter);
     // muestro elementos esperados
-    fprintf (salida, "Elementos esperados: %s\n", _elementos_esperados);
+    fprintf (stderr, ">>>> Elementos esperados: %s\n", _elementos_esperados);
     return ERROR;
 }
 
