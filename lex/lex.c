@@ -354,7 +354,7 @@ int main()
     terminal[T_menos] =             "-";
     terminal[T_asterisco] =         "*";  
     terminal[T_barra] =             "/"; 
-    terminal[T_letra] =             "a-z A-Z";   
+    terminal[T_letra] =             "a-z A-Z _";   
     terminal[T_digito] =            "0-9";   
     terminal[T_igual] =             "="; 
     terminal[T_menor] =             "<"; 
@@ -575,7 +575,7 @@ int fin_id()
     *tmp = '\0';
     if (strlen(token) > LONG_MAX)
     {
-        printf("identificador demasiado largo en linea: %d", linea);
+        fprintf(stderr, "identificador demasiado largo en linea: %d\n", linea);
         exit(2);
     } 
     i = esPalabraRes();
@@ -809,6 +809,9 @@ int get_evento(char c)
             
         case '}':
             return 24;
+
+        case '_':
+            return 4;
             
         default:
             return 15;

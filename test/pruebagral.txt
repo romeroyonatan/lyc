@@ -77,4 +77,5 @@ iF
 pal@bra
 --/ comentario --/ muy --/ anidado /-- /-- /--
 1c2015
+variable_muy_larga_para_que_la_acepte_el_compilador
 " un string que no cierra
