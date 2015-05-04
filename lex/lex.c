@@ -724,8 +724,10 @@ void get_elementos_esperados(char *esperados)
 {
     int i;
     for (i = 0; i < CANT_TERMINALES; i++)
-        /* busco los terminales que no me deriven en un error, evitando EOF */
-        if (i != T_EOF && proceso [estado][i] != error) {
+        /* busco los terminales que no me deriven en un error, obviando EOF
+         * y espacios en blanco */
+        if (i != T_EOF && i!= T_tab && i!= T_espacio && i != T_newline && 
+            proceso [estado][i] != error) {
             /* agrego elemento a la lista de terminales esperados */
             strcat (esperados, terminal[i]);
             strcat (esperados, " ");
