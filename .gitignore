@@ -36,6 +36,7 @@ bin/
 test/Final.asm
 test/intermedia.txt
 test/prueba*_resultado.txt
+test/tabla_de_simbolos.txt
 
 
 # archivos vim
