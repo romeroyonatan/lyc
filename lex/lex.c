@@ -22,27 +22,31 @@
 #define PARENT_ABRE 270
 #define PARENT_CIERRA 271
 #define COMA 272
-#define CTE 273
-#define STRING 274
-#define OP_CONCATENAR 275
-#define OUTPUT 276
-#define INPUT 277
-#define MAIN 278
-#define AND 280
-#define OR 281
-#define IF 282
-#define ELSE 283
-#define WHILE 284
-#define ID 287
-#define DECLARE 288
-#define ENDDECLARE 289
-#define NEGAR 290
-#define REAL 294
-#define INT 295
-#define CONST 296
-#define LLAVE_ABRE 299
-#define LLAVE_CIERRA 300
-#define COM 301
+#define CTE_ENTERO 273
+#define OP_CONCATENAR 274
+#define OUTPUT 275
+#define INPUT 276
+#define ID 277
+#define NEGAR 278
+#define LLAVE_ABRE 279
+#define LLAVE_CIERRA 280
+#define CTE_STRING 281
+#define CTE_REAL 282
+//Palabras Reservadas
+#define WHILE 300
+#define IF 301
+#define CONST 302
+#define DECLARE 303
+#define ENDDECLARE 304
+#define REAL 305
+#define INT 306
+#define STRING 307
+#define MAIN 308
+#define ELSE 309
+#define AND 310
+#define OR 311
+#define PUT 312
+#define GET 313
 #define ERROR -1
 //////////////////////////////
 
@@ -81,53 +85,52 @@
 #define LONG_MAX 30 //largo maximo de los string y nombre de id
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
-
+#define TAMMAX 100
 
 //Funciones de la matriz
 void limpiar_token();
-int inic_com();
-int cont_com();
-int fin_com();
-int op_suma();
-int op_menos();
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-int op_menos2();//lo puse para el caso de ---/
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-int op_mul();
-int op_div();
-int op_asig();
-int op_asig();
-int op_menor();
-int op_menor_ig();
-int op_mayor();
-int op_mayor_ig();
-int dos_puntos();
-int op_negar();
-int puntoycoma();
-int par_abre();
-int par_cierra();
-int llave_abre();
-int llave_cierra();
-int coma();
-int inic_id();
-int cont_id();
-int fin_id();
-int inic_real();
-int cont_real();
-int fin_real();
-int inic_cte();
-int cont_cte();
-int fin_cte();
-int inic_string();
-int cont_string();
-int fin_string();
-int punto();
-int salto_linea();
-int op_concaten();
-int op_igualdad();
-int op_distinto();
-int error();
-int nada();
+void inic_com();
+void cont_com();
+void fin_com();
+void op_suma();
+void op_menos();
+void op_menos2();
+void op_mul();
+void op_div();
+void op_asig();
+void op_asig();
+void op_menor();
+void op_menor_ig();
+void op_mayor();
+void op_mayor_ig();
+void dos_puntos();
+void op_negar();
+void puntoycoma();
+void par_abre();
+void par_cierra();
+void llave_abre();
+void llave_cierra();
+void coma();
+void inic_id();
+void cont_id();
+void fin_id();
+void inic_real();
+void cont_real();
+void fin_real();
+void inic_cte();
+void cont_cte();
+void fin_cte();
+void inic_string();
+void cont_string();
+void fin_string();
+
+void salto_linea();
+void op_concaten();
+void op_igualdad();
+void op_distinto();
+void error();
+void nada();
+
 //////////////////////////
 
 int yylex();
@@ -136,21 +139,37 @@ void get_elementos_esperados(char*);
 int get_evento(char);
 int esPalabraRes();
 void a_minuscula (char*);
+int insertarTS();
+void guardarTS();
+void guardarToken();
+
 
 int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
-int (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
+void (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
+
+
+/* TABLA DE SIMBOLOS */
+struct tablaDeSimbolos
+{
+    char nombre[100];
+    char tipo  [11];
+    char valor [100];
+    char ren   [31];
+    int longitud;
+};
+struct tablaDeSimbolos TS[TAMMAX];
 
 /*----------VARIABLES GLOBALES-----------------*/
 
-FILE * entrada,*salida,*pruebagral;
+int yylval;
+FILE *salida,*entrada, *tos;
+int TStop = 0;  // Índice de la TS
 int tipo_token; //numero identificador del token
 int linea = 0; //linea por la que esta leyendo
 int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
-char archivo[50]; //linea que se lee del archivo principal
-char archivo_entrada[50]; //nombre del archivo de entrada
 const char palabrasRes[CANTPR][LARGOMAX]={
     {"while"},
     {"if"},
@@ -180,9 +199,11 @@ int NroPalabrasRes[CANTPR]={
     INT,
     STRING,
     MAIN,
-  ELSE,
-  AND,
-  OR
+    ELSE,
+    AND,
+    OR,
+    PUT,
+    GET
 };
 
 /*---------------------------------------------*/
@@ -190,15 +211,16 @@ int main()
 {
     int i,j;
     /* lleno la matriz de proximo estado */
-    for (i=0; i<CANT_ESTADOS; i++) 
+    for (i=0; i<CANT_ESTADOS; i++)
         for (j=0; j<CANT_TERMINALES; j++)
             nuevo_estado[i][j] = QFIN;
 
     /* lleno la matriz de proceso */
-    for (i=0; i<CANT_ESTADOS; i++) 
+    for (i=0; i<CANT_ESTADOS; i++)
         for (j=0; j<CANT_TERMINALES; j++)
             proceso[i][j] = nada;
-     
+
+
     nuevo_estado[0][T_mas] = 3;
     nuevo_estado[0][T_menos] = 15;
     nuevo_estado[0][T_asterisco] = 16;
@@ -260,7 +282,7 @@ int main()
     nuevo_estado[32][T_menos] = 0;
     nuevo_estado[32][T_barra] = 31;
     nuevo_estado[31][T_EOF] = QFIN;
-    
+
     for(i = 0; i < CANT_TERMINALES; i++)
         nuevo_estado[34][i] = 30;
     nuevo_estado[34][T_menos] = 35;
@@ -350,58 +372,65 @@ int main()
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
 
-    terminal[T_mas] =               "+"; 
+
+    terminal[T_mas] =               "+";
     terminal[T_menos] =             "-";
-    terminal[T_asterisco] =         "*";  
-    terminal[T_barra] =             "/"; 
-    terminal[T_letra] =             "a-z A-Z _";   
-    terminal[T_digito] =            "0-9";   
-    terminal[T_igual] =             "="; 
-    terminal[T_menor] =             "<"; 
-    terminal[T_mayor] =             ">"; 
-    terminal[T_pregunta] =          "?"; 
-    terminal[T_dospuntos] =         ":"; 
-    terminal[T_exclamacion] =       "!"; 
-    terminal[T_comillas] =          "\""; 
-    terminal[T_punto] =             "."; 
-    terminal[T_pyc] =               ";"; 
-    terminal[T_CAR] =               "caracter"; 
-    terminal[T_parentesis_abre] =   "("; 
-    terminal[T_parentesis_cierra] = ")"; 
-    terminal[T_coma] =              ","; 
-    terminal[T_tab] =               "tab"; 
-    terminal[T_espacio] =           "espacio"; 
-    terminal[T_newline] =           "nueva linea"; 
-    terminal[T_EOF] =               "EOF"; 
-    terminal[T_corchete_abre] =     "["; 
-    terminal[T_corchete_cierra] =   "]"; 
+    terminal[T_asterisco] =         "*";
+    terminal[T_barra] =             "/";
+    terminal[T_letra] =             "a-z A-Z _";
+    terminal[T_digito] =            "0-9";
+    terminal[T_igual] =             "=";
+    terminal[T_menor] =             "<";
+    terminal[T_mayor] =             ">";
+    terminal[T_pregunta] =          "?";
+    terminal[T_dospuntos] =         ":";
+    terminal[T_exclamacion] =       "!";
+    terminal[T_comillas] =          "\"";
+    terminal[T_punto] =             ".";
+    terminal[T_pyc] =               ";";
+    terminal[T_CAR] =               "caracter";
+    terminal[T_parentesis_abre] =   "(";
+    terminal[T_parentesis_cierra] = ")";
+    terminal[T_coma] =              ",";
+    terminal[T_tab] =               "tab";
+    terminal[T_espacio] =           "espacio";
+    terminal[T_newline] =           "nueva linea";
+    terminal[T_EOF] =               "EOF";
+    terminal[T_corchete_abre] =     "[";
+    terminal[T_corchete_cierra] =   "]";
     
 
-    //Apertura del archivo con el programa
-    if ((entrada = fopen("pruebagral.txt", "r")) != NULL) {
-   
-        //Apertura del archivo de salida
-        //if((salida = fopen("pruebagral_resultado.txt", "w"))!=NULL){
-        if((salida = stdout)!=NULL){
-   
-            while(!feof(entrada)){
-                tipo_token = yylex();
-                if(*token)
-                    fprintf(salida,"%s\n",token);
-                limpiar_token();
-            }
+    //------------------------------------------------------//
 
-            fclose(salida);
-   
-        } else 
-            printf("No se puede crear el archivo pruebagral_resultado.txt\n");
-   
-        fclose(entrada);
-   
-    } else {
+    //Apertura del archivo con el lote de pruebas
+    if((entrada = fopen("pruebagral.txt", "r")) == NULL){
         printf("No se puede abrir el archivo pruebagral.txt\n");
+        exit(1);
     }
 
+    if((salida = fopen("pruebagral_resultado.txt", "w"))==NULL){
+    	printf("No se puede crear el archivo pruebagral_resultado.txt\n");
+    	exit(1);
+    }
+
+    if((tos = fopen("tabla_de_simbolos.txt", "w"))==NULL){
+        printf("No se puede crear el archivo tabla_de_simbolos.txt\n");
+        exit(1);
+    }
+
+    while(!feof(entrada)){
+    	tipo_token = yylex();
+    	if(tipo_token>0){
+    		guardarToken();
+    	}
+    	limpiar_token();
+    }
+
+    guardarTS();
+
+    fclose(entrada);
+    fclose(salida);
+    fclose(tos);
     return 0;
 }
 
@@ -413,14 +442,12 @@ int yylex()
         if ((caracter = proximo_caracter()) != EOF)
         {
             int columna = get_evento(caracter);
-            tipo_token = (proceso [estado] [columna]) ();
+            (proceso [estado] [columna]) ();
             estado = nuevo_estado [estado] [columna];
         }
         else
         {
-            /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
-            tipo_token = (proceso [estado] [22]) ();
-            /* +++++++++++++++++++++++++++++++++++++++++++++++++ */
+            (proceso [estado] [22]) ();
             estado=QFIN;
         }
     }
@@ -439,7 +466,7 @@ char proximo_caracter()
     // salto de linea
     if (_caracter == '\n') linea++;
     // devuelvo caracter leido
-    return _caracter;  
+    return _caracter;
 }
 
 
@@ -447,258 +474,221 @@ void limpiar_token()
 {
   *token = '\0';
 }
-int inic_com()
+void inic_com()
 {
     limpiar_token();
-    return COM;
 }
-int cont_com()
+void cont_com()
 {
-    return COM;
 }
-int fin_com()
+void fin_com()
 {
-    return COM;
-}
-int op_suma()
-{
-    strcpy(token,"<OP_SUMA>");
-    return OP_SUMA;
-}
-int op_menos()
-{
-    strcpy(token,"<OP_RESTA>");
-    return OP_MENOS;
-}
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-int op_menos2()
-{
-    fseek(entrada,-sizeof(char),SEEK_CUR);
-    strcpy(token,"<OP_RESTA>");
-    return OP_MENOS;
-}
-/*++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-int op_mul()
-{
-    strcpy(token,"<OP_MULTIPLICACION>");
-    return OP_MUL;
-}
-int op_div()
-{
-    strcpy(token,"<OP_DIVISION>");
-    return OP_DIV;
-}
-int op_asig()
-{
-    strcpy(token,"<OP_ASIGNACION>");
-    return OP_ASIG;
+    tipo_token =  0;
 }
 
-int op_menor()
+void op_suma()
 {
-    strcpy(token,"<OP_MENOR>");
-    return OP_MENOR;
+    tipo_token =  OP_SUMA;
 }
-int op_menor_ig()
+void op_menos()
 {
-    limpiar_token();
-    strcpy(token,"<OP_MENOR_IGUAL>");
-    return OP_MENOR_IGUAL;
+	tipo_token =  OP_MENOS;
 }
-int op_mayor()
+void op_menos2()
 {
-    strcpy(token,"<OP_MAYOR>");
-    return OP_MAYOR;
+    fseek(entrada,-sizeof(char),SEEK_CUR);
+    tipo_token =  OP_MENOS;
 }
-int op_mayor_ig()
+void op_mul()
 {
-    limpiar_token();
-    strcpy(token,"<OP_MAYOR_IGUAL>");
-    return OP_MAYOR_IGUAL;
+	tipo_token =  OP_MUL;
 }
-int dos_puntos()
+void op_div()
 {
-    strcpy(token,"<DOS_PUNTOS>");
-    return DOS_PUNTOS;
+	tipo_token =  OP_DIV;
 }
-int op_negar()
+void op_asig()
 {
-    strcpy(token,"<OP_NEGAR>");
-    return 0;
+	tipo_token =  OP_ASIG;
 }
-int puntoycoma()
+
+void op_menor()
 {
-    strcpy(token,"<PUNTO_Y_COMA>");
-    return PUNTO_Y_COMA;
+    tipo_token =   OP_MENOR;
 }
-int par_abre()
+void op_menor_ig()
 {
-    strcpy(token,"<PARENTESIS_ABRE>");
-    return PARENT_ABRE;
+    tipo_token =   OP_MENOR_IGUAL;
 }
-int par_cierra()
+void op_mayor()
 {
-    strcpy(token,"<PARENTESIS_CIERRA>");
-    return PARENT_CIERRA;
+    tipo_token =   OP_MAYOR;
 }
-int llave_abre()
+void op_mayor_ig()
 {
-    strcpy(token,"<LLAVE_ABRE>");
-    return LLAVE_ABRE;
+    tipo_token =   OP_MAYOR_IGUAL;
 }
-int llave_cierra(tipo)
+void dos_puntos()
 {
-    strcpy(token,"<LLAVE_CIERRA>");
-    return LLAVE_CIERRA;
+    tipo_token =   DOS_PUNTOS;
 }
-int coma()
+void op_negar()
 {
-    strcpy(token,"<COMA>");
-    return COMA;
+	tipo_token =   NEGAR;
 }
-int inic_id()
+void puntoycoma()
+{
+    tipo_token =   PUNTO_Y_COMA;
+}
+void par_abre()
+{
+    tipo_token =   PARENT_ABRE;
+}
+void par_cierra()
+{
+    tipo_token =   PARENT_CIERRA;
+}
+void llave_abre()
+{
+    tipo_token =   LLAVE_ABRE;
+}
+void llave_cierra(tipo)
+{
+    tipo_token =   LLAVE_CIERRA;
+}
+void coma()
+{
+    tipo_token =   COMA;
+}
+void inic_id()
 {
     limpiar_token();
     strcat(token,&caracter);
-    return ID;
+    tipo_token =   ID;
 }
-int cont_id()
+void cont_id()
 {
-    
     strcat(token,&caracter);
-    return ID;
+    tipo_token =   ID;
 }
-int fin_id()
+void fin_id()
 {
     int i;
-    char tmp[LONG_MAX + 1];
-    *tmp = '\0';
     if (strlen(token) > LONG_MAX)
     {
-        fprintf(stderr, "identificador demasiado largo en linea: %d\n", linea);
-        exit(2);
-    } 
-    i = esPalabraRes();
-    if(i != -1)
-    {
-        strcpy(tmp, palabrasRes[i]);
-        sprintf(token, "<PR: %s>", tmp);
-        return NroPalabrasRes[i];
+        fprintf(stderr,"identificador demasiado largo en linea: %d\n",linea);
+        *token='\0';
+        tipo_token =  0;
+    } else {
+        if( (i = esPalabraRes()) != -1)
+        {
+            tipo_token =  NroPalabrasRes[i];
+        }
+        else
+        {
+            tipo_token = ID;
+            yylval = insertarTS();
+        }
     }
-    else
-    {
-        strcpy(tmp, token);
-        sprintf(token, "<ID: %s>", tmp);
-    }
-    return ID;
 }
-int inic_cte()
+void inic_cte()
 {
     limpiar_token();
     strcat(token,&caracter);
-    return CTE;
+    tipo_token =   CTE_ENTERO;
 }
-int cont_cte()
+void cont_cte()
 {
     strcat(token,&caracter);
-    return CTE;
+    tipo_token =   CTE_ENTERO;
 }
-int fin_cte()
+void fin_cte()
 {
     int cte = atoi(token);
-    if(cte > MAX_INT)
-    {
-        fprintf(stderr, "Entero sobrepasa limite maximo en linea: %d\n", linea);
-        *token='\0';
-        return 0;
+    if(cte > MAX_INT) {
+        fprintf(stderr, "Entero sobrepasa limite maximo en linea: %d\n",linea);
+		*token='\0';
+        tipo_token =  0;
+    } else {
+        tipo_token = CTE_ENTERO;
+        yylval = insertarTS();
     }
-    sprintf(token,"<CTE: %d>", cte);
-    return CTE;
+
 }
-int inic_real()
+void inic_real()
 {
     limpiar_token();
     strcat(token,&caracter);
-    return REAL;
+    tipo_token =   CTE_REAL;
 }
-int cont_real()
+void cont_real()
 {
     strcat(token,&caracter);
-    return REAL;
+    tipo_token =   CTE_REAL;
 }
-int fin_real()
+void fin_real()
 {
     float cte = atof(token);
     if(cte > MAX_REAL)
     {
-        fprintf(salida, "Real sobrepasa limite maximo en linea: %d", linea);
-        *token='\0';
-        return -1;
+        fprintf(stderr, "Real sobrepasa limite maximo en linea: %d\n",linea);
+		*token='\0';
+        tipo_token =  0;
+    } else {
+        tipo_token = CTE_REAL;
+        yylval = insertarTS();
     }
-    sprintf(token,"<REAL: %f>", cte);
-    return REAL;
+
 }
-int inic_string()
+void inic_string()
 {
     limpiar_token();
-    //strcat(token,&caracter);
-    return STRING;
+    tipo_token =   CTE_STRING;
 }
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-int cont_string()
+void cont_string()
 {
     strcat(token,&caracter);
-    return STRING;
+    tipo_token =   CTE_STRING;
 }
 
-int fin_string()
+void fin_string()
 {
-    char tmp[LONG_MAX + 1];
-    if (strlen(token) > LONG_MAX - 1)
+    if (strlen(token) > LONG_MAX)
     {
         fprintf(stderr, "String demasiado largo en linea: %d\n", linea);
-        *token='\0';
-        return 0;
+		*token='\0';
+        tipo_token = 0;
+    } else {
+        tipo_token = CTE_STRING;
+        yylval = insertarTS();
     }
-    strcpy(tmp, token);
-    sprintf(token, "<STRING: %s>", tmp);
-    return STRING;
+
 }
-/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-int punto()
+void salto_linea()
 {
-    strcpy(token,"<PUNTO>");
-    return CTE;
+    tipo_token =  0;
 }
-int salto_linea()
-{
-    //linea++;
-    return 0;
-}
-int op_concaten()
+void op_concaten()
 {
     limpiar_token();
-    strcpy(token,"<CONCATENAR>");
-    return OP_CONCATENAR;
+    tipo_token =   OP_CONCATENAR;
 }
-int op_igualdad()
+void op_igualdad()
 {
     limpiar_token();
-    strcpy(token,"<IGUALDAD>");
-    return OP_IGUAL;
+    tipo_token =   OP_IGUAL;
 }
-int op_distinto()
+void op_distinto()
 {
     limpiar_token();
-    strcpy(token,"<DISTINTO>");
-    return OP_DISTINTO;
+    tipo_token =  OP_DISTINTO;
 }
-int nada()
+void nada()
 {
-    return 0;
 }
 
-int error()
+
+void error()
 {
     char _elementos_esperados[300] = {'\0'};
     /* como es un error, descarto el contenido de token */
@@ -707,17 +697,16 @@ int error()
     // en caso de un fin de archivo inesperado muestro mensaje y salgo
     if (caracter == EOF) {
         fprintf (stderr, "Error linea %d: Fin de archivo inesperado \n", linea);
-        return ERROR;
+		tipo_token =  ERROR;
+		return;
     }
-
     // obtengo elementos esperados
-    get_elementos_esperados (_elementos_esperados); 
-    // muestro mensaje de error 
-    fprintf (stderr, "Error linea %d, cerca del elemento inesperado: '%c'\n",
-                    linea, caracter);
+    get_elementos_esperados (_elementos_esperados);
+    // muestro mensaje de error
+    fprintf (stderr, "Error linea %d, cerca del elemento inesperado: '%c'\n", linea, caracter);
     // muestro elementos esperados
     fprintf (stderr, ">>>> Elementos esperados: %s\n", _elementos_esperados);
-    return ERROR;
+    tipo_token =  ERROR;
 }
 
 void get_elementos_esperados(char *esperados)
@@ -750,65 +739,65 @@ int get_evento(char c)
             return 0;
         case '-':
             return 1;
-            
+
         case '*':
             return 2;
-            
+
         case '/':
             return 3;
-            
+
         case '=':
             return 6;
-            
+
         case '<':
             return 7;
-            
+
         case '>':
             return 8;
-            
+
         case '?':
             return 9;
-            
+
         case ':':
             return 10;
-            
+
         case '!':
             return 11;
-            
+
         case '"':
             return 12;
-            
+
         case '.':
             return 13;
-            
+
         case ';':
             return 14;
-            
+
         case '(':
             return 16;
-            
+
         case ')':
             return 17;
-            
+
         case ',':
             return 18;
-            
+
         //case '\t':
         //    return 19;
-            
+
         case '\t':
         case '\r':
         case ' ':
             return 20;
-            
+
         case '\n':
             return 21;
-            
+
         case EOF:
             return 22;
         case '{':
             return 23;
-            
+
         case '}':
             return 24;
 
@@ -825,8 +814,8 @@ int esPalabraRes()
     char aux[LONG_MAX];
     int i;
     strcpy(aux, token);
-    // pasamos todo el token a minuscula 
-    a_minuscula(aux); 
+    // pasamos todo el token a minuscula
+    a_minuscula(aux);
     for(i=0;i<CANTPR;i++)
     {
         if(strcmp(palabrasRes[i],aux)==0)
@@ -838,12 +827,163 @@ int esPalabraRes()
     return -1;
 }
 
-void a_minuscula (char *palabra) 
+void a_minuscula (char *palabra)
 {
     char *tmp = palabra;
-    while (*tmp) 
+    while (*tmp)
     {
         *tmp = tolower(*tmp);
         tmp++;
     }
+}
+
+void guardarTS()
+{
+    int i;
+    fprintf(tos,"Nro\t | Nombre\t\t\t | Tipo\t | Valor\t | Longitud \n");
+    for (i=0; i<TStop; i++){
+        fprintf(tos,"%d     \t | %s     \t\t\t | %s     \t | %s \t | %d \n",i,TS[i].nombre, TS[i].tipo, TS[i].valor, TS[i].longitud);
+    }
+}
+
+/* Inserta en la TS o si ya existe devuelve la posicion */
+int insertarTS()
+{
+	int i=0;
+
+    // Reviso si ya existe en la TS
+    for (i=0; i<TStop;  i++) {
+
+        if (tipo_token==ID) {
+            if (strcmp(TS[i].nombre,token)==0)
+                return i;
+        }
+        else {
+            if (strcmp(TS[i].valor,token)==0)
+                return i;
+        }
+    }
+
+    // Inserto en la TS
+  	switch (tipo_token) {
+
+        case ID:
+            strcpy(TS[TStop].nombre,token);
+            strcpy(TS[TStop].tipo,"ID" );
+            TStop++;
+        break;
+        case CTE_ENTERO:
+            strcpy(TS[TStop].nombre, "_");
+            strcpy(TS[TStop].tipo,"CTE");
+            strcpy(TS[TStop].valor, token);
+   			TStop++;
+		break;
+        case CTE_REAL:
+            strcpy(TS[TStop].nombre,"_");
+            strcpy(TS[TStop].tipo,"REAL");
+            strcpy(TS[TStop].valor, token);
+   			TStop++;
+		break;
+       	case CTE_STRING:
+            strcpy(TS[TStop].nombre, "_");
+            strcpy(TS[TStop].tipo,"STRING" );
+            strcpy(TS[TStop].valor, token);
+            TS[TStop].longitud = (strlen(token));
+            TStop++;
+        break;
+    }
+
+    return TStop-1;
+}
+
+
+void guardarToken()
+{
+
+   switch(tipo_token)
+   {
+   	   	   case ID:
+   	   		    fprintf(salida,"< ID: %s >\n",token);
+                break;
+           case OP_SUMA:
+                fprintf(salida,"< OP_SUMA >\n");
+                break;
+           case OP_MENOS:
+                fprintf(salida,"< OP_MENOS >\n");
+                break;
+           case OP_MUL:
+			   fprintf(salida,"< OP_MUL >\n");
+			   break;
+		  case OP_DIV:
+			   fprintf(salida,"< OP_DIV >\n");
+			   break;
+		  case OP_ASIG:
+			   fprintf(salida,"< OP_ASIG >\n");
+			   break;
+		  case OP_IGUAL:
+			   fprintf(salida,"< OP_IGUAL >\n");
+			   break;
+		  case OP_MENOR:
+			   fprintf(salida,"< OP_MENOR >\n");
+			   break;
+		  case OP_MAYOR:
+			   fprintf(salida,"< OP_MAYOR >\n");
+			   break;
+		  case OP_MAYOR_IGUAL:
+			   fprintf(salida,"< OP_MAYOR_IGUAL  >\n");
+			   break;
+		  case OP_MENOR_IGUAL:
+			   fprintf(salida,"< OP_MENOR_IGUAL >\n");
+			   break;
+		  case DOS_PUNTOS:
+			   fprintf(salida,"< DOS_PUNTOS >\n");
+			   break;
+		  case OP_DISTINTO:
+			   fprintf(salida,"< OP_DISTINTO >\n");
+			   break;
+		  case PUNTO_Y_COMA:
+			   fprintf(salida,"< PUNTO_Y_COMA >\n");
+			   break;
+		  case PARENT_ABRE:
+			   fprintf(salida,"< PARENT_ABRE >\n");
+			   break;
+		  case PARENT_CIERRA:
+			   fprintf(salida,"< PARENT_CIERRA >\n");
+			   break;
+		  case COMA:
+			   fprintf(salida,"< COMA >\n");
+			   break;
+		  case CTE_ENTERO:
+			   fprintf(salida,"< CTE_ENTERO: %s >\n",token);
+			   break;
+		  case CTE_REAL:
+			   fprintf(salida,"< CTE_REAL: %s >\n",token);
+			   break;
+		  case CTE_STRING:
+		  	   fprintf(salida,"< CTE_STRING: %s >\n",token);
+			   break;
+		  case OP_CONCATENAR:
+			   fprintf(salida,"< OP_CONCATENAR >\n");
+			   break;
+		  case OUTPUT:
+			   fprintf(salida,"< OUTPUT >\n");
+			   break;
+		  case INPUT:
+			   fprintf(salida,"< INPUT >\n");
+			   break;
+		  case NEGAR:
+			   fprintf(salida,"< NEGAR >\n");
+			   break;
+		  case LLAVE_ABRE:
+			   fprintf(salida,"< LLAVE_ABRE >\n");
+			   break;
+		  case LLAVE_CIERRA:
+			   fprintf(salida,"< LLAVE_CIERRA >\n");
+			   break;
+          default:
+        	   fprintf(salida,"< PR: %s >\n",token);
+        	   break;
+     }
+
+
 }
