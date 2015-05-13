@@ -165,7 +165,7 @@ int yylval;
 FILE *salida,*entrada, *tos;
 int TStop = 0;  // Índice de la TS
 int tipo_token; //numero identificador del token
-int linea = 0; //linea por la que esta leyendo
+int linea = 1; //linea por la que esta leyendo
 int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
@@ -362,6 +362,7 @@ int main()
     for(i = 0; i < CANT_TERMINALES; i++)
         proceso[30][i] = cont_com;
     proceso[30][T_EOF] = error;
+    proceso[30][T_newline] = salto_linea;
 
     for(i = 0; i < CANT_TERMINALES; i++)
         proceso[31][i] = cont_com;
@@ -372,6 +373,7 @@ int main()
     proceso[32][T_menos] = fin_com;
     proceso[32][T_EOF] = error;
 
+    proceso[36][T_newline] = salto_linea;
 
     terminal[T_mas] =               "+";
     terminal[T_menos] =             "-";
@@ -398,7 +400,7 @@ int main()
     terminal[T_EOF] =               "EOF";
     terminal[T_corchete_abre] =     "[";
     terminal[T_corchete_cierra] =   "]";
-    
+
 
     //------------------------------------------------------//
 
@@ -464,7 +466,7 @@ char proximo_caracter()
     // obtengo caracter desde el archivo de entrada
     _caracter = fgetc(entrada);
     // salto de linea
-    if (_caracter == '\n') linea++;
+    //if (_caracter == '\n') linea++;
     // devuelvo caracter leido
     return _caracter;
 }
@@ -667,6 +669,7 @@ void fin_string()
 void salto_linea()
 {
     tipo_token =  0;
+    linea++;
 }
 void op_concaten()
 {
@@ -715,7 +718,7 @@ void get_elementos_esperados(char *esperados)
     for (i = 0; i < CANT_TERMINALES; i++)
         /* busco los terminales que no me deriven en un error, obviando EOF
          * y espacios en blanco */
-        if (i != T_EOF && i!= T_tab && i!= T_espacio && i != T_newline && 
+        if (i != T_EOF && i!= T_tab && i!= T_espacio && i != T_newline &&
             proceso [estado][i] != error) {
             /* agrego elemento a la lista de terminales esperados */
             strcat (esperados, terminal[i]);
@@ -803,7 +806,7 @@ int get_evento(char c)
 
         case '_':
             return 4;
-            
+
         default:
             return 15;
     }
