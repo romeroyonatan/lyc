@@ -23,7 +23,8 @@
 %token LLAVE_CIERRA 
 /* palabras reservadas */
 %token OUTPUT INPUT WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING
-%token MAIN ELSE AND OR PUT GET 
+%token MAIN ELSE  PUT GET 
+%left AND OR
 /* operadores */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
 
@@ -31,9 +32,64 @@
 /* ------------------------------------------------------------------------- */
 %%
 programa: declaraciones lista_sentencias
-declaraciones: BEGIN lista_declaraciones END
-lista_declaraciones: declaracion
-                   | lista_declaraciones COMA declaracion
+        ;
+declaraciones: DECLARE lista_declaraciones ENDDECLARE
+             ;
+lista_declaraciones : declaracion
+                    | lista_declaraciones COMA declaracion
+                    ;
+declaracion : ID DOS_PUNTOS REAL
+            | ID DOS_PUNTOS INT
+            | ID DOS_PUNTOS STRING
+            ;
+lista_sentencias: sentencia
+                | lista_sentencias sentencia
+                ;
+sentencia: IF condicion LLAVE_ABRE lista_sentencias LLAVE_CIERRA
+         | IF condicion LLAVE_ABRE lista_sentencias LLAVE_CIERRA 
+           ELSE LLAVE_ABRE lista_sentencias LLAVE_CIERRA
+         | WHILE condicion LLAVE_ABRE lista_sentencias LLAVE_CIERRA
+         | PUT ID
+         | PUT CTE_STRING
+         | GET ID
+         | asignacion
+         ;
+
+condicion: factor OP_MENOR factor
+         | factor OP_MENOR_IGUAL factor
+         | factor OP_IGUAL factor
+         | factor OP_DISTINTO factor
+         | factor OP_MAYOR factor
+         | factor OP_MAYOR_IGUAL factor
+         | condicion AND condicion
+         | condicion OR condicion
+         ;
+
+asignacion: ID OP_ASIG expresion
+          | ID OP_ASIG concatenacion
+          ;
+
+expresion: expresion OP_SUMA termino
+         | expresion OP_MENOS termino
+         | termino
+         ;
+
+termino: termino OP_MUL factor
+       | termino OP_DIV factor
+       | factor
+       ;
+
+factor: ID
+      | CTE_STRING
+      | CTE_ENTERO
+      | CTE_REAL
+      ;
+
+concatenacion: ID OP_CONCATENAR ID
+             | ID OP_CONCATENAR CTE_STRING
+             | CTE_STRING OP_CONCATENAR ID
+             | CTE_STRING OP_CONCATENAR CTE_STRING
+             ;
 %%
 
 /* FUNCIONES AUXILIARES */    
