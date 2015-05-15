@@ -14,13 +14,8 @@
 /* ------------------------------------------------------------------------- */
 /* operadores */
 %token OP_ASIG
-%token OP_SUMA OP_MENOS
-%token OP_MUL OP_DIV
 %token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTINTO
 %token OP_CONCATENAR NEGAR
-/* puntuacion */
-%token DOS_PUNTOS PUNTO_Y_COMA PARENT_ABRE PARENT_CIERRA COMA LLAVE_ABRE
-%token LLAVE_CIERRA 
 /* palabras reservadas */
 %token OUTPUT INPUT WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING
 %token MAIN ELSE  PUT GET 
@@ -36,19 +31,19 @@ programa: declaraciones lista_sentencias
 declaraciones: DECLARE lista_declaraciones ENDDECLARE
              ;
 lista_declaraciones : declaracion
-                    | lista_declaraciones COMA declaracion
+                    | lista_declaraciones ',' declaracion
                     ;
-declaracion : ID DOS_PUNTOS REAL
-            | ID DOS_PUNTOS INT
-            | ID DOS_PUNTOS STRING
+declaracion : ID ':' REAL
+            | ID ':' INT
+            | ID ':' STRING
             ;
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
                 ;
-sentencia: IF condicion LLAVE_ABRE lista_sentencias LLAVE_CIERRA
-         | IF condicion LLAVE_ABRE lista_sentencias LLAVE_CIERRA 
-           ELSE LLAVE_ABRE lista_sentencias LLAVE_CIERRA
-         | WHILE condicion LLAVE_ABRE lista_sentencias LLAVE_CIERRA
+sentencia: IF condicion '{' lista_sentencias '}'
+         | IF condicion '{' lista_sentencias '}' 
+           ELSE '{' lista_sentencias '}'
+         | WHILE condicion '{' lista_sentencias '}'
          | PUT ID
          | PUT CTE_STRING
          | GET ID
@@ -69,13 +64,13 @@ asignacion: ID OP_ASIG expresion
           | ID OP_ASIG concatenacion
           ;
 
-expresion: expresion OP_SUMA termino
-         | expresion OP_MENOS termino
+expresion: expresion '+' termino
+         | expresion '-' termino
          | termino
          ;
 
-termino: termino OP_MUL factor
-       | termino OP_DIV factor
+termino: termino '*' factor
+       | termino '/' factor
        | factor
        ;
 
@@ -83,7 +78,7 @@ factor: ID
       | CTE_STRING
       | CTE_ENTERO
       | CTE_REAL
-      | PARENT_ABRE expresion PARENT_CIERRA
+      | '(' expresion ')'
       ;
 
 concatenacion: ID OP_CONCATENAR ID
