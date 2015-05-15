@@ -18,7 +18,7 @@
 %token OP_CONCATENAR 
 /* palabras reservadas */
 %token WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING MAIN ELSE PUT GET
-%nonassoc AND OR NEGAR
+%token AND OR NEGAR
 /* operandos */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
 
@@ -40,10 +40,10 @@ declaracion : ID ':' REAL
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
                 ;
-sentencia: IF condicion '{' lista_sentencias '}'
-         | IF condicion '{' lista_sentencias '}' 
+sentencia: IF condicion_logica '{' lista_sentencias '}'
+         | IF condicion_logica '{' lista_sentencias '}' 
            ELSE '{' lista_sentencias '}'
-         | WHILE condicion '{' lista_sentencias '}'
+         | WHILE condicion_logica '{' lista_sentencias '}'
          | PUT ID
          | PUT CTE_STRING
          | GET ID
@@ -60,15 +60,18 @@ cte : CTE_STRING
     | CTE_REAL
     ;
 
+condicion_logica: condicion AND condicion
+                | condicion OR condicion
+                | NEGAR condicion
+                | condicion
+                ;
+
 condicion: factor OP_MENOR factor
          | factor OP_MENOR_IGUAL factor
          | factor OP_IGUAL factor
          | factor OP_DISTINTO factor
          | factor OP_MAYOR factor
          | factor OP_MAYOR_IGUAL factor
-         | NEGAR condicion
-         | condicion AND condicion
-         | condicion OR condicion
          ;
 
 asignacion: ID OP_ASIG expresion
