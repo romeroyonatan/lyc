@@ -15,7 +15,7 @@
 /* operadores */
 %token OP_ASIG
 %token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTINTO
-%token OP_CONCATENAR NEGAR
+%token OP_CONCATENAR OP_NEGAR
 /* palabras reservadas */
 %token OUTPUT INPUT WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING
 %token MAIN ELSE  PUT GET 
@@ -56,6 +56,7 @@ condicion: factor OP_MENOR factor
          | factor OP_DISTINTO factor
          | factor OP_MAYOR factor
          | factor OP_MAYOR_IGUAL factor
+         | OP_NEGAR condicion
          | condicion AND condicion
          | condicion OR condicion
          ;
