@@ -83,6 +83,7 @@ factor: ID
       | CTE_STRING
       | CTE_ENTERO
       | CTE_REAL
+      | PARENT_ABRE expresion PARENT_CIERRA
       ;
 
 concatenacion: ID OP_CONCATENAR ID
