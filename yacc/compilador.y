@@ -24,7 +24,7 @@
 /* palabras reservadas */
 %token OUTPUT INPUT WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING
 %token MAIN ELSE  PUT GET 
-%left AND OR
+%nonassoc AND OR
 /* operadores */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
 
