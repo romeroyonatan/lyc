@@ -28,6 +28,7 @@
 programa: declaraciones lista_sentencias
         ;
 declaraciones: DECLARE lista_declaraciones ENDDECLARE
+             | 
              ;
 lista_declaraciones : declaracion
                     | lista_declaraciones ',' declaracion
@@ -47,7 +48,17 @@ sentencia: IF condicion '{' lista_sentencias '}'
          | PUT CTE_STRING
          | GET ID
          | asignacion
+         | CONST tipo ID OP_ASIG cte
          ;
+
+tipo: INT 
+    | REAL 
+    | STRING
+    ;
+cte : CTE_STRING 
+    | CTE_ENTERO 
+    | CTE_REAL
+    ;
 
 condicion: factor OP_MENOR factor
          | factor OP_MENOR_IGUAL factor
@@ -74,9 +85,7 @@ termino: termino '*' factor
        ;
 
 factor: ID
-      | CTE_STRING
-      | CTE_ENTERO
-      | CTE_REAL
+      | cte
       | '(' expresion ')'
       ;
 
