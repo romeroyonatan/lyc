@@ -15,11 +15,11 @@
 /* operadores */
 %token OP_ASIG
 %token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTINTO
-%token OP_CONCATENAR OP_NEGAR
+%token OP_CONCATENAR 
 /* palabras reservadas */
 %token WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING MAIN ELSE PUT GET
-%nonassoc AND OR
-/* operadores */
+%nonassoc AND OR NEGAR
+/* operandos */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
 
 /* REGLAS SEMANTICAS */
@@ -55,7 +55,7 @@ condicion: factor OP_MENOR factor
          | factor OP_DISTINTO factor
          | factor OP_MAYOR factor
          | factor OP_MAYOR_IGUAL factor
-         | OP_NEGAR condicion
+         | NEGAR condicion
          | condicion AND condicion
          | condicion OR condicion
          ;
@@ -65,6 +65,7 @@ asignacion: ID OP_ASIG expresion
           ;
 
 expresion: expresion '+' termino
+         | termino
          ;
 
 termino: termino '*' factor
