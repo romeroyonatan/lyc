@@ -1,0 +1,19 @@
+DECLARE
+    a : int, 
+    b : int,
+    aux : int,
+    i : int
+ENDDECLARE
+
+a = 1
+b = 1
+CONST int cantidad = 10
+
+PUT a
+while i < cantidad {
+    aux = b
+    b = a + b
+    a = aux
+    PUT a
+    i = i + 1
+}
