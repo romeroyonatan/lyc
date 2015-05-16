@@ -148,7 +148,7 @@ declaraciones: DECLARE lista_declaraciones ENDDECLARE
 lista_declaraciones : declaracion
                     | lista_declaraciones ',' declaracion
                     ;
-declaracion : ID ':' tipo{puts("Declaracion de variable");}
+declaracion : ID ':' tipo{printf("Declaracion de variable '%s'\n", TS[$1].nombre);}
             ;
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
