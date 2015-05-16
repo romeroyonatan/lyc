@@ -1,9 +1,10 @@
 DECLARE
-	int i,
-	CONST real b = 8
+	i : int,
+	t : real
 ENDDECLARE
 i = 4 + 5/2
 g= "p"++"w"
+CONST real h=14
 if a<9-2*8 
 {
 	f=f+1
