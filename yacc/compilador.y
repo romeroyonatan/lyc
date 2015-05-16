@@ -93,8 +93,7 @@ declaraciones: DECLARE lista_declaraciones ENDDECLARE
 lista_declaraciones : declaracion
                     | lista_declaraciones COMA declaracion
                     ;
-declaracion : tipo ID{puts("Declaracion de ID");}
-			| CONST tipo ID OP_ASIG cte{puts("Declaracion de CTE con nombre");}
+declaracion : ID DOS_PUNTOS tipo{puts("Declaracion de variable");}
             ;
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
@@ -107,6 +106,7 @@ sentencia: IF condicion_logica LLAVE_ABRE lista_sentencias LLAVE_CIERRA{puts("Fi
          | PUT CTE_STRING{puts("Mostrar por pantalla STRING");}
          | GET ID {puts("Leer por pantalla ID");}
          | asignacion
+		 |CONST tipo ID OP_ASIG cte{puts("Declaracion de CTE con nombre");}
          ;
 
 tipo: INT 
