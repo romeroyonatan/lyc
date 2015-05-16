@@ -1,9 +1,14 @@
-declare
-	int a,b,c
-enddeclare
-main
+DECLARE
+	i : int,
+	t : real
+ENDDECLARE
+i = 4 + 5/2
+g= "p"++"w"
+CONST real h=14
+if a<9-2*8 
 {
-	a = 0.2+5
-	b = 8.2
-	c = "cadena"
+	f=f+1
+}
+while a<8 AND b>8*8 {b=0
+
 }
