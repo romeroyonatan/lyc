@@ -214,8 +214,8 @@ concatenacion: ID OP_CONCATENAR ID{puts("Concatena ID con ID");}
 %%
 /* FUNCIONES AUXILIARES */    
 /* ------------------------------------------------------------------------- */
-/*----------VARIABLES GLOBALES-----------------*/
 
+/*----------VARIABLES GLOBALES-----------------*/
 int yylval;
 FILE *entrada, *tos;
 int TStop = 0;  // Índice de la TS
@@ -260,6 +260,7 @@ int NroPalabrasRes[CANTPR]={
     PUT,
     GET
 };
+
 int main(int argc, char **argv)
 {
     // inicializo matriz de estados de automata finito
@@ -306,10 +307,10 @@ int yylex()
             estado=QFIN;
         }
     }
+
     if(!feof(entrada))
-    {
         fseek(entrada,-sizeof(char),SEEK_CUR);
-    }
+
     return tipo_token;
 }
 
