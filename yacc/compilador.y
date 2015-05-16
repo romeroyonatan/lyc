@@ -263,7 +263,7 @@ int NroPalabrasRes[CANTPR]={
     PUT,
     GET
 };
-int main()
+int main(int argc, char **argv)
 {
     int i,j;
     /* lleno la matriz de proximo estado */
@@ -459,10 +459,11 @@ int main()
 
 
     //------------------------------------------------------//
-
     //Apertura del archivo con el lote de pruebas
-    if((entrada = fopen("pruebagral.txt", "r")) == NULL){
-        printf("No se puede abrir el archivo pruebagral.txt\n");
+    entrada = argc == 2 ? fopen(argv[1], "r") : fopen("prueba.txt", "r"); 
+    if(entrada == NULL){
+        printf("No se puede abrir el archivo %s\n", argc == 2 ? argv[1] : 
+                                                    "prueba.txt");
         exit(1);
     }
 
