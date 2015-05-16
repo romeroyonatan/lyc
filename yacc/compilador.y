@@ -270,18 +270,18 @@ int main(int argc, char **argv)
     if(entrada == NULL){
         printf("No se puede abrir el archivo %s\n", argc == 2 ? argv[1] : 
                                                     "prueba.txt");
-        exit(1);
+        exit(ERROR);
     }
 
+    //XXX: Para el analizador sintactico ya no la necesitamos mostrar
     if((tos = fopen("tabla_de_simbolos.txt", "w"))==NULL){
         printf("No se puede crear el archivo tabla_de_simbolos.txt\n");
-        exit(1);
+        exit(ERROR);
     }
 
    	yyparse();
 
     guardarTS();
-
     fclose(entrada);
     fclose(tos);
     return 0;
