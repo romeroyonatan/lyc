@@ -4,6 +4,9 @@
 * Universidad Nacional de la Matanza
 * 2015
 */
+
+/* DECLARACIONES*/
+/* ------------------------------------------------------------------------- */
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,10 +54,76 @@
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
 #define TAMMAX 100
 
-/*---------------------------------------------*/
+//Funciones de la matriz
+void limpiar_token();
+void inic_com();
+void cont_com();
+void fin_com();
+void op_suma();
+void op_menos();
+void op_menos2();
+void op_mul();
+void op_div();
+void op_asig();
+void op_asig();
+void op_menor();
+void op_menor_ig();
+void op_mayor();
+void op_mayor_ig();
+void dos_puntos();
+void op_negar();
+void puntoycoma();
+void par_abre();
+void par_cierra();
+void llave_abre();
+void llave_cierra();
+void coma();
+void inic_id();
+void cont_id();
+void fin_id();
+void inic_real();
+void cont_real();
+void fin_real();
+void inic_cte();
+void cont_cte();
+void fin_cte();
+void inic_string();
+void cont_string();
+void fin_string();
+
+void salto_linea();
+void op_concaten();
+void op_igualdad();
+void op_distinto();
+void error();
+void nada();
+
+//////////////////////////
+void init();
+int yylex();
+int yyerror(char*);
+char proximo_caracter();
+void get_elementos_esperados(char*);
+int get_evento(char);
+int esPalabraRes();
+void a_minuscula (char*);
+int insertarTS();
+void guardarTS();
+
+int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
+void (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
+
+/* TABLA DE SIMBOLOS */
+struct tablaDeSimbolos
+{
+    char nombre[100];
+    char tipo  [11];
+    char valor [100];
+    char ren   [31];
+    int longitud;
+};
+struct tablaDeSimbolos TS[TAMMAX];
 %}
-/* DECLARACIONES*/
-/* ------------------------------------------------------------------------- */
 
 /* TOKENS */
 /* ------------------------------------------------------------------------- */
@@ -145,77 +214,6 @@ concatenacion: ID OP_CONCATENAR ID{puts("Concatena ID con ID");}
 %%
 /* FUNCIONES AUXILIARES */    
 /* ------------------------------------------------------------------------- */
-//Funciones de la matriz
-void limpiar_token();
-void inic_com();
-void cont_com();
-void fin_com();
-void op_suma();
-void op_menos();
-void op_menos2();
-void op_mul();
-void op_div();
-void op_asig();
-void op_asig();
-void op_menor();
-void op_menor_ig();
-void op_mayor();
-void op_mayor_ig();
-void dos_puntos();
-void op_negar();
-void puntoycoma();
-void par_abre();
-void par_cierra();
-void llave_abre();
-void llave_cierra();
-void coma();
-void inic_id();
-void cont_id();
-void fin_id();
-void inic_real();
-void cont_real();
-void fin_real();
-void inic_cte();
-void cont_cte();
-void fin_cte();
-void inic_string();
-void cont_string();
-void fin_string();
-
-void salto_linea();
-void op_concaten();
-void op_igualdad();
-void op_distinto();
-void error();
-void nada();
-
-//////////////////////////
-
-int yylex();
-char proximo_caracter();
-void get_elementos_esperados(char*);
-int get_evento(char);
-int esPalabraRes();
-void a_minuscula (char*);
-int insertarTS();
-void guardarTS();
-
-
-int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
-void (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
-
-
-/* TABLA DE SIMBOLOS */
-struct tablaDeSimbolos
-{
-    char nombre[100];
-    char tipo  [11];
-    char valor [100];
-    char ren   [31];
-    int longitud;
-};
-struct tablaDeSimbolos TS[TAMMAX];
-
 /*----------VARIABLES GLOBALES-----------------*/
 
 int yylval;
@@ -264,6 +262,71 @@ int NroPalabrasRes[CANTPR]={
 };
 int main(int argc, char **argv)
 {
+    // inicializo matriz de estados de automata finito
+    init();
+
+    //Apertura del archivo con el lote de pruebas
+    entrada = argc == 2 ? fopen(argv[1], "r") : fopen("prueba.txt", "r"); 
+    if(entrada == NULL){
+        printf("No se puede abrir el archivo %s\n", argc == 2 ? argv[1] : 
+                                                    "prueba.txt");
+        exit(1);
+    }
+
+    if((tos = fopen("tabla_de_simbolos.txt", "w"))==NULL){
+        printf("No se puede crear el archivo tabla_de_simbolos.txt\n");
+        exit(1);
+    }
+
+   	yyparse();
+
+    guardarTS();
+
+    fclose(entrada);
+    fclose(tos);
+    return 0;
+}
+
+int yylex()
+{
+    estado=0;
+    while(estado != QFIN)
+    {
+        if ((caracter = proximo_caracter()) != EOF)
+        {
+            int columna = get_evento(caracter);
+            (proceso [estado] [columna]) ();
+
+            estado = nuevo_estado [estado] [columna];
+        }
+        else
+        {
+			if(estado==0)return EOF;
+            (proceso [estado] [22]) ();
+            estado=QFIN;
+        }
+    }
+    if(!feof(entrada))
+    {
+        fseek(entrada,-sizeof(char),SEEK_CUR);
+    }
+    return tipo_token;
+}
+
+char proximo_caracter()
+{
+    char _caracter;
+    // obtengo caracter desde el archivo de entrada
+    _caracter = fgetc(entrada);
+    // salto de linea
+    //if (_caracter == '\n') linea++;
+    // devuelvo caracter leido
+    return _caracter;
+}
+
+/* inicializa matriz de automata finito del analizador lexico */
+void init () {
+
     int i,j;
     /* lleno la matriz de proximo estado */
     for (i=0; i<CANT_ESTADOS; i++)
@@ -457,66 +520,8 @@ int main(int argc, char **argv)
     terminal[T_corchete_cierra] =   "]";
 
 
-    //------------------------------------------------------//
-    //Apertura del archivo con el lote de pruebas
-    entrada = argc == 2 ? fopen(argv[1], "r") : fopen("prueba.txt", "r"); 
-    if(entrada == NULL){
-        printf("No se puede abrir el archivo %s\n", argc == 2 ? argv[1] : 
-                                                    "prueba.txt");
-        exit(1);
-    }
 
-    if((tos = fopen("tabla_de_simbolos.txt", "w"))==NULL){
-        printf("No se puede crear el archivo tabla_de_simbolos.txt\n");
-        exit(1);
-    }
-
-   	yyparse();
-
-    guardarTS();
-
-    fclose(entrada);
-    fclose(tos);
-    return 0;
 }
-
-int yylex()
-{
-    estado=0;
-    while(estado != QFIN)
-    {
-        if ((caracter = proximo_caracter()) != EOF)
-        {
-            int columna = get_evento(caracter);
-            (proceso [estado] [columna]) ();
-            estado = nuevo_estado [estado] [columna];
-        }
-        else
-        {
-			if(estado==0)return EOF;
-            (proceso [estado] [22]) ();
-            estado=QFIN;
-        }
-    }
-    if(!feof(entrada))
-    {
-        fseek(entrada,-sizeof(char),SEEK_CUR);
-    }
-    return tipo_token;
-}
-
-char proximo_caracter()
-{
-    char _caracter;
-    // obtengo caracter desde el archivo de entrada
-    _caracter = fgetc(entrada);
-    // salto de linea
-    //if (_caracter == '\n') linea++;
-    // devuelvo caracter leido
-    return _caracter;
-}
-
-
 void limpiar_token()
 {
   *token = '\0';
