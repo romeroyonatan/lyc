@@ -199,7 +199,6 @@ int esPalabraRes();
 void a_minuscula (char*);
 int insertarTS();
 void guardarTS();
-void guardarToken();
 
 
 int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
@@ -220,7 +219,7 @@ struct tablaDeSimbolos TS[TAMMAX];
 /*----------VARIABLES GLOBALES-----------------*/
 
 int yylval;
-FILE *salida,*entrada, *tos;
+FILE *entrada, *tos;
 int TStop = 0;  // Índice de la TS
 int tipo_token; //numero identificador del token
 int linea = 1; //linea por la que esta leyendo
@@ -467,11 +466,6 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if((salida = fopen("pruebagral_resultado.txt", "w"))==NULL){
-    	printf("No se puede crear el archivo pruebagral_resultado.txt\n");
-    	exit(1);
-    }
-
     if((tos = fopen("tabla_de_simbolos.txt", "w"))==NULL){
         printf("No se puede crear el archivo tabla_de_simbolos.txt\n");
         exit(1);
@@ -482,7 +476,6 @@ int main(int argc, char **argv)
     guardarTS();
 
     fclose(entrada);
-    fclose(salida);
     fclose(tos);
     return 0;
 }
@@ -952,97 +945,6 @@ int insertarTS()
     return TStop-1;
 }
 
-
-void guardarToken()
-{
-
-   switch(tipo_token)
-   {
-   	   	   case ID:
-   	   		    fprintf(salida,"< ID: %s >\n",token);
-                break;
-           case '+':
-                fprintf(salida,"< '+' >\n");
-                break;
-           case '-':
-                fprintf(salida,"< '-' >\n");
-                break;
-           case '*':
-			   fprintf(salida,"< '*' >\n");
-			   break;
-		  case '/':
-			   fprintf(salida,"< '/' >\n");
-			   break;
-		  case OP_ASIG:
-			   fprintf(salida,"< OP_ASIG >\n");
-			   break;
-		  case OP_IGUAL:
-			   fprintf(salida,"< OP_IGUAL >\n");
-			   break;
-		  case OP_MENOR:
-			   fprintf(salida,"< OP_MENOR >\n");
-			   break;
-		  case OP_MAYOR:
-			   fprintf(salida,"< OP_MAYOR >\n");
-			   break;
-		  case OP_MAYOR_IGUAL:
-			   fprintf(salida,"< OP_MAYOR_IGUAL  >\n");
-			   break;
-		  case OP_MENOR_IGUAL:
-			   fprintf(salida,"< OP_MENOR_IGUAL >\n");
-			   break;
-		  case ':':
-			   fprintf(salida,"< ':' >\n");
-			   break;
-		  case OP_DISTINTO:
-			   fprintf(salida,"< OP_DISTINTO >\n");
-			   break;
-		  case ';':
-			   fprintf(salida,"< ';' >\n");
-			   break;
-		  case '(':
-			   fprintf(salida,"< '(' >\n");
-			   break;
-		  case ')':
-			   fprintf(salida,"< ')' >\n");
-			   break;
-		  case ',':
-			   fprintf(salida,"< ',' >\n");
-			   break;
-		  case CTE_ENTERO:
-			   fprintf(salida,"< CTE_ENTERO: %s >\n",token);
-			   break;
-		  case CTE_REAL:
-			   fprintf(salida,"< CTE_REAL: %s >\n",token);
-			   break;
-		  case CTE_STRING:
-		  	   fprintf(salida,"< CTE_STRING: %s >\n",token);
-			   break;
-		  case OP_CONCATENAR:
-			   fprintf(salida,"< OP_CONCATENAR >\n");
-			   break;
-		  case PUT:
-			   fprintf(salida,"< PUT >\n");
-			   break;
-		  case GET:
-			   fprintf(salida,"< GET >\n");
-			   break;
-		  case NEGAR:
-			   fprintf(salida,"< NEGAR >\n");
-			   break;
-		  case '{':
-			   fprintf(salida,"< '{' >\n");
-			   break;
-		  case '}':
-			   fprintf(salida,"< '}' >\n");
-			   break;
-          default:
-        	   fprintf(salida,"< PR: %s >\n",token);
-        	   break;
-     }
-
-
-}
 int yyerror(char *s)
 {
     fprintf(stderr,"%s en linea %d\n",s,linea);
