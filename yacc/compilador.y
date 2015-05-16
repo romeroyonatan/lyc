@@ -165,7 +165,7 @@ sentencia: IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");}
          | asignacion
 		 |CONST tipo ID OP_ASIG cte
             {printf("Declaracion de CTE %s con nombre '%s' valor '%s'\n",
-                    TS[$3].tipo, TS[$3].nombre, TS[$3].valor);}
+                    TS[$3].tipo, TS[$3].nombre, TS[$5].valor);}
          ;
 
 tipo: INT 
