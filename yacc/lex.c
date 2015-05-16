@@ -1,55 +1,14 @@
+
+# line 8 "ultimo19.y"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <float.h>
-
-//TOKENS
-#define QFIN 33
-#define OP_SUMA 257
-#define OP_MENOS 258
-#define OP_MUL 259
-#define OP_DIV 260
-#define OP_ASIG 261
-#define OP_IGUAL 262
-#define OP_MENOR 263
-#define OP_MAYOR 264
-#define OP_MAYOR_IGUAL 265
-#define OP_MENOR_IGUAL 266
-#define DOS_PUNTOS 267
-#define OP_DISTINTO 268
-#define PUNTO_Y_COMA 269
-#define PARENT_ABRE 270
-#define PARENT_CIERRA 271
-#define COMA 272
-#define CTE_ENTERO 273
-#define OP_CONCATENAR 274
-#define OUTPUT 275
-#define INPUT 276
-#define ID 277
-#define NEGAR 278
-#define LLAVE_ABRE 279
-#define LLAVE_CIERRA 280
-#define CTE_STRING 281
-#define CTE_REAL 282
-//Palabras Reservadas
-#define WHILE 300
-#define IF 301
-#define CONST 302
-#define DECLARE 303
-#define ENDDECLARE 304
-#define REAL 305
-#define INT 306
-#define STRING 307
-#define MAIN 308
-#define ELSE 309
-#define AND 310
-#define OR 311
-#define PUT 312
-#define GET 313
 #define ERROR -1
 //////////////////////////////
 
+#define QFIN 33
 /* Terminales */
 #define T_mas               0
 #define T_menos             1
@@ -87,6 +46,55 @@
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
 #define TAMMAX 100
 
+/*---------------------------------------------*/
+#define OP_ASIG 257
+#define OP_IGUAL 258
+#define OP_MENOR 259
+#define OP_MAYOR 260
+#define OP_MAYOR_IGUAL 261
+#define OP_MENOR_IGUAL 262
+#define OP_DISTINTO 263
+#define OP_CONCATENAR 264
+#define DOS_PUNTOS 265
+#define PUNTO_Y_COMA 266
+#define PARENT_ABRE 267
+#define PARENT_CIERRA 268
+#define COMA 269
+#define LLAVE_CIERRA 270
+#define LLAVE_ABRE 271
+#define OP_SUMA 272
+#define OP_MENOS 273
+#define OP_MUL 274
+#define OP_DIV 275
+#define PUT 276
+#define GET 277
+#define WHILE 278
+#define IF 279
+#define CONST 280
+#define DECLARE 281
+#define ENDDECLARE 282
+#define REAL 283
+#define INT 284
+#define STRING 285
+#define MAIN 286
+#define ELSE 287
+#define AND 288
+#define OR 289
+#define NEGAR 290
+#define ID 291
+#define CTE_ENTERO 292
+#define CTE_STRING 293
+#define CTE_REAL 294
+#ifndef YYSTYPE
+#define YYSTYPE int
+#endif
+YYSTYPE yylval, yyval;
+#define YYERRCODE 256
+
+# line 159 "ultimo19.y"
+
+/* FUNCIONES AUXILIARES */
+/* ------------------------------------------------------------------------- */
 //Funciones de la matriz
 void limpiar_token();
 void inic_com();
@@ -205,8 +213,6 @@ int NroPalabrasRes[CANTPR]={
     PUT,
     GET
 };
-
-/*---------------------------------------------*/
 int main()
 {
     int i,j;
@@ -421,11 +427,7 @@ int main()
     }
 
     while(!feof(entrada)){
-    	tipo_token = yylex();
-    	if(tipo_token>0){
-    		guardarToken();
-    	}
-    	limpiar_token();
+    	yyparse();
     }
 
     guardarTS();
@@ -449,6 +451,7 @@ int yylex()
         }
         else
         {
+			if(estado==0)return EOF;
             (proceso [estado] [22]) ();
             estado=QFIN;
         }
@@ -968,11 +971,11 @@ void guardarToken()
 		  case OP_CONCATENAR:
 			   fprintf(salida,"< OP_CONCATENAR >\n");
 			   break;
-		  case OUTPUT:
-			   fprintf(salida,"< OUTPUT >\n");
+		  case PUT:
+			   fprintf(salida,"< PUT >\n");
 			   break;
-		  case INPUT:
-			   fprintf(salida,"< INPUT >\n");
+		  case GET:
+			   fprintf(salida,"< GET >\n");
 			   break;
 		  case NEGAR:
 			   fprintf(salida,"< NEGAR >\n");
@@ -989,4 +992,412 @@ void guardarToken()
      }
 
 
+}
+int yyerror(char *s)
+{
+    fprintf(stderr,"%s en linea %d\n",s,linea);
+	exit(1);
+}
+FILE *yytfilep;
+char *yytfilen;
+int yytflag = 0;
+int svdprd[2];
+char svdnams[2][2];
+
+int yyexca[] = {
+  -1, 1,
+  0, -1,
+  -2, 0,
+  -1, 83,
+  287, 11,
+  -2, 10,
+  0,
+};
+
+#define YYNPROD 53
+#define YYLAST 212
+
+int yyact[] = {
+      29,      31,      30,      32,      29,      89,      63,      90,
+      29,      87,      34,      88,      35,      40,      36,      43,
+      44,      94,      19,      18,      20,      54,      55,      23,
+      27,      31,      30,      32,      27,      31,      30,      32,
+      60,      31,      61,      32,      97,      39,      95,      28,
+      93,      81,       8,       9,       7,       6,       8,       9,
+       7,       6,      38,      52,      53,      79,      42,      17,
+      83,      11,      19,      18,      20,      11,       8,       9,
+       7,       6,       8,       9,       7,       6,      80,       4,
+       8,       9,       7,       6,      82,      11,      78,      37,
+      22,      11,      52,      53,      59,      26,      16,      11,
+      48,      46,      50,      51,      47,      49,       5,      15,
+       3,      25,      13,      12,      45,      66,      52,      53,
+      41,      65,      10,      13,       5,      42,      21,      57,
+      92,      14,       2,       1,       0,       0,      33,       0,
+       0,       0,      91,       0,       0,       0,      67,       0,
+      16,       0,       0,      28,       0,       0,       0,      62,
+       0,      24,       0,      64,      76,      77,       0,       0,
+      21,       0,      84,      85,      65,       0,      74,      75,
+       0,       0,       0,       0,       0,       0,      15,      13,
+       0,      79,      55,      26,       0,      66,      22,      56,
+       0,       0,       0,       0,      53,      25,       0,      58,
+      86,       0,       0,       0,       0,      13,       0,      95,
+      68,      69,      70,      71,      72,      73,       0,      13,
+      96,       3,      37,       0,      46,       0,       0,       0,
+       0,       0,       0,       0,       0,       0,      47,      48,
+      49,      50,      51,      24,
+};
+
+int yypact[] = {
+    -210,   -1000,    -204,    -204,    -225,   -1000,    -267,    -267,
+    -281,    -277,   -1000,    -178,    -204,   -1000,    -232,   -1000,
+    -278,    -265,   -1000,   -1000,   -1000,    -217,    -273,   -1000,
+    -170,    -253,   -1000,   -1000,   -1000,    -263,   -1000,   -1000,
+   -1000,   -1000,   -1000,   -1000,   -1000,    -259,   -1000,    -225,
+   -1000,    -285,    -204,   -1000,   -1000,    -263,    -263,    -263,
+    -263,    -263,    -263,    -263,    -263,    -263,    -263,    -263,
+    -190,    -218,    -221,   -1000,    -194,    -223,   -1000,    -181,
+    -214,    -263,    -263,   -1000,    -221,    -221,    -221,    -221,
+    -221,    -221,    -253,    -253,   -1000,   -1000,   -1000,    -204,
+    -282,    -286,    -291,   -1000,   -1000,   -1000,    -230,   -1000,
+   -1000,   -1000,   -1000,   -1000,    -270,   -1000,    -233,    -204,
+    -234,   -1000,
+};
+
+int yypgo[] = {
+       0,     115,     114,      96,     113,      95,      86,      39,
+      94,     110,     112,     111,     106,      80,     105,     101,
+     100,     137,      84,      97,      85,
+};
+
+int yyr1[] = {
+       0,       1,       1,       2,       4,       4,       5,       5,
+       3,       3,       8,      10,       8,      11,       8,       8,
+       8,       8,       8,       6,       6,       6,       7,       7,
+       7,      14,       9,      15,       9,      16,       9,       9,
+      13,      13,      13,      13,      13,      13,      12,      12,
+      17,      17,      17,      19,      19,      19,      20,      20,
+      20,      18,      18,      18,      18,
+};
+
+int yyr2[] = {
+       2,       2,       1,       3,       1,       3,       2,       5,
+       1,       2,       5,       0,      10,       0,       6,       2,
+       2,       2,       1,       1,       1,       1,       1,       1,
+       1,       0,       4,       0,       4,       0,       3,       1,
+       3,       3,       3,       3,       3,       3,       3,       3,
+       3,       3,       1,       3,       3,       1,       1,       1,
+       3,       3,       3,       3,       3,
+};
+
+int yychk[] = {
+   -1000,      -1,      -2,      -3,     281,      -8,     279,     278,
+     276,     277,     -12,     291,      -3,      -8,      -4,      -5,
+      -6,     280,     284,     283,     285,      -9,     -13,     290,
+     -17,     -19,     -20,     291,      -7,     267,     293,     292,
+     294,      -9,     291,     293,     291,     257,     282,     269,
+     291,      -6,     271,     288,     289,     -16,     259,     262,
+     258,     263,     260,     261,     272,     273,     274,     275,
+     -17,     -11,     -17,     -18,     291,     293,      -5,     291,
+      -3,     -14,     -15,     -13,     -17,     -17,     -17,     -17,
+     -17,     -17,     -19,     -19,     -20,     -20,     268,     271,
+     264,     264,     257,     270,     -13,     -13,      -3,     291,
+     293,     291,     293,      -7,     -10,     270,     287,     271,
+      -3,     270,
+};
+
+int yydef[] = {
+       0,      -2,       0,       2,       0,       8,       0,       0,
+       0,       0,      18,       0,       1,       9,       0,       4,
+       0,       0,      19,      20,      21,       0,      31,      29,
+       0,      42,      45,      46,      47,       0,      22,      23,
+      24,      13,      15,      16,      17,       0,       3,       0,
+       6,       0,       0,      25,      27,       0,       0,       0,
+       0,       0,       0,       0,       0,       0,       0,       0,
+       0,       0,      38,      39,      46,      22,       5,       0,
+       0,       0,       0,      30,      32,      33,      34,      35,
+      36,      37,      40,      41,      43,      44,      48,       0,
+       0,       0,       0,      -2,      26,      28,       0,      49,
+      50,      51,      52,       7,       0,      14,       0,       0,
+       0,      12,
+};
+
+int *yyxi;
+
+
+/*****************************************************************/
+/* PCYACC LALR parser driver routine -- a table driven procedure */
+/* for recognizing sentences of a language defined by the        */
+/* grammar that PCYACC analyzes. An LALR parsing table is then   */
+/* constructed for the grammar and the skeletal parser uses the  */
+/* table when performing syntactical analysis on input source    */
+/* programs. The actions associated with grammar rules are       */
+/* inserted into a switch statement for execution.               */
+/*****************************************************************/
+
+
+#ifndef YYMAXDEPTH
+#define YYMAXDEPTH 200
+#endif
+#ifndef YYREDMAX
+#define YYREDMAX 1000
+#endif
+#define PCYYFLAG -1000
+#define WAS0ERR 0
+#define WAS1ERR 1
+#define WAS2ERR 2
+#define WAS3ERR 3
+#define yyclearin pcyytoken = -1
+#define yyerrok   pcyyerrfl = 0
+YYSTYPE yyv[YYMAXDEPTH];     /* value stack */
+int pcyyerrct = 0;           /* error count */
+int pcyyerrfl = 0;           /* error flag */
+int redseq[YYREDMAX];
+int redcnt = 0;
+int pcyytoken = -1;          /* input token */
+
+
+yyparse()
+{
+  int statestack[YYMAXDEPTH]; /* state stack */
+  int      j, m;              /* working index */
+  YYSTYPE *yypvt;
+  int      tmpstate, tmptoken, *yyps, n;
+  YYSTYPE *yypv;
+
+
+  tmpstate = 0;
+  pcyytoken = -1;
+#ifdef YYDEBUG
+  tmptoken = -1;
+#endif
+  pcyyerrct = 0;
+  pcyyerrfl = 0;
+  yyps = &statestack[-1];
+  yypv = &yyv[-1];
+
+
+  enstack:    /* push stack */
+#ifdef YYDEBUG
+    printf("at state %d, next token %d\n", tmpstate, tmptoken);
+#endif
+    if (++yyps - &statestack[YYMAXDEPTH] > 0) {
+      yyerror("pcyacc internal stack overflow");
+      return(1);
+    }
+    *yyps = tmpstate;
+    ++yypv;
+    *yypv = yyval;
+
+
+  newstate:
+    n = yypact[tmpstate];
+    if (n <= PCYYFLAG) goto defaultact; /*  a simple state */
+
+
+    if (pcyytoken < 0) if ((pcyytoken=yylex()) < 0) pcyytoken = 0;
+    if ((n += pcyytoken) < 0 || n >= YYLAST) goto defaultact;
+
+
+    if (yychk[n=yyact[n]] == pcyytoken) { /* a shift */
+#ifdef YYDEBUG
+      tmptoken  = pcyytoken;
+#endif
+      pcyytoken = -1;
+      yyval = yylval;
+      tmpstate = n;
+      if (pcyyerrfl > 0) --pcyyerrfl;
+      goto enstack;
+    }
+
+
+  defaultact:
+
+
+    if ((n=yydef[tmpstate]) == -2) {
+      if (pcyytoken < 0) if ((pcyytoken=yylex())<0) pcyytoken = 0;
+      for (yyxi=yyexca; (*yyxi!= (-1)) || (yyxi[1]!=tmpstate); yyxi += 2);
+      while (*(yyxi+=2) >= 0) if (*yyxi == pcyytoken) break;
+      if ((n=yyxi[1]) < 0) { /* an accept action */
+        if (yytflag) {
+          int ti; int tj;
+          yytfilep = fopen(yytfilen, "w");
+          if (yytfilep == NULL) {
+            fprintf(stderr, "Can't open t file: %s\n", yytfilen);
+            return(0);          }
+          for (ti=redcnt-1; ti>=0; ti--) {
+            tj = svdprd[redseq[ti]];
+            while (strcmp(svdnams[tj], "$EOP"))
+              fprintf(yytfilep, "%s ", svdnams[tj++]);
+            fprintf(yytfilep, "\n");
+          }
+          fclose(yytfilep);
+        }
+        return (0);
+      }
+    }
+
+
+    if (n == 0) {        /* error situation */
+      switch (pcyyerrfl) {
+        case WAS0ERR:          /* an error just occurred */
+          yyerror("syntax error");
+          yyerrlab:
+            ++pcyyerrct;
+        case WAS1ERR:
+        case WAS2ERR:           /* try again */
+          pcyyerrfl = 3;
+	   /* find a state for a legal shift action */
+          while (yyps >= statestack) {
+	     n = yypact[*yyps] + YYERRCODE;
+	     if (n >= 0 && n < YYLAST && yychk[yyact[n]] == YYERRCODE) {
+	       tmpstate = yyact[n];  /* simulate a shift of "error" */
+	       goto enstack;
+            }
+	     n = yypact[*yyps];
+
+
+	     /* the current yyps has no shift on "error", pop stack */
+#ifdef YYDEBUG
+            printf("error: pop state %d, recover state %d\n", *yyps, yyps[-1]);
+#endif
+	     --yyps;
+	     --yypv;
+	   }
+
+
+	   yyabort:
+            if (yytflag) {
+              int ti; int tj;
+              yytfilep = fopen(yytfilen, "w");
+              if (yytfilep == NULL) {
+                fprintf(stderr, "Can't open t file: %s\n", yytfilen);
+                return(1);              }
+              for (ti=1; ti<redcnt; ti++) {
+                tj = svdprd[redseq[ti]];
+                while (strcmp(svdnams[tj], "$EOP"))
+                  fprintf(yytfilep, "%s ", svdnams[tj++]);
+                fprintf(yytfilep, "\n");
+              }
+              fclose(yytfilep);
+            }
+	     return(1);
+
+
+	 case WAS3ERR:  /* clobber input char */
+#ifdef YYDEBUG
+          printf("error: discard token %d\n", pcyytoken);
+#endif
+          if (pcyytoken == 0) goto yyabort; /* quit */
+	   pcyytoken = -1;
+	   goto newstate;      } /* switch */
+    } /* if */
+
+
+    /* reduction, given a production n */
+#ifdef YYDEBUG
+    printf("reduce with rule %d\n", n);
+#endif
+    if (yytflag && redcnt<YYREDMAX) redseq[redcnt++] = n;
+    yyps -= yyr2[n];
+    yypvt = yypv;
+    yypv -= yyr2[n];
+    yyval = yypv[1];
+    m = n;
+    /* find next state from goto table */
+    n = yyr1[n];
+    j = yypgo[n] + *yyps + 1;
+    if (j>=YYLAST || yychk[ tmpstate = yyact[j] ] != -n) tmpstate = yyact[yypgo[n]];
+    switch (m) { /* actions associated with grammar rules */
+
+      case 1:
+# line 88 "ultimo19.y"
+      {puts("Fin de programa");} break;
+      case 6:
+# line 96 "ultimo19.y"
+      {puts("Declaracion de ID");} break;
+      case 7:
+# line 97 "ultimo19.y"
+      {puts("Declaracion de CTE con nombre");} break;
+      case 10:
+# line 102 "ultimo19.y"
+      {puts("Fin IF");} break;
+      case 11:
+# line 103 "ultimo19.y"
+      {puts("Fin IF");} break;
+      case 12:
+# line 104 "ultimo19.y"
+      {puts("Fin ELSE");} break;
+      case 13:
+# line 105 "ultimo19.y"
+      {puts("Inicio WHILE");} break;
+      case 14:
+# line 105 "ultimo19.y"
+      {puts("Fin WHILE");} break;
+      case 15:
+# line 106 "ultimo19.y"
+      {puts("Mostrar por pantalla ID");} break;
+      case 16:
+# line 107 "ultimo19.y"
+      {puts("Mostrar por pantalla STRING");} break;
+      case 17:
+# line 108 "ultimo19.y"
+      {puts("Leer por pantalla ID");} break;
+      case 25:
+# line 121 "ultimo19.y"
+      {puts("AND");} break;
+      case 27:
+# line 122 "ultimo19.y"
+      {puts("OR");} break;
+      case 29:
+# line 123 "ultimo19.y"
+      {puts("NEGAR");} break;
+      case 32:
+# line 127 "ultimo19.y"
+      {puts("Comparacion MENOR");} break;
+      case 33:
+# line 128 "ultimo19.y"
+      {puts("Comparacion MENOR_IGUAL");} break;
+      case 34:
+# line 129 "ultimo19.y"
+      {puts("Comparacion IGUALDAD");} break;
+      case 35:
+# line 130 "ultimo19.y"
+      {puts("Comparacion DISTINTO");} break;
+      case 36:
+# line 131 "ultimo19.y"
+      {puts("Comparacion MAYOR");} break;
+      case 37:
+# line 132 "ultimo19.y"
+      {puts("Comparacion MAYOR_IGUAL");} break;
+      case 38:
+# line 135 "ultimo19.y"
+      {puts("Asignacion");} break;
+      case 39:
+# line 136 "ultimo19.y"
+      {puts("Asignacion");} break;
+      case 40:
+# line 139 "ultimo19.y"
+      {puts("SUMA");} break;
+      case 41:
+# line 140 "ultimo19.y"
+      {puts("RESTA");} break;
+      case 43:
+# line 144 "ultimo19.y"
+      {puts("MULITPLICACION");} break;
+      case 44:
+# line 145 "ultimo19.y"
+      {puts("DIVISION");} break;
+      case 49:
+# line 154 "ultimo19.y"
+      {puts("Concatena ID con ID");} break;
+      case 50:
+# line 155 "ultimo19.y"
+      {puts("Concatena ID con CTE_STRING");} break;
+      case 51:
+# line 156 "ultimo19.y"
+      {puts("Concatena CTE_STRING con ID");} break;
+      case 52:
+# line 157 "ultimo19.y"
+      {puts("Concatena CTE_STRING con CTE_STRING");} break;    }
+    goto enstack;
 }
