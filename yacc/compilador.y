@@ -62,20 +62,6 @@
 %token OP_ASIG
 %token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTINTO
 %token OP_CONCATENAR 
-%token DOS_PUNTOS
-%token OP_DISTINTO
-%token PUNTO_Y_COMA
-%token PARENT_ABRE
-%token PARENT_CIERRA
-%token COMA
-%token LLAVE_CIERRA
-%token LLAVE_ABRE
-%token OP_SUMA
-%token OP_MENOS
-%token OP_MUL
-%token OP_DIV
-%token PUT
-%token GET
 /* palabras reservadas */
 %token WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING MAIN ELSE PUT GET
 %token AND OR NEGAR
@@ -91,17 +77,17 @@ programa: lista_sentencias;
 declaraciones: DECLARE lista_declaraciones ENDDECLARE
              ;
 lista_declaraciones : declaracion
-                    | lista_declaraciones COMA declaracion
+                    | lista_declaraciones ',' declaracion
                     ;
-declaracion : ID DOS_PUNTOS tipo{puts("Declaracion de variable");}
+declaracion : ID ':' tipo{puts("Declaracion de variable");}
             ;
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
                 ;
-sentencia: IF condicion_logica LLAVE_ABRE lista_sentencias LLAVE_CIERRA{puts("Fin IF");}
-         | IF condicion_logica LLAVE_ABRE lista_sentencias LLAVE_CIERRA{puts("Fin IF");} 
-           ELSE LLAVE_ABRE lista_sentencias LLAVE_CIERRA{puts("Fin ELSE");}
-         | WHILE condicion_logica {puts("Inicio WHILE");} LLAVE_ABRE lista_sentencias LLAVE_CIERRA{puts("Fin WHILE");} 
+sentencia: IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");}
+         | IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");} 
+           ELSE '{' lista_sentencias '}'{puts("Fin ELSE");}
+         | WHILE condicion_logica {puts("Inicio WHILE");} '{' lista_sentencias '}'{puts("Fin WHILE");} 
          | PUT ID{puts("Mostrar por pantalla ID");}
          | PUT CTE_STRING{puts("Mostrar por pantalla STRING");}
          | GET ID {puts("Leer por pantalla ID");}
@@ -136,19 +122,19 @@ asignacion: ID OP_ASIG expresion{puts("Asignacion");}
           | ID OP_ASIG concatenacion{puts("Asignacion");}
           ;
 
-expresion: expresion OP_SUMA termino{puts("SUMA");}
-		 | expresion OP_MENOS termino{puts("RESTA");}
+expresion: expresion '+' termino{puts("SUMA");}
+		 | expresion '-' termino{puts("RESTA");}
          | termino
          ;
 
-termino: termino OP_MUL factor{puts("MULITPLICACION");}
-       | termino OP_DIV factor{puts("DIVISION");}
+termino: termino '*' factor{puts("MULITPLICACION");}
+       | termino '/' factor{puts("DIVISION");}
        | factor
        ;
 
 factor: ID 
       | cte
-      | PARENT_ABRE expresion PARENT_CIERRA
+      | '(' expresion ')'
       ;
 
 concatenacion: ID OP_CONCATENAR ID{puts("Concatena ID con ID");}
@@ -557,24 +543,24 @@ void fin_com()
 
 void op_suma()
 {
-    tipo_token =  OP_SUMA;
+    tipo_token =  '+';
 }
 void op_menos()
 {
-	tipo_token =  OP_MENOS;
+	tipo_token =  '-';
 }
 void op_menos2()
 {
     fseek(entrada,-sizeof(char),SEEK_CUR);
-    tipo_token =  OP_MENOS;
+    tipo_token =  '-';
 }
 void op_mul()
 {
-	tipo_token =  OP_MUL;
+	tipo_token =  '*';
 }
 void op_div()
 {
-	tipo_token =  OP_DIV;
+	tipo_token =  '/';
 }
 void op_asig()
 {
@@ -599,7 +585,7 @@ void op_mayor_ig()
 }
 void dos_puntos()
 {
-    tipo_token =   DOS_PUNTOS;
+    tipo_token =   ':';
 }
 void op_negar()
 {
@@ -607,27 +593,27 @@ void op_negar()
 }
 void puntoycoma()
 {
-    tipo_token =   PUNTO_Y_COMA;
+    tipo_token =   ';';
 }
 void par_abre()
 {
-    tipo_token =   PARENT_ABRE;
+    tipo_token =   '(';
 }
 void par_cierra()
 {
-    tipo_token =   PARENT_CIERRA;
+    tipo_token =   ')';
 }
 void llave_abre()
 {
-    tipo_token =   LLAVE_ABRE;
+    tipo_token =   '{';
 }
 void llave_cierra(tipo)
 {
-    tipo_token =   LLAVE_CIERRA;
+    tipo_token =   '}';
 }
 void coma()
 {
-    tipo_token =   COMA;
+    tipo_token =   ',';
 }
 void inic_id()
 {
@@ -975,17 +961,17 @@ void guardarToken()
    	   	   case ID:
    	   		    fprintf(salida,"< ID: %s >\n",token);
                 break;
-           case OP_SUMA:
-                fprintf(salida,"< OP_SUMA >\n");
+           case '+':
+                fprintf(salida,"< '+' >\n");
                 break;
-           case OP_MENOS:
-                fprintf(salida,"< OP_MENOS >\n");
+           case '-':
+                fprintf(salida,"< '-' >\n");
                 break;
-           case OP_MUL:
-			   fprintf(salida,"< OP_MUL >\n");
+           case '*':
+			   fprintf(salida,"< '*' >\n");
 			   break;
-		  case OP_DIV:
-			   fprintf(salida,"< OP_DIV >\n");
+		  case '/':
+			   fprintf(salida,"< '/' >\n");
 			   break;
 		  case OP_ASIG:
 			   fprintf(salida,"< OP_ASIG >\n");
@@ -1005,23 +991,23 @@ void guardarToken()
 		  case OP_MENOR_IGUAL:
 			   fprintf(salida,"< OP_MENOR_IGUAL >\n");
 			   break;
-		  case DOS_PUNTOS:
-			   fprintf(salida,"< DOS_PUNTOS >\n");
+		  case ':':
+			   fprintf(salida,"< ':' >\n");
 			   break;
 		  case OP_DISTINTO:
 			   fprintf(salida,"< OP_DISTINTO >\n");
 			   break;
-		  case PUNTO_Y_COMA:
-			   fprintf(salida,"< PUNTO_Y_COMA >\n");
+		  case ';':
+			   fprintf(salida,"< ';' >\n");
 			   break;
-		  case PARENT_ABRE:
-			   fprintf(salida,"< PARENT_ABRE >\n");
+		  case '(':
+			   fprintf(salida,"< '(' >\n");
 			   break;
-		  case PARENT_CIERRA:
-			   fprintf(salida,"< PARENT_CIERRA >\n");
+		  case ')':
+			   fprintf(salida,"< ')' >\n");
 			   break;
-		  case COMA:
-			   fprintf(salida,"< COMA >\n");
+		  case ',':
+			   fprintf(salida,"< ',' >\n");
 			   break;
 		  case CTE_ENTERO:
 			   fprintf(salida,"< CTE_ENTERO: %s >\n",token);
@@ -1044,11 +1030,11 @@ void guardarToken()
 		  case NEGAR:
 			   fprintf(salida,"< NEGAR >\n");
 			   break;
-		  case LLAVE_ABRE:
-			   fprintf(salida,"< LLAVE_ABRE >\n");
+		  case '{':
+			   fprintf(salida,"< '{' >\n");
 			   break;
-		  case LLAVE_CIERRA:
-			   fprintf(salida,"< LLAVE_CIERRA >\n");
+		  case '}':
+			   fprintf(salida,"< '}' >\n");
 			   break;
           default:
         	   fprintf(salida,"< PR: %s >\n",token);
