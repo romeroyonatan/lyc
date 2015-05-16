@@ -157,11 +157,15 @@ sentencia: IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");}
          | IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");} 
            ELSE '{' lista_sentencias '}'{puts("Fin ELSE");}
          | WHILE condicion_logica {puts("Inicio WHILE");} '{' lista_sentencias '}'{puts("Fin WHILE");} 
-         | PUT ID{puts("Mostrar por pantalla ID");}
-         | PUT CTE_STRING{puts("Mostrar por pantalla STRING");}
-         | GET ID {puts("Leer por pantalla ID");}
+         | PUT ID{printf("Mostrar por pantalla el valor de variable '%s'\n",
+                         TS[$2].nombre);}
+         | PUT CTE_STRING{printf("Mostrar por pantalla '%s'\n",TS[$2].valor);}
+         | GET ID {printf("Leer del teclado y guardar en variable '%s'",
+                          TS[$2].valor);}
          | asignacion
-		 |CONST tipo ID OP_ASIG cte{puts("Declaracion de CTE con nombre");}
+		 |CONST tipo ID OP_ASIG cte
+            {printf("Declaracion de CTE %s con nombre '%s' valor '%s'\n",
+                    TS[$3].tipo, TS[$3].nombre, TS[$3].valor);}
          ;
 
 tipo: INT 
@@ -187,22 +191,34 @@ condicion: expresion OP_MENOR expresion{puts("Comparacion MENOR");}
          | expresion OP_MAYOR_IGUAL expresion{puts("Comparacion MAYOR_IGUAL");}
          ;
 
-asignacion: ID OP_ASIG expresion{puts("Asignacion");}
-          | ID OP_ASIG concatenacion{puts("Asignacion");}
+asignacion: ID OP_ASIG expresion{printf("Asignacion de %s\n", TS[$1].nombre);}
+          | ID OP_ASIG concatenacion{printf("Asignacion de %s\n", TS[$1].nombre);}
           ;
 
-expresion: expresion '+' termino{puts("SUMA");}
-		 | expresion '-' termino{puts("RESTA");}
+expresion: expresion '+' termino{printf("Suma entre %s y %s\n",
+                                  *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
+                                  *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
+                                  );}
+		 | expresion '-' termino{printf("Resta entre %s y %s\n",
+                                  *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
+                                  *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
+                                  );}
          | termino
          ;
 
-termino: termino '*' factor{puts("MULITPLICACION");}
-       | termino '/' factor{puts("DIVISION");}
+termino: termino '*' factor{printf("Multiplicacion entre %s y %s\n", 
+                                  *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
+                                  *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
+                                  );}
+       | termino '/' factor{printf("Division entre %s y %s\n",
+                                *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
+                                *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
+                            );}
        | factor
        ;
 
 factor: ID 
-      | cte
+      | cte 
       | '(' expresion ')'
       ;
 
@@ -928,19 +944,19 @@ int insertarTS()
             TStop++;
         break;
         case CTE_ENTERO:
-            strcpy(TS[TStop].nombre, "_");
+            strcpy(TS[TStop].nombre, "");
             strcpy(TS[TStop].tipo,"CTE");
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
         case CTE_REAL:
-            strcpy(TS[TStop].nombre,"_");
+            strcpy(TS[TStop].nombre,"");
             strcpy(TS[TStop].tipo,"REAL");
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
        	case CTE_STRING:
-            strcpy(TS[TStop].nombre, "_");
+            strcpy(TS[TStop].nombre, "");
             strcpy(TS[TStop].tipo,"STRING" );
             strcpy(TS[TStop].valor, token);
             TS[TStop].longitud = (strlen(token));
