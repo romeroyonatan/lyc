@@ -1,0 +1,13 @@
+DECLARE
+	int i,
+	CONST real b = 8
+ENDDECLARE
+i = 4 + 5/2
+g= "p"++"w"
+if a<9-2*8 
+{
+	f=f+1
+}
+while a<8 AND b>8*8 {b=0
+
+}
