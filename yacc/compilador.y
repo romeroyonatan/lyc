@@ -476,9 +476,7 @@ int main()
         exit(1);
     }
 
-    while(!feof(entrada)){
-    	yyparse();
-    }
+   	yyparse();
 
     guardarTS();
 
@@ -898,7 +896,8 @@ void guardarTS()
     int i;
     fprintf(tos,"Nro\t | Nombre\t\t\t | Tipo\t | Valor\t | Longitud \n");
     for (i=0; i<TStop; i++){
-        fprintf(tos,"%d     \t | %s     \t\t\t | %s     \t | %s \t | %d \n",i,TS[i].nombre, TS[i].tipo, TS[i].valor, TS[i].longitud);
+        fprintf(tos,"%d     \t | %s     \t\t\t | %s     \t | %s \t | %d \n",
+                i,TS[i].nombre, TS[i].tipo, TS[i].valor, TS[i].longitud);
     }
 }
 
