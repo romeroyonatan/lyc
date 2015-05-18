@@ -1,3 +1,4 @@
+--/ declaracion de variables /--
 DECLARE
     a : int, 
     b : int,
@@ -5,15 +6,24 @@ DECLARE
     i : int
 ENDDECLARE
 
+--/ asigno valores iniciales /--
 a = 1
 b = 1
+
+--/ defino cantidad de numeros de la serie que quiero mostrar /--
 CONST int cantidad = 10
 
+--/ muestro en pantalla el primer numero de la serie /--
 PUT a
+
 while i < cantidad {
+        --/ guardo el valor de 'b' para asignarselo despues a 'a' /--
     aux = b
+    --/ sumo los 2 ultimos numeros de la serie /--
     b = a + b
+    --/ asigno a 'a' el valor que tenia 'b' antes de la suma /--
     a = aux
+    --/ muestro en pantalla el valor de 'a' /--
     PUT a
     i = i + 1
 }
