@@ -140,8 +140,8 @@ struct tablaDeSimbolos TS[TAMMAX];
 /* REGLAS SEMANTICAS */
 /* ------------------------------------------------------------------------- */
 %%
-programa: declaraciones lista_sentencias{puts("Fin de programa");};
-programa: lista_sentencias;
+programa: {puts("Inicio de programa");} declaraciones lista_sentencias{puts("Fin de programa");}
+        | {puts("Inicio de programa");} lista_sentencias{puts("Fin de programa");}
 
 declaraciones: DECLARE lista_declaraciones ENDDECLARE
              ;
