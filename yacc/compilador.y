@@ -910,9 +910,9 @@ void a_minuscula (char *palabra)
 void guardarTS()
 {
     int i;
-    fprintf(tos,"Nro\t | Nombre\t\t\t | Tipo\t | Valor\t | Longitud \n");
+    fprintf(tos,"%-9s|%-20s|%-10s|%-20s|%-20s\n","Nro","Nombre","Tipo","Valor","Longitud");
     for (i=0; i<TStop; i++){
-        fprintf(tos,"%d     \t | %s     \t\t\t | %s     \t | %s \t | %d \n",
+        fprintf(tos,"%-9d|%-20s|%-10s|%-20s|%-20d\n",
                 i,TS[i].nombre, TS[i].tipo, TS[i].valor, TS[i].longitud);
     }
 }
