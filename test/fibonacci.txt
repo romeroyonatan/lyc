@@ -23,7 +23,7 @@ while i < cantidad {
     b = a + b
     --/ asigno a 'a' el valor que tenia 'b' antes de la suma /--
     a = aux
-    --/ muestro en pantalla el valor de 'a' /--
+    --/ muestro en pantalla siguiente valor de la seri /--
     PUT a
     i = i + 1
 }
