@@ -1,0 +1,6 @@
+--/ 
+Este es nuestro compilador
+y este es el famoso hola mundo
+que debe tener cualquier lenguaje
+/--
+put "Hola mundo"
