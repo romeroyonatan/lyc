@@ -153,9 +153,9 @@ declaracion : ID ':' tipo{printf("Declaracion de variable '%s'\n", TS[$1].nombre
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
                 ;
-sentencia: IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");}
-         | IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");} 
-           ELSE '{' lista_sentencias '}'{puts("Fin ELSE");}
+sentencia: seleccion{puts("Fin THEN");} 
+         | seleccion{puts("Fin THEN");} 
+           ELSE {puts("Inicio ELSE");}'{' lista_sentencias '}'{puts("Fin ELSE");};
          | WHILE condicion_logica {puts("Inicio WHILE");} '{' lista_sentencias '}'{puts("Fin WHILE");} 
          | PUT ID{printf("Mostrar por pantalla el valor de variable '%s'\n",
                          TS[$2].nombre);}
@@ -167,6 +167,8 @@ sentencia: IF condicion_logica '{' lista_sentencias '}'{puts("Fin IF");}
             {printf("Declaracion de CTE %s con nombre '%s' valor '%s'\n",
                     TS[$3].tipo, TS[$3].nombre, TS[$5].valor);}
          ;
+
+seleccion: IF condicion_logica '{'{puts("Inicio THEN");}  lista_sentencias '}';
 
 tipo: INT 
     | REAL 
