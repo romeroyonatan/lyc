@@ -32,7 +32,9 @@
 *.dSYM/
 
 # Codigo generado
-bin/
+build/*.exe
+build/*.c
+build/Grupo06
 test/Final.asm
 test/intermedia.txt
 test/prueba*_resultado.txt

@@ -1,7 +1,14 @@
-bin/compilador: yacc/compilador.y
-	bison -o compilador.tab.c  yacc/compilador.y
-	gcc -g -Wall -o bin/compilador compilador.tab.c
-	rm compilador.tab.c
-bin/lex: lex/lex.c
-	gcc -g -Wall -o bin/lex lex/lex.c
+all: build/Grupo06 build/Grupo06.exe
+	
+build/Grupo06: build/Grupo06.tab.c
+	gcc -g -Wall -o build/Grupo06 build/Grupo06.tab.c
+
+build/Grupo06.exe: build/Grupo06.tab.c
+	i686-w64-mingw32-gcc -g -o build/Grupo06.exe build/Grupo06.tab.c
+
+build/Grupo06.tab.c: yacc/Grupo06.y
+	bison -o build/Grupo06.tab.c  yacc/Grupo06.y
+
+build/lex: lex/lex.c
+	gcc -g -Wall -o build/lex lex/lex.c
 
