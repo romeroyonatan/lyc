@@ -126,7 +126,13 @@ struct tablaDeSimbolos
 struct tablaDeSimbolos TS[TAMMAX];
 
 /* Notacion intermedia */
-char tercetos[TERCETOS_MAX][MAX_LONG];
+struct s_terceto {
+    char t1[MAX_LONG],
+         t2[MAX_LONG],
+         t3[MAX_LONG],
+}
+struct s_tercetos tercetos[TERCETOS_MAX];
+int crear_terceto(const char*, const char*, const char*);
 %}
 
 
