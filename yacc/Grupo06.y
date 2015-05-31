@@ -49,10 +49,11 @@
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
 #define CANTPR 15 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
-#define LONG_MAX 30 //largo maximo de los string y nombre de id
+#define MAX_LONG 30 //largo maximo de los string y nombre de id
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
 #define TAMMAX 100
+#define TERCETOS_MAX 100 // cantidad maxima de tercetos
 
 //Funciones de la matriz
 void limpiar_token();
@@ -113,7 +114,7 @@ void guardarTS();
 int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
 void (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 
-/* TABLA DE SIMBOLOS */
+/* Tabla de simbolos */
 struct tablaDeSimbolos
 {
     char nombre[100];
@@ -123,7 +124,11 @@ struct tablaDeSimbolos
     int longitud;
 };
 struct tablaDeSimbolos TS[TAMMAX];
+
+/* Notacion intermedia */
+char tercetos[TERCETOS_MAX][MAX_LONG];
 %}
+
 
 /* TOKENS */
 /* ------------------------------------------------------------------------- */
@@ -623,7 +628,7 @@ void llave_abre()
 {
     tipo_token =   '{';
 }
-void llave_cierra(tipo)
+void llave_cierra()
 {
     tipo_token =   '}';
 }
@@ -645,7 +650,7 @@ void cont_id()
 void fin_id()
 {
     int i;
-    if (strlen(token) > LONG_MAX)
+    if (strlen(token) > MAX_LONG)
     {
         fprintf(stderr,"identificador demasiado largo en linea: %d\n",linea);
         *token='\0';
@@ -724,7 +729,7 @@ void cont_string()
 
 void fin_string()
 {
-    if (strlen(token) > LONG_MAX)
+    if (strlen(token) > MAX_LONG)
     {
         fprintf(stderr, "String demasiado largo en linea: %d\n", linea);
 		*token='\0';
@@ -883,7 +888,7 @@ int get_evento(char c)
 
 int esPalabraRes()
 {
-    char aux[LONG_MAX];
+    char aux[MAX_LONG];
     int i;
     strcpy(aux, token);
     // pasamos todo el token a minuscula
