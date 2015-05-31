@@ -53,7 +53,7 @@
 #define MAX_INT 65535 //largo maximo de los enteros de 16 bit
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
 #define TAMMAX 100
-#define TERCETOS_MAX 100 // cantidad maxima de tercetos
+#define MAX_TERCETOS 1024 // cantidad maxima de tercetos
 
 //Funciones de la matriz
 void limpiar_token();
@@ -126,13 +126,22 @@ struct tablaDeSimbolos
 struct tablaDeSimbolos TS[TAMMAX];
 
 /* Notacion intermedia */
-struct s_terceto {
-    char t1[MAX_LONG],
-         t2[MAX_LONG],
-         t3[MAX_LONG],
-}
-struct s_tercetos tercetos[TERCETOS_MAX];
+/* estrutura de un terceto */
+typedef struct s_terceto {
+    char t1[MAX_LONG], // primer termino
+         t2[MAX_LONG], // segundo termino
+         t3[MAX_LONG]; // tercer termino
+    char aux[MAX_LONG]; // nombre variable auxiliar correspondiente
+} t_terceto;
+/* coleccion de tercetos */
+t_terceto* tercetos[MAX_TERCETOS];
+/* cantidad de tercetos */
+int cant_tercetos;
+/* crea un terceto y lo agrega a la coleccion */
 int crear_terceto(const char*, const char*, const char*);
+/* escribe los tercetos en un archivo */
+void escribir_tercetos(FILE *);
+
 %}
 
 
@@ -292,6 +301,7 @@ int NroPalabrasRes[CANTPR]={
 
 int main(int argc, char **argv)
 {
+    FILE *intermedia;
     // inicializo matriz de estados de automata finito
     init();
 
@@ -300,6 +310,11 @@ int main(int argc, char **argv)
     if(entrada == NULL){
         printf("No se puede abrir el archivo %s\n", argc == 2 ? argv[1] : 
                                                     "prueba.txt");
+        exit(ERROR);
+    }
+
+    if((intermedia = fopen("Intermedia.txt", "w"))==NULL){
+        printf("No se puede crear el archivo Intermedia.txt\n");
         exit(ERROR);
     }
 
@@ -312,6 +327,8 @@ int main(int argc, char **argv)
    	yyparse();
 
     guardarTS();
+    // guardo coleccion de tercetos en archivo
+    escribir_tercetos(intermedia);
     fclose(entrada);
     fclose(tos);
     return 0;
@@ -348,8 +365,6 @@ char proximo_caracter()
     char _caracter;
     // obtengo caracter desde el archivo de entrada
     _caracter = fgetc(entrada);
-    // salto de linea
-    //if (_caracter == '\n') linea++;
     // devuelvo caracter leido
     return _caracter;
 }
@@ -548,10 +563,10 @@ void init () {
     terminal[T_EOF] =               "EOF";
     terminal[T_corchete_abre] =     "[";
     terminal[T_corchete_cierra] =   "]";
-
-
-
+    
+    cant_tercetos = 0;
 }
+
 void limpiar_token()
 {
   *token = '\0';
@@ -985,4 +1000,29 @@ int yyerror(char *s)
 {
     fprintf(stderr,"%s en linea %d\n",s,linea);
 	exit(1);
+}
+
+int crear_terceto(const char* t1, const char* t2, const char* t3){
+   // creo un nuevo terceto
+   t_terceto* terceto = (t_terceto*) malloc(sizeof(t_terceto));
+   int numero = cant_tercetos;
+   // completo sus atributos
+   strcpy(terceto->t1, t1);
+   strcpy(terceto->t2, t2);
+   strcpy(terceto->t3, t3);
+   // lo agrego a la coleccion de tercetos
+   tercetos[numero] = terceto;
+   cant_tercetos++;
+   // devuelvo numero de terceto
+   return numero;
+}
+
+/** Escribe tercetos en un archivo de texto */
+void escribir_tercetos (FILE* archivo) {
+    int i;
+    for (i = 0; i < cant_tercetos; i++)
+        fprintf(archivo, "%d (%s, %s, %s)\n", i,
+                                              tercetos[i]->t1,
+                                              tercetos[i]->t2,
+                                              tercetos[i]->t3);
 }
