@@ -1003,18 +1003,24 @@ int yyerror(char *s)
 }
 
 int crear_terceto(const char* t1, const char* t2, const char* t3){
-   // creo un nuevo terceto
-   t_terceto* terceto = (t_terceto*) malloc(sizeof(t_terceto));
-   int numero = cant_tercetos;
-   // completo sus atributos
-   strcpy(terceto->t1, t1);
-   strcpy(terceto->t2, t2);
-   strcpy(terceto->t3, t3);
-   // lo agrego a la coleccion de tercetos
-   tercetos[numero] = terceto;
-   cant_tercetos++;
-   // devuelvo numero de terceto
-   return numero;
+    // creo un nuevo terceto
+    t_terceto* terceto = (t_terceto*) malloc(sizeof(t_terceto));
+    int numero = cant_tercetos;
+    // completo sus atributos
+    strcpy(terceto->t1, t1);
+    if (t2)
+        strcpy(terceto->t2, t2);
+    else
+        *(terceto->t2) = '\0';
+    if (t3)
+        strcpy(terceto->t3, t3);
+    else
+        *(terceto->t3) = '\0';
+    // lo agrego a la coleccion de tercetos
+    tercetos[numero] = terceto;
+    cant_tercetos++;
+    // devuelvo numero de terceto
+    return numero;
 }
 
 /** Escribe tercetos en un archivo de texto */
