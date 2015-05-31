@@ -141,6 +141,8 @@ int cant_tercetos;
 int crear_terceto(const char*, const char*, const char*);
 /* escribe los tercetos en un archivo */
 void escribir_tercetos(FILE *);
+/* libera memoria pedida para tercetos */
+void limpiar_tercetos();
 
 %}
 
@@ -329,7 +331,12 @@ int main(int argc, char **argv)
     guardarTS();
     // guardo coleccion de tercetos en archivo
     escribir_tercetos(intermedia);
+    // libero memoria de tercetos
+    limpiar_tercetos();
+
+    // cerramos archivos abiertos
     fclose(entrada);
+    fclose(intermedia);
     fclose(tos);
     return 0;
 }
@@ -1002,16 +1009,19 @@ int yyerror(char *s)
 	exit(1);
 }
 
+/** crea un terceto y lo agrega a la coleccion de tercetos */
 int crear_terceto(const char* t1, const char* t2, const char* t3){
     // creo un nuevo terceto
     t_terceto* terceto = (t_terceto*) malloc(sizeof(t_terceto));
     int numero = cant_tercetos;
     // completo sus atributos
     strcpy(terceto->t1, t1);
+
     if (t2)
         strcpy(terceto->t2, t2);
     else
         *(terceto->t2) = '\0';
+
     if (t3)
         strcpy(terceto->t3, t3);
     else
@@ -1031,4 +1041,10 @@ void escribir_tercetos (FILE* archivo) {
                                               tercetos[i]->t1,
                                               tercetos[i]->t2,
                                               tercetos[i]->t3);
+}
+/** Libera memoria pedida para tercetos */ 
+void limpiar_tercetos () {
+    int i;
+    for (i = 0; i < cant_tercetos; i++)
+        free(tercetos[i]);
 }
