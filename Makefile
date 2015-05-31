@@ -11,4 +11,5 @@ build/Grupo06.tab.c: yacc/Grupo06.y
 
 build/lex: lex/lex.c
 	gcc -g -Wall -o build/lex lex/lex.c
-
+clean:
+	rm build/Grupo06 build/Grupo06.exe build/Grupo06.tab.c
