@@ -1409,7 +1409,9 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
        strcat (espera, esperados[i]);
    }
    /* Muestro mensaje de error */
-   sprintf(error, "Error semantico - Tipos esperados %s", espera);
+   sprintf(error, "Error. Tipo incompatible en variable %s - Tipo esperado %s", 
+                TS[posicion].nombre,
+                espera);
    yyerror(error);
    /* termino de leer parametros variables */
    va_end(vl);
