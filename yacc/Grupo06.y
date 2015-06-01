@@ -211,8 +211,10 @@ lista_declaraciones : declaracion
                     ;
 declaracion : ID ':' tipo{printf("Declaracion de variable '%s'\n", TS[$1].nombre);}
             ;
-lista_sentencias: sentencia
-                | lista_sentencias sentencia
+lista_sentencias: sentencia 
+                | lista_sentencias sentencia {
+                    $$ = $2;
+                  }
                 ;
 sentencia: seleccion
          | WHILE condicion_logica {
@@ -259,7 +261,8 @@ seleccion: IF condicion_logica {
                int inicio_then = sacar_pila (pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
-               sprintf(destino, "[%d]", $4 + 1);
+               sprintf(destino, "[%d]", $5 + 1);
+               printf(">>>lista_sentencias: %d\n", $5);
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
