@@ -52,6 +52,10 @@
 #define CMP_DISTINTO 4
 #define CMP_IGUAL 5
 
+#define TIPO_INT 1
+#define TIPO_REAL 2
+#define TIPO_STRING 3
+
 #define CANT_ESTADOS 39 //filas de la matriz de estados
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
 #define CANTPR 15 //cantidad de palabras reservadas
@@ -210,23 +214,20 @@ lista_declaraciones : declaracion
                     | lista_declaraciones ',' declaracion
                     ;
 declaracion : ID ':' tipo {
-                  /*
                   char id[MAX_LONG], tipo[MAX_LONG];
                   obtener_nombre_o_valor($1, id);
                   switch($3) {
-                      case STRING:
+                      case TIPO_STRING:
                         strcpy(tipo, "STRING");
                         break;
-                      case REAL:
+                      case TIPO_REAL:
                         strcpy(tipo, "REAL");
                         break;
-                      case INT:
+                      case TIPO_INT:
                         strcpy(tipo, "INT");
                         break;
                   }
-                  printf("%s, %s\n", id, tipo);
                   $$ = crear_terceto(tipo, id, NULL);
-                  */
               }
             ;
 lista_sentencias: sentencia 
@@ -309,9 +310,9 @@ seleccion: IF condicion_logica {
            }
          ;
 
-tipo: INT 
-    | REAL 
-    | STRING
+tipo: INT {$$ = TIPO_INT;}
+    | REAL {$$ = TIPO_REAL;}
+    | STRING {$$ = TIPO_STRING;}
     ;
 cte : CTE_STRING 
     | CTE_ENTERO 
@@ -894,7 +895,6 @@ void fin_id()
         if( (i = esPalabraRes()) != -1)
         {
             tipo_token =  NroPalabrasRes[i];
-            //yylval =  NroPalabrasRes[i];
         }
         else
         {
