@@ -272,23 +272,25 @@ sentencia: seleccion
                $$ = $4;
            } 
          | PUT ID {
-            char valor[MAX_LONG];
-            obtener_nombre_o_valor($2, valor);
-            $$ = crear_terceto ("PUT", valor, NULL);
+            //XXX ¿solo puedo escribir strings?
+                char valor[MAX_LONG];
+                obtener_nombre_o_valor($2, valor);
+                $$ = crear_terceto ("PUT", valor, NULL);
            }
          | PUT CTE_STRING{
-            char valor[MAX_LONG];
-            obtener_nombre_o_valor($2, valor);
-            $$ = crear_terceto ("PUT", valor, NULL);
+               char valor[MAX_LONG];
+               obtener_nombre_o_valor($2, valor);
+               $$ = crear_terceto ("PUT", valor, NULL);
            }
          | GET ID {
+            //XXX ¿solo puedo leer strings?
             char valor[MAX_LONG];
             obtener_nombre_o_valor($2, valor);
             $$ = crear_terceto ("GET", valor, NULL);
            }
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
-            // XXX no se porque no anda el tipo
+            //XXX chequear tipos compatibles
             strcpy (TS[$3].tipo, TS[$2].tipo); 
             strcpy (TS[$3].valor, TS[$5].valor); 
             if ($2 == STRING)
@@ -302,7 +304,6 @@ seleccion: IF condicion_logica {
            }
            '{' lista_sentencias '}' {
                // creo el salto al ultimo terceto del then
-               // XXX no funciona salto hacia terceto despues del then
                int inicio_then = sacar_pila (pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
@@ -406,14 +407,18 @@ condicion: expresion OP_MENOR expresion {
          ;
 
 asignacion: ID OP_ASIG expresion {
-                char e[7];
-                sprintf(e, "[%d]", $3);
-                $$ = crear_terceto("=", TS[$1].nombre, e); 
+                if (comprobar_tipos ($1, 2, INT, REAL)) {
+                    char e[7];
+                    sprintf(e, "[%d]", $3);
+                    $$ = crear_terceto("=", TS[$1].nombre, e); 
+                }
             }
           | ID OP_ASIG concatenacion{
-                char e[7];
-                sprintf(e, "[%d]", $3);
-                $$ = crear_terceto("=", TS[$1].nombre, e); 
+                if (comprobar_tipos ($1, 1, STRING)) {
+                    char e[7];
+                    sprintf(e, "[%d]", $3);
+                    $$ = crear_terceto("=", TS[$1].nombre, e); 
+                }
             }
           ;
 
@@ -448,30 +453,40 @@ termino: termino '*' factor {
        ;
 
 factor: ID { 
-          char id[MAX_LONG];
-          obtener_nombre_o_valor ($1, id);
-          $$ = crear_terceto(id, NULL, NULL); 
+          if (comprobar_tipos ($1, 2, INT, REAL)) {
+            char id[MAX_LONG];
+            obtener_nombre_o_valor ($1, id);
+            $$ = crear_terceto(id, NULL, NULL); 
+          }
         }
       | cte { 
-          char cte[MAX_LONG];
-          obtener_nombre_o_valor ($1, cte);
-          $$ = crear_terceto(cte, NULL, NULL);
+          if (comprobar_tipos ($1, 2, INT, REAL)) {
+            char cte[MAX_LONG];
+            obtener_nombre_o_valor ($1, cte);
+            $$ = crear_terceto(cte, NULL, NULL);
+          }
         }
       | '(' expresion ')'
       ;
 
 concatenacion: ID OP_CONCATENAR ID {
-                   if (comprobar_tipos ($1, 2, REAL, STRING) &&
-                       comprobar_tipos ($3, 2, STRING, REAL))
+                   if (comprobar_tipos ($1, 1, STRING) &&
+                       comprobar_tipos ($3, 1, STRING))
                        $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
                }
              | ID OP_CONCATENAR CTE_STRING {
+                   if (comprobar_tipos ($1, 1, STRING) &&
+                       comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].nombre, TS[$3].valor);
                }
              | CTE_STRING OP_CONCATENAR ID {
+                   if (comprobar_tipos ($1, 1, STRING) &&
+                       comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].valor, TS[$3].nombre);
                }
              | CTE_STRING OP_CONCATENAR CTE_STRING {
+                   if (comprobar_tipos ($1, 1, STRING) &&
+                       comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].valor, TS[$3].valor);
                }
              ;
@@ -1230,7 +1245,7 @@ int insertarTS()
 
 int yyerror(char *s)
 {
-    fprintf(stderr,"%s en linea %d\n",s,linea);
+    fprintf(stderr,"Linea %d: %s.\n",linea, s);
 	exit(1);
 }
 
@@ -1372,6 +1387,7 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
    }
    /* si llegue aca no encontre el tipo en la lista */
    char espera[255];
+   char error[255];
    for (i = 0; i < cantidad_tipos; i++) {
        if (i > 0) 
            /* agrego coma */
@@ -1379,8 +1395,8 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
        strcat (espera, esperados[i]);
    }
    /* Muestro mensaje de error */
-   fprintf(stderr, "Error semantico linea %d: Tipos esperados %s\n", linea, 
-                                                                     espera);
+   sprintf(error, "Error semantico - Tipos esperados %s", espera);
+   yyerror(error);
    /* termino de leer parametros variables */
    va_end(vl);
    return 0;
