@@ -205,13 +205,13 @@ void destruir_pila(t_nodo*);
 /* REGLAS SEMANTICAS */
 /* ------------------------------------------------------------------------- */
 %%
-programa: {puts("Inicio de programa");} declaraciones lista_sentencias{puts("Fin de programa");}
-        | {puts("Inicio de programa");} lista_sentencias{puts("Fin de programa");};
+programa: declaraciones lista_sentencias { puts("Compilacion OK"); }
+        | lista_sentencias { puts("Compilacion OK"); }
 
-declaraciones: DECLARE lista_declaraciones ENDDECLARE
+declaraciones: DECLARE lista_declaraciones ENDDECLARE { $$ = $2; }
              ;
 lista_declaraciones : declaracion
-                    | lista_declaraciones ',' declaracion
+                    | lista_declaraciones ',' declaracion { $$ = $3; }
                     ;
 declaracion : ID ':' tipo {
                   char id[MAX_LONG], tipo[MAX_LONG];
@@ -227,6 +227,9 @@ declaracion : ID ':' tipo {
                         strcpy(tipo, "INT");
                         break;
                   }
+                  // modifico tipo en tabla de simbolos
+                  strcpy (TS[$1].tipo, tipo);
+                  // creo terceto
                   $$ = crear_terceto(tipo, id, NULL);
               }
             ;
@@ -1189,7 +1192,7 @@ int insertarTS()
         break;
         case CTE_ENTERO:
             strcpy(TS[TStop].nombre, "");
-            strcpy(TS[TStop].tipo,"CTE");
+            strcpy(TS[TStop].tipo,"INT");
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
