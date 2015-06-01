@@ -255,6 +255,7 @@ seleccion: IF condicion_logica {
            }
            '{' lista_sentencias '}' {
                // creo el salto al ultimo terceto del then
+               // XXX no funciona salto hacia terceto despues del then
                int inicio_then = sacar_pila (pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
