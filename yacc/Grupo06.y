@@ -209,7 +209,25 @@ declaraciones: DECLARE lista_declaraciones ENDDECLARE
 lista_declaraciones : declaracion
                     | lista_declaraciones ',' declaracion
                     ;
-declaracion : ID ':' tipo{printf("Declaracion de variable '%s'\n", TS[$1].nombre);}
+declaracion : ID ':' tipo {
+                  /*
+                  char id[MAX_LONG], tipo[MAX_LONG];
+                  obtener_nombre_o_valor($1, id);
+                  switch($3) {
+                      case STRING:
+                        strcpy(tipo, "STRING");
+                        break;
+                      case REAL:
+                        strcpy(tipo, "REAL");
+                        break;
+                      case INT:
+                        strcpy(tipo, "INT");
+                        break;
+                  }
+                  printf("%s, %s\n", id, tipo);
+                  $$ = crear_terceto(tipo, id, NULL);
+                  */
+              }
             ;
 lista_sentencias: sentencia 
                 | lista_sentencias sentencia {
@@ -236,11 +254,21 @@ sentencia: seleccion
                tercetos[comparacion] = _crear_terceto(salto[iCmp], cmp, destino); 
                $$ = $4;
            } 
-         | PUT ID{printf("Mostrar por pantalla el valor de variable '%s'\n",
-                         TS[$2].nombre);}
-         | PUT CTE_STRING{printf("Mostrar por pantalla '%s'\n",TS[$2].valor);}
-         | GET ID {printf("Leer del teclado y guardar en variable '%s'",
-                          TS[$2].valor);}
+         | PUT ID {
+            char valor[MAX_LONG];
+            obtener_nombre_o_valor($2, valor);
+            $$ = crear_terceto ("PUT", valor, NULL);
+           }
+         | PUT CTE_STRING{
+            char valor[MAX_LONG];
+            obtener_nombre_o_valor($2, valor);
+            $$ = crear_terceto ("PUT", valor, NULL);
+           }
+         | GET ID {
+            char valor[MAX_LONG];
+            obtener_nombre_o_valor($2, valor);
+            $$ = crear_terceto ("GET", valor, NULL);
+           }
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
             // XXX no se porque no anda el tipo
@@ -262,7 +290,6 @@ seleccion: IF condicion_logica {
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
                sprintf(destino, "[%d]", $5 + 1);
-               printf(">>>lista_sentencias: %d\n", $5);
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
@@ -867,6 +894,7 @@ void fin_id()
         if( (i = esPalabraRes()) != -1)
         {
             tipo_token =  NroPalabrasRes[i];
+            //yylval =  NroPalabrasRes[i];
         }
         else
         {
