@@ -45,6 +45,13 @@
 #define T_corchete_cierra   24
 /****************************/
 
+#define CMP_MENOR 0
+#define CMP_MENOR_IGUAL 1
+#define CMP_MAYOR 2
+#define CMP_MAYOR_IGUAL 3
+#define CMP_DISTINTO 4
+#define CMP_IGUAL 5
+
 #define CANT_ESTADOS 39 //filas de la matriz de estados
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
 #define CANTPR 15 //cantidad de palabras reservadas
@@ -114,6 +121,16 @@ void guardarTS();
 int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
 void (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 
+const char salto[7][4] = {
+    {"BGE"}, // menor
+    {"BG"}, // menor igual
+    {"BLE"}, //mayor
+    {"BL"}, //mayor igual
+    {"BLE"}, // mayor
+    {"EQ"}, // distinto
+    {"NEQ"}, //igual
+};
+
 /* Tabla de simbolos */
 struct tablaDeSimbolos
 {
@@ -123,7 +140,10 @@ struct tablaDeSimbolos
     char ren   [31];
     int longitud;
 };
+
 struct tablaDeSimbolos TS[TAMMAX];
+/* obtiene nombre o valor del elemento en posicion i en la tabla de simbolos */
+void obtener_nombre_o_valor(int, char*);
 
 /* Notacion intermedia */
 /* estrutura de un terceto */
@@ -137,13 +157,32 @@ typedef struct s_terceto {
 t_terceto* tercetos[MAX_TERCETOS];
 /* cantidad de tercetos */
 int cant_tercetos;
+/** crea una estructura de datos de terceto */
+t_terceto* _crear_terceto (const char*, const char*, const char*);
 /* crea un terceto y lo agrega a la coleccion */
 int crear_terceto(const char*, const char*, const char*);
 /* escribe los tercetos en un archivo */
 void escribir_tercetos(FILE *);
 /* libera memoria pedida para tercetos */
 void limpiar_tercetos();
+/* Indica que operador de comparacion se uso */
+int iCmp;
 
+/* Pila */ 
+typedef struct s_nodo {
+    int valor;
+    struct s_nodo *sig;
+} t_nodo;
+/* apunta al ultimo elemento ingresado */
+t_nodo *pila;
+/** inserta un entero en la pila */
+void insertar_pila (int);
+/** obtiene un entero de la pila */
+int sacar_pila(t_nodo*);
+/** crea una estructura de pila */
+void crear_pila(t_nodo*);
+/** destruye pila */
+void destruir_pila(t_nodo*);
 %}
 
 
@@ -175,22 +214,69 @@ declaracion : ID ':' tipo{printf("Declaracion de variable '%s'\n", TS[$1].nombre
 lista_sentencias: sentencia
                 | lista_sentencias sentencia
                 ;
-sentencia: seleccion{puts("Fin THEN");} 
-         | seleccion{puts("Fin THEN");} 
-           ELSE {puts("Inicio ELSE");}'{' lista_sentencias '}'{puts("Fin ELSE");};
-         | WHILE condicion_logica {puts("Inicio WHILE");} '{' lista_sentencias '}'{puts("Fin WHILE");} 
+sentencia: seleccion
+         | WHILE condicion_logica {
+               // creo un terceto temporal donde colocare el salto
+               insertar_pila (crear_terceto("Temporal",NULL,NULL));
+           } '{' lista_sentencias '}'{
+               // creo el salto incondicional a la comparacion 
+               int comparacion = sacar_pila (pila);
+               int fin_while;
+               char cmp[7], destino[7];
+               sprintf(cmp, "[%d]", $2);
+               // fin del while, creo salto incondicional
+               fin_while = crear_terceto("BI", cmp, NULL);
+               sprintf(destino, "[%d]", fin_while + 1);
+               /*
+               * creo terceto para saltar a la siguiente sentencia despues del
+               * while
+               */
+               tercetos[comparacion] = _crear_terceto(salto[iCmp], cmp, destino); 
+               $$ = $4;
+           } 
          | PUT ID{printf("Mostrar por pantalla el valor de variable '%s'\n",
                          TS[$2].nombre);}
          | PUT CTE_STRING{printf("Mostrar por pantalla '%s'\n",TS[$2].valor);}
          | GET ID {printf("Leer del teclado y guardar en variable '%s'",
                           TS[$2].valor);}
          | asignacion
-		 |CONST tipo ID OP_ASIG cte
-            {printf("Declaracion de CTE %s con nombre '%s' valor '%s'\n",
-                    TS[$3].tipo, TS[$3].nombre, TS[$5].valor);}
+		 | CONST tipo ID OP_ASIG cte {
+            // XXX no se porque no anda el tipo
+            strcpy (TS[$3].tipo, TS[$2].tipo); 
+            strcpy (TS[$3].valor, TS[$5].valor); 
+            if ($2 == STRING)
+                TS[$3].longitud = strlen(TS[$3].valor);
+           }
          ;
 
-seleccion: IF condicion_logica '{'{puts("Inicio THEN");}  lista_sentencias '}';
+seleccion: IF condicion_logica {
+               // creo un terceto temporal donde colocare el salto
+               insertar_pila (crear_terceto("Temporal",NULL,NULL));
+           }
+           '{' lista_sentencias '}' {
+               // creo el salto al ultimo terceto del then
+               int inicio_then = sacar_pila (pila);
+               char condicion[7], destino[7];
+               sprintf(condicion, "[%d]", $2);
+               sprintf(destino, "[%d]", $4 + 1);
+               tercetos[inicio_then] = _crear_terceto(salto[iCmp],
+                                                      condicion,
+                                                      destino);
+               $$ = $4;
+           }
+         | seleccion ELSE {
+               // creo un terceto temporal donde colocare el salto del then
+               insertar_pila (crear_terceto("Temporal",NULL,NULL));
+           }
+           '{' lista_sentencias '}'{
+               // creo el salto al ultimo terceto del else
+               int fin_then = sacar_pila (pila);
+               char  destino[7];
+               sprintf(destino, "[%d]", $4 + 1);
+               tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
+               $$ = $4;
+           }
+         ;
 
 tipo: INT 
     | REAL 
@@ -201,55 +287,143 @@ cte : CTE_STRING
     | CTE_REAL
     ;
 
-condicion_logica: condicion AND{puts("AND");} condicion
-                | condicion OR{puts("OR");} condicion
-                | NEGAR{puts("NEGAR");} condicion
+condicion_logica: condicion AND condicion {
+                    char c1[7], c2[7];
+                    sprintf(c1, "[%d]", $1);
+                    sprintf(c2, "[%d]", $3);
+                    $$ = crear_terceto("AND", c1, c2); 
+                  }
+                | condicion OR condicion {
+                    char c1[7], c2[7];
+                    sprintf(c1, "[%d]", $1);
+                    sprintf(c2, "[%d]", $3);
+                    $$ = crear_terceto("OR", c1, c2); 
+                  }
+                | NEGAR condicion  {
+                    char c[7];
+                    sprintf(c, "[%d]", $2);
+                    $$ = crear_terceto("NOT", c, NULL); 
+                  }
                 | condicion
                 ;
 
-condicion: expresion OP_MENOR expresion{puts("Comparacion MENOR");}
-         | expresion OP_MENOR_IGUAL expresion{puts("Comparacion MENOR_IGUAL");}
-         | expresion OP_IGUAL expresion{puts("Comparacion IGUALDAD");}
-         | expresion OP_DISTINTO expresion{puts("Comparacion DISTINTO");}
-         | expresion OP_MAYOR expresion{puts("Comparacion MAYOR");}
-         | expresion OP_MAYOR_IGUAL expresion{puts("Comparacion MAYOR_IGUAL");}
+condicion: expresion OP_MENOR expresion {
+            char e1[7], e2[7];
+            sprintf(e1, "[%d]", $1);
+            sprintf(e2, "[%d]", $3);
+            /* aviso que operacion hay que hacer */
+            iCmp = CMP_MENOR;
+            $$ = crear_terceto("CMP", e1, e2); 
+           }
+         | expresion OP_MENOR_IGUAL expresion {
+            char e1[7], e2[7];
+            sprintf(e1, "[%d]", $1);
+            sprintf(e2, "[%d]", $3);
+            /* aviso que operacion hay que hacer */
+            iCmp = CMP_MENOR_IGUAL;
+            $$ = crear_terceto("CMP", e1, e2); 
+           }
+         | expresion OP_IGUAL expresion {
+            char e1[7], e2[7];
+            sprintf(e1, "[%d]", $1);
+            sprintf(e2, "[%d]", $3);
+            /* aviso que operacion hay que hacer */
+            iCmp = CMP_IGUAL;
+            $$ = crear_terceto("CMP", e1, e2); 
+           }
+         | expresion OP_DISTINTO expresion {
+            char e1[7], e2[7];
+            sprintf(e1, "[%d]", $1);
+            sprintf(e2, "[%d]", $3);
+            /* aviso que operacion hay que hacer */
+            iCmp = CMP_DISTINTO;
+            $$ = crear_terceto("CMP", e1, e2); 
+           }
+         | expresion OP_MAYOR expresion {
+            char e1[7], e2[7];
+            sprintf(e1, "[%d]", $1);
+            sprintf(e2, "[%d]", $3);
+            /* aviso que operacion hay que hacer */
+            iCmp = CMP_MAYOR;
+            $$ = crear_terceto("CMP", e1, e2); 
+           }
+         | expresion OP_MAYOR_IGUAL expresion {
+            char e1[7], e2[7];
+            sprintf(e1, "[%d]", $1);
+            sprintf(e2, "[%d]", $3);
+            /* aviso que operacion hay que hacer */
+            iCmp = CMP_MAYOR_IGUAL;
+            $$ = crear_terceto("CMP", e1, e2); 
+           }
          ;
 
-asignacion: ID OP_ASIG expresion{printf("Asignacion de %s\n", TS[$1].nombre);}
-          | ID OP_ASIG concatenacion{printf("Asignacion de %s\n", TS[$1].nombre);}
+asignacion: ID OP_ASIG expresion {
+                char e[7];
+                sprintf(e, "[%d]", $3);
+                $$ = crear_terceto("=", TS[$1].nombre, e); 
+            }
+          | ID OP_ASIG concatenacion{
+                char e[7];
+                sprintf(e, "[%d]", $3);
+                $$ = crear_terceto("=", TS[$1].nombre, e); 
+            }
           ;
 
-expresion: expresion '+' termino{printf("Suma entre %s y %s\n",
-                                  *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
-                                  *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
-                                  );}
-		 | expresion '-' termino{printf("Resta entre %s y %s\n",
-                                  *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
-                                  *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
-                                  );}
+expresion: expresion '+' termino {
+                char e[7], t[7];
+                sprintf(e, "[%d]", $1);
+                sprintf(t, "[%d]", $3);
+                $$ = crear_terceto("+", e, t); 
+           }
+		 | expresion '-' termino {
+                char e[7], t[7];
+                sprintf(e, "[%d]", $1);
+                sprintf(t, "[%d]", $3);
+                $$ = crear_terceto("-", e, t); 
+           }
          | termino
          ;
 
-termino: termino '*' factor{printf("Multiplicacion entre %s y %s\n", 
-                                  *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
-                                  *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
-                                  );}
-       | termino '/' factor{printf("Division entre %s y %s\n",
-                                *(TS[$1].nombre) ? TS[$1].nombre : TS[$1].valor,
-                                *(TS[$3].nombre) ? TS[$3].nombre : TS[$3].valor
-                            );}
+termino: termino '*' factor {
+           char t[7], f[7];
+           sprintf(t, "[%d]", $1);
+           sprintf(f, "[%d]", $3);
+           $$ = crear_terceto("*", t, f); 
+         }
+       | termino '/' factor { 
+           char t[7], f[7];
+           sprintf(t, "[%d]", $1);
+           sprintf(f, "[%d]", $3);
+           $$ = crear_terceto("/", t, f); 
+         }
        | factor
        ;
 
-factor: ID 
-      | cte 
+factor: ID { 
+          char id[MAX_LONG];
+          obtener_nombre_o_valor ($1, id);
+          $$ = crear_terceto(id, NULL, NULL); 
+        }
+      | cte { 
+          char cte[MAX_LONG];
+          obtener_nombre_o_valor ($1, cte);
+          $$ = crear_terceto(cte, NULL, NULL);
+        }
       | '(' expresion ')'
       ;
 
-concatenacion: ID OP_CONCATENAR ID{puts("Concatena ID con ID");}
-             | ID OP_CONCATENAR CTE_STRING{puts("Concatena ID con CTE_STRING");}
-             | CTE_STRING OP_CONCATENAR ID{puts("Concatena CTE_STRING con ID");}
-             | CTE_STRING OP_CONCATENAR CTE_STRING{puts("Concatena CTE_STRING con CTE_STRING");}
+concatenacion: ID OP_CONCATENAR ID {
+                    $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
+               }
+             | ID OP_CONCATENAR CTE_STRING {
+                    $$ = crear_terceto("++", TS[$1].nombre, TS[$3].valor);
+               }
+             | CTE_STRING OP_CONCATENAR ID {
+                    $$ = crear_terceto("++", TS[$1].valor, TS[$3].nombre);
+               }
+             | CTE_STRING OP_CONCATENAR CTE_STRING {
+                    $$ = crear_terceto("++", TS[$1].valor, TS[$3].valor);
+               }
              ;
 %%
 /* FUNCIONES AUXILIARES */    
@@ -281,6 +455,7 @@ const char palabrasRes[CANTPR][LARGOMAX]={
     {"put"},
     {"get"}
 };
+
 
 const char *terminal[CANT_TERMINALES];
 
@@ -572,6 +747,7 @@ void init () {
     terminal[T_corchete_cierra] =   "]";
     
     cant_tercetos = 0;
+    crear_pila(pila);
 }
 
 void limpiar_token()
@@ -1009,11 +1185,9 @@ int yyerror(char *s)
 	exit(1);
 }
 
-/** crea un terceto y lo agrega a la coleccion de tercetos */
-int crear_terceto(const char* t1, const char* t2, const char* t3){
-    // creo un nuevo terceto
+/** crea una estructura de datos de terceto */
+t_terceto* _crear_terceto (const char* t1, const char* t2, const char* t3){
     t_terceto* terceto = (t_terceto*) malloc(sizeof(t_terceto));
-    int numero = cant_tercetos;
     // completo sus atributos
     strcpy(terceto->t1, t1);
 
@@ -1026,8 +1200,14 @@ int crear_terceto(const char* t1, const char* t2, const char* t3){
         strcpy(terceto->t3, t3);
     else
         *(terceto->t3) = '\0';
-    // lo agrego a la coleccion de tercetos
-    tercetos[numero] = terceto;
+    return terceto; 
+}
+
+/** crea un terceto y lo agrega a la coleccion de tercetos */
+int crear_terceto(const char* t1, const char* t2, const char* t3){
+    // creo un nuevo terceto y lo agrego a la coleccion de tercetos
+    int numero = cant_tercetos;
+    tercetos[numero] = _crear_terceto (t1, t2, t3);
     cant_tercetos++;
     // devuelvo numero de terceto
     return numero;
@@ -1048,3 +1228,48 @@ void limpiar_tercetos () {
     for (i = 0; i < cant_tercetos; i++)
         free(tercetos[i]);
 }
+
+/** Obtiene nombre o valor del elemento en posicion i en la tabla de simbolos */
+void obtener_nombre_o_valor(int posicion, char* destino) {
+    if (*(TS[posicion].valor))
+        strcpy(destino, TS[posicion].valor);
+    else
+        strcpy(destino, TS[posicion].nombre);
+}
+
+/** inserta un entero en la pila */
+void insertar_pila (int valor) {
+    // creo nodo
+    t_nodo *nodo = (t_nodo*) malloc (sizeof(t_nodo));
+    // asigno valor
+    nodo->valor = valor;
+    // apunto al elemento siguiente
+    nodo->sig = pila;
+    // apunto al tope de la pila
+    pila = nodo;
+}
+
+/** obtiene un entero de la pila */
+int sacar_pila(t_nodo* pila) {
+    int valor;
+    t_nodo *aux;
+    if (pila != NULL) {
+       aux = pila;
+       valor = aux->valor;
+       pila = aux->sig;
+       free(aux);
+    } else
+       valor = ERROR;
+    return valor;
+}
+
+/** crea una estructura de pila */
+void crear_pila(t_nodo* pila) {
+    pila = NULL;
+}
+
+/** destruye pila */
+void destruir_pila(t_nodo* pila) {
+    while ( ERROR != sacar_pila(pila));
+}
+
