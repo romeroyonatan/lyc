@@ -277,9 +277,11 @@ sentencia: seleccion
            } 
          | PUT ID {
             //XXX ¿solo puedo escribir strings?
+            if (variable_declarada($2)) {
                 char valor[MAX_LONG];
                 obtener_nombre_o_valor($2, valor);
                 $$ = crear_terceto ("PUT", valor, NULL);
+            }
            }
          | PUT CTE_STRING{
                char valor[MAX_LONG];
@@ -288,9 +290,11 @@ sentencia: seleccion
            }
          | GET ID {
             //XXX ¿solo puedo leer strings?
-            char valor[MAX_LONG];
-            obtener_nombre_o_valor($2, valor);
-            $$ = crear_terceto ("GET", valor, NULL);
+            if (variable_declarada($2)) {
+                char valor[MAX_LONG];
+                obtener_nombre_o_valor($2, valor);
+                $$ = crear_terceto ("GET", valor, NULL);
+            }
            }
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
@@ -411,7 +415,8 @@ condicion: expresion OP_MENOR expresion {
          ;
 
 asignacion: ID OP_ASIG expresion {
-                if (comprobar_tipos ($1, 2, INT, REAL)) {
+                if (variable_declarada($1) &&
+                    comprobar_tipos ($1, 2, INT, REAL)) {
                     char e[7];
                     sprintf(e, "[%d]", $3);
                     $$ = crear_terceto("=", TS[$1].nombre, e); 
@@ -457,7 +462,8 @@ termino: termino '*' factor {
        ;
 
 factor: ID { 
-          if (comprobar_tipos ($1, 2, INT, REAL)) {
+          if (variable_declarada($1) &&
+              comprobar_tipos ($1, 2, INT, REAL)) {
             char id[MAX_LONG];
             obtener_nombre_o_valor ($1, id);
             $$ = crear_terceto(id, NULL, NULL); 
