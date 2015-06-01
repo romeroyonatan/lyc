@@ -224,7 +224,7 @@ declaracion : ID ':' tipo {
                         strcpy(tipo, "REAL");
                         break;
                       case TIPO_INT:
-                        strcpy(tipo, "INT");
+                        strcpy(tipo, "ENTERO");
                         break;
                   }
                   // modifico tipo en tabla de simbolos
@@ -1192,7 +1192,7 @@ int insertarTS()
         break;
         case CTE_ENTERO:
             strcpy(TS[TStop].nombre, "");
-            strcpy(TS[TStop].tipo,"INT");
+            strcpy(TS[TStop].tipo,"ENTERO");
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
