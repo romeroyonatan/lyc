@@ -36,7 +36,7 @@ build/*.exe
 build/*.c
 build/Grupo06
 test/Final.asm
-test/intermedia.txt
+test/Intermedia.txt
 test/prueba*_resultado.txt
 test/tabla_de_simbolos.txt
 yacc/*.tab.c
