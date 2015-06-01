@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include <ctype.h>
 #include <float.h>
 #define ERROR -1
@@ -135,6 +136,8 @@ const char salto[7][4] = {
     {"NEQ"}, //igual
 };
 
+int linea = 1; //linea por la que esta leyendo
+
 /* Tabla de simbolos */
 struct tablaDeSimbolos
 {
@@ -187,6 +190,16 @@ int sacar_pila(t_nodo*);
 void crear_pila(t_nodo*);
 /** destruye pila */
 void destruir_pila(t_nodo*);
+/** 
+* Comprueba que el elemento de la tabla de simbolos pertenece a alguno de los
+* tipos compatibles. Devuelve cero en caso que no cumpla con el tipo requerido
+* 
+* comprobar_tipos(POSICION_TABLA_SIMBOLOS, CANTIDAD_DE_TIPOS_ADMITIDOS, TIPO1, 
+*                 TIPO2, TIPON);
+* Ejemplo de uso:
+*   comprobar_tipos(1, 2, INT, REAL);
+*/
+int comprobar_tipos(int, int,...);
 %}
 
 
@@ -448,7 +461,9 @@ factor: ID {
       ;
 
 concatenacion: ID OP_CONCATENAR ID {
-                    $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
+                   if (comprobar_tipos ($1, 2, REAL, STRING) &&
+                       comprobar_tipos ($3, 2, STRING, REAL))
+                       $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
                }
              | ID OP_CONCATENAR CTE_STRING {
                     $$ = crear_terceto("++", TS[$1].nombre, TS[$3].valor);
@@ -469,7 +484,6 @@ int yylval;
 FILE *entrada, *tos;
 int TStop = 0;  // Índice de la TS
 int tipo_token; //numero identificador del token
-int linea = 1; //linea por la que esta leyendo
 int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
@@ -1308,3 +1322,66 @@ void destruir_pila(t_nodo* pila) {
     while ( ERROR != sacar_pila(pila));
 }
 
+/** 
+* Comprueba que el elemento de la tabla de simbolos pertenece a alguno de los
+* tipos compatibles. Devuelve cero en caso que no cumpla con el tipo requerido
+* 
+* comprobar_tipos(POSICION_TABLA_SIMBOLOS, CANTIDAD_DE_TIPOS_ADMITIDOS, TIPO1, 
+*                 TIPO2, TIPON);
+*
+* Ejemplo de uso:
+*   comprobar_tipos($1, 2 , INT, REAL);
+*/
+int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
+    int i;
+    /* defino tipos esperados */
+    char esperados[cantidad_tipos][LARGOMAX];
+    // valores de los parametros
+    int val; 
+    // lista de parametros
+    va_list vl;
+    // empiezo a leer parametros variables
+    va_start(vl, cantidad_tipos);
+    // ************** aca leo parametros y comparo
+    for (i = 0; i < cantidad_tipos; i++) {
+        // obtengo proximo parametro de tipo entero
+        val = va_arg (vl, int);
+        // armo el string del tipo
+        switch (val) {
+            case STRING:
+            case CTE_STRING:
+                strcpy (esperados[i], "STRING");
+                break;
+            case INT:
+            case CTE_ENTERO:
+                strcpy (esperados[i], "ENTERO");
+                break;
+            case REAL:
+            case CTE_REAL:
+                strcpy (esperados[i], "REAL");
+                break;
+            default:
+                return 0;
+        }
+        if (strcmp(TS[posicion].tipo, esperados[i]) == 0){
+            /* termino de leer parametros variables */
+            va_end(vl);
+            /* devuelvo 1 porque encontre el tipo en la lista*/
+            return 1;
+        }
+   }
+   /* si llegue aca no encontre el tipo en la lista */
+   char espera[255];
+   for (i = 0; i < cantidad_tipos; i++) {
+       if (i > 0) 
+           /* agrego coma */
+           strcat (espera, ", ");
+       strcat (espera, esperados[i]);
+   }
+   /* Muestro mensaje de error */
+   fprintf(stderr, "Error semantico linea %d: Tipos esperados %s\n", linea, 
+                                                                     espera);
+   /* termino de leer parametros variables */
+   va_end(vl);
+   return 0;
+}
