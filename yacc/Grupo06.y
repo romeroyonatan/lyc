@@ -200,6 +200,9 @@ void destruir_pila(t_nodo*);
 *   comprobar_tipos(1, 2, INT, REAL);
 */
 int comprobar_tipos(int, int,...);
+
+/** Verifica que una variable haya sido declarada antes de su uso */
+int variable_declarada (int);
 %}
 
 
@@ -415,7 +418,7 @@ asignacion: ID OP_ASIG expresion {
                 }
             }
           | ID OP_ASIG concatenacion{
-                if (comprobar_tipos ($1, 1, STRING)) {
+                if (variable_declarada($1) && comprobar_tipos ($1, 1, STRING)) {
                     char e[7];
                     sprintf(e, "[%d]", $3);
                     $$ = crear_terceto("=", TS[$1].nombre, e); 
@@ -1402,4 +1405,17 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
    /* termino de leer parametros variables */
    va_end(vl);
    return 0;
+}
+
+/** Verifica que una variable haya sido declarada antes de su uso */
+int variable_declarada (int posicion) {
+    char error[255];
+    if (strcmp(TS[posicion].tipo, "ID") != 0)
+        return 1;
+    else {
+        sprintf(error, "Intentando usar variable %s no declarada", 
+                       TS[posicion].nombre);
+        yyerror(error);
+        return 0;
+    }
 }
