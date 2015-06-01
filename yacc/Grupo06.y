@@ -218,8 +218,9 @@ int comprobar_tipos(int, int,...);
 /* REGLAS SEMANTICAS */
 /* ------------------------------------------------------------------------- */
 %%
-programa: declaraciones lista_sentencias { puts("Compilacion OK"); }
-        | lista_sentencias { puts("Compilacion OK"); }
+programa: declaraciones lista_sentencias
+        | lista_sentencias 
+        ;
 
 declaraciones: DECLARE lista_declaraciones ENDDECLARE { $$ = $2; }
              ;
@@ -570,6 +571,7 @@ int main(int argc, char **argv)
     guardarTS();
     // guardo coleccion de tercetos en archivo
     escribir_tercetos(intermedia);
+    escribir_tercetos(stdout);
     // libero memoria de tercetos
     limpiar_tercetos();
 
