@@ -474,17 +474,20 @@ factor: ID {
       ;
 
 concatenacion: ID OP_CONCATENAR ID {
-                   if (comprobar_tipos ($1, 1, STRING) &&
+                   if (variable_declarada($1) && variable_declarada($3) &&
+                       comprobar_tipos ($1, 1, STRING) &&
                        comprobar_tipos ($3, 1, STRING))
                        $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
                }
              | ID OP_CONCATENAR CTE_STRING {
-                   if (comprobar_tipos ($1, 1, STRING) &&
+                   if (variable_declarada($1) &&
+                       comprobar_tipos ($1, 1, STRING) &&
                        comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].nombre, TS[$3].valor);
                }
              | CTE_STRING OP_CONCATENAR ID {
-                   if (comprobar_tipos ($1, 1, STRING) &&
+                   if (variable_declarada($3) && 
+                       comprobar_tipos ($1, 1, STRING) &&
                        comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].valor, TS[$3].nombre);
                }
