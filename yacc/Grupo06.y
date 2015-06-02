@@ -3,7 +3,6 @@
 * Lenguajes y compiladores
 * Universidad Nacional de la Matanza
 * 2015
-* TODO: No se deben asignar a constantes con nombre
 */
 
 /* DECLARACIONES*/
@@ -54,9 +53,9 @@
 #define CMP_DISTINTO 4
 #define CMP_IGUAL 5
 
-#define TIPO_INT 1
-#define TIPO_REAL 2
-#define TIPO_STRING 3
+#define VAR_ENTERO 1
+#define VAR_REAL 2
+#define VAR_STRING 3
 
 #define CANT_ESTADOS 39 //filas de la matriz de estados
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
@@ -138,6 +137,8 @@ const char salto[7][4] = {
 };
 
 int linea = 1; //linea por la que esta leyendo
+/* flag error de sintaxis */
+int sintaxis_error;
 
 /* Tabla de simbolos */
 struct tablaDeSimbolos
@@ -235,14 +236,14 @@ declaracion : ID ':' tipo {
                   char id[MAX_LONG], tipo[MAX_LONG];
                   obtener_nombre_o_valor($1, id);
                   switch($3) {
-                      case TIPO_STRING:
-                        strcpy(tipo, "STRING");
+                      case VAR_STRING:
+                        strcpy(tipo, "VAR_STRING");
                         break;
-                      case TIPO_REAL:
-                        strcpy(tipo, "REAL");
+                      case VAR_REAL:
+                        strcpy(tipo, "VAR_REAL");
                         break;
-                      case TIPO_INT:
-                        strcpy(tipo, "ENTERO");
+                      case VAR_ENTERO:
+                        strcpy(tipo, "VAR_ENTERO");
                         break;
                   }
                   // modifico tipo en tabla de simbolos
@@ -300,7 +301,21 @@ sentencia: seleccion
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
             //XXX chequear tipos compatibles
-            strcpy (TS[$3].tipo, TS[$2].tipo); 
+            char tipo[LARGOMAX];
+            switch($2) {
+                case VAR_STRING:
+                  strcpy(tipo, "STRING");
+                  break;
+                case VAR_REAL:
+                  strcpy(tipo, "REAL");
+                  break;
+                case VAR_ENTERO:
+                  strcpy(tipo, "ENTERO");
+                  break;
+            }
+            if (strcmp(tipo, TS[$5].tipo))
+                yyerror("Tipo incompatible al asignar constante con nombre");
+            strcpy (TS[$3].tipo, TS[$5].tipo); 
             strcpy (TS[$3].valor, TS[$5].valor); 
             if ($2 == STRING)
                 TS[$3].longitud = strlen(TS[$3].valor);
@@ -336,9 +351,9 @@ seleccion: IF condicion_logica {
            }
          ;
 
-tipo: INT {$$ = TIPO_INT;}
-    | REAL {$$ = TIPO_REAL;}
-    | STRING {$$ = TIPO_STRING;}
+tipo: INT {$$ = VAR_ENTERO;}
+    | REAL {$$ = VAR_REAL;}
+    | STRING {$$ = VAR_STRING;}
     ;
 cte : CTE_STRING 
     | CTE_ENTERO 
@@ -471,11 +486,9 @@ factor: ID {
           }
         }
       | cte { 
-          if (comprobar_tipos ($1, 2, INT, REAL)) {
             char cte[MAX_LONG];
             obtener_nombre_o_valor ($1, cte);
             $$ = crear_terceto(cte, NULL, NULL);
-          }
         }
       | '(' expresion ')'
       ;
@@ -583,8 +596,10 @@ int main(int argc, char **argv)
 
     guardarTS();
     // guardo coleccion de tercetos en archivo
-    escribir_tercetos(intermedia);
-    escribir_tercetos(stdout);
+    if (!sintaxis_error) {
+        escribir_tercetos(intermedia);
+        escribir_tercetos(stdout);
+    }
     // libero memoria de tercetos
     limpiar_tercetos();
 
@@ -1261,7 +1276,8 @@ int insertarTS()
 int yyerror(char *s)
 {
     fprintf(stderr,"Linea %d: %s.\n",linea, s);
-	exit(1);
+    sintaxis_error = 1;
+    return 1;
 }
 
 /** crea una estructura de datos de terceto */
@@ -1379,14 +1395,20 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
         // armo el string del tipo
         switch (val) {
             case STRING:
+                strcpy (esperados[i], "VAR_STRING");
+                break;
             case CTE_STRING:
                 strcpy (esperados[i], "STRING");
                 break;
             case INT:
+                strcpy (esperados[i], "VAR_ENTERO");
+                break;
             case CTE_ENTERO:
                 strcpy (esperados[i], "ENTERO");
                 break;
             case REAL:
+                strcpy (esperados[i], "VAR_REAL");
+                break;
             case CTE_REAL:
                 strcpy (esperados[i], "REAL");
                 break;
