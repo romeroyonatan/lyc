@@ -3,6 +3,7 @@
 * Lenguajes y compiladores
 * Universidad Nacional de la Matanza
 * 2015
+* TODO: No se deben asignar a constantes con nombre
 */
 
 /* DECLARACIONES*/
