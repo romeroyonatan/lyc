@@ -300,7 +300,6 @@ sentencia: seleccion
            }
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
-            //XXX chequear tipos compatibles
             switch($2) {
                 case VAR_STRING:
                   comprobar_tipos($5, 2, CTE_STRING);
@@ -1212,10 +1211,10 @@ void a_minuscula (char *palabra)
 void guardarTS()
 {
     int i;
-    fprintf(tos,"%-9s|%-20s|%-10s|%-20s|%-10s\n","Nro","Nombre","Tipo","Valor",
+    fprintf(tos,"%-4s|%-20s|%-10s|%-35s|%-10s\n","Nro","Nombre","Tipo","Valor",
                                                 "Longitud");
     for (i=0; i<TStop; i++){
-        fprintf(tos,"%-9d|%-20s|%-10s|%-20s|%-10d\n",
+        fprintf(tos,"%-4d|%-20s|%-10s|%-35s|%-10d\n",
                 i,TS[i].nombre, TS[i].tipo, TS[i].valor, TS[i].longitud);
     }
 }
