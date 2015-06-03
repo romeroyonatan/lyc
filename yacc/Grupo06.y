@@ -292,7 +292,7 @@ sentencia: seleccion
            }
          | PUT CTE_STRING{
                char valor[MAX_LONG];
-               obtener_nombre_o_valor($2, valor);
+               sprintf(valor, "\"%s\"", TS[$2].valor);
                $$ = crear_terceto ("PUT", valor, NULL);
            }
          | GET ID {
@@ -502,17 +502,27 @@ concatenacion: ID OP_CONCATENAR ID {
                        $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
                }
              | ID OP_CONCATENAR CTE_STRING {
+                   char cte[MAX_LONG];
                    if (variable_declarada($1) &&
-                       comprobar_tipos ($1, 1, STRING))
-                    $$ = crear_terceto("++", TS[$1].nombre, TS[$3].valor);
+                       comprobar_tipos ($1, 1, STRING)) {
+                    sprintf(cte, "\"%s\"", TS[$3].valor);
+                    $$ = crear_terceto("++", TS[$1].nombre, cte);
+                   }
                }
              | CTE_STRING OP_CONCATENAR ID {
+                   char cte[MAX_LONG];
                    if (variable_declarada($3) && 
-                       comprobar_tipos ($3, 1, STRING))
-                    $$ = crear_terceto("++", TS[$1].valor, TS[$3].nombre);
+                       comprobar_tipos ($3, 1, STRING)) {
+                    sprintf(cte, "\"%s\"", TS[$1].valor);
+                    $$ = crear_terceto("++", cte, TS[$1].valor);
+                   }
                }
              | CTE_STRING OP_CONCATENAR CTE_STRING {
-                    $$ = crear_terceto("++", TS[$1].valor, TS[$3].valor);
+                   char cte1[MAX_LONG];
+                   char cte2[MAX_LONG];
+                   sprintf(cte1, "\"%s\"", TS[$1].valor);
+                   sprintf(cte2, "\"%s\"", TS[$3].valor);
+                   $$ = crear_terceto("++", cte1, cte2);
                }
              ;
 %%
