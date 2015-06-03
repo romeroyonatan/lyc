@@ -301,20 +301,17 @@ sentencia: seleccion
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
             //XXX chequear tipos compatibles
-            char tipo[LARGOMAX];
             switch($2) {
                 case VAR_STRING:
-                  strcpy(tipo, "STRING");
+                  comprobar_tipos($5, 2, CTE_STRING);
                   break;
                 case VAR_REAL:
-                  strcpy(tipo, "REAL");
+                  comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
                   break;
                 case VAR_ENTERO:
-                  strcpy(tipo, "ENTERO");
+                  comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
                   break;
             }
-            if (strcmp(tipo, TS[$5].tipo))
-                yyerror("Tipo incompatible al asignar constante con nombre");
             strcpy (TS[$3].tipo, TS[$5].tipo); 
             strcpy (TS[$3].valor, TS[$5].valor); 
             if ($2 == STRING)
@@ -479,7 +476,7 @@ termino: termino '*' factor {
 
 factor: ID { 
           if (variable_declarada($1) &&
-              comprobar_tipos ($1, 2, INT, REAL)) {
+              comprobar_tipos ($1, 4, INT, REAL, CTE_ENTERO, CTE_REAL)) {
             char id[MAX_LONG];
             obtener_nombre_o_valor ($1, id);
             $$ = crear_terceto(id, NULL, NULL); 
