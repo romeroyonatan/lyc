@@ -144,9 +144,8 @@ int sintaxis_error;
 struct tablaDeSimbolos
 {
     char nombre[100];
-    char tipo  [11];
+    int tipo;
     char valor [100];
-    char ren   [31];
     int longitud;
 };
 
@@ -205,6 +204,9 @@ int comprobar_tipos(int, int,...);
 
 /** Verifica que una variable haya sido declarada antes de su uso */
 int variable_declarada (int);
+
+/* Devuelve nombre del tipo en base a su numero */
+void string_tipo(char *destino, int tipo);
 %}
 
 
@@ -233,23 +235,26 @@ lista_declaraciones : declaracion
                     | lista_declaraciones ',' declaracion { $$ = $3; }
                     ;
 declaracion : ID ':' tipo {
-                  char id[MAX_LONG], tipo[MAX_LONG];
+                  char id[MAX_LONG];
+                  // obtengo tipo
+                  int tipo = $3 + 255;
+                  // obtengo nombre
                   obtener_nombre_o_valor($1, id);
-                  switch($3) {
-                      case VAR_STRING:
-                        strcpy(tipo, "VAR_STRING");
+                  // modifico tipo en tabla de simbolos
+                  TS[$1].tipo = tipo;
+                  // creo terceto
+                  switch(tipo) {
+                      case STRING:
+                        $$ = crear_terceto("STRING", id, NULL);
                         break;
-                      case VAR_REAL:
-                        strcpy(tipo, "VAR_REAL");
+                      case INT:
+                        $$ = crear_terceto("ENTERO", id, NULL);
                         break;
-                      case VAR_ENTERO:
-                        strcpy(tipo, "VAR_ENTERO");
+                      case REAL:
+                        $$ = crear_terceto("REAL", id, NULL);
                         break;
                   }
-                  // modifico tipo en tabla de simbolos
-                  strcpy (TS[$1].tipo, tipo);
                   // creo terceto
-                  $$ = crear_terceto(tipo, id, NULL);
               }
             ;
 lista_sentencias: sentencia 
@@ -300,18 +305,19 @@ sentencia: seleccion
            }
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
-            switch($2) {
-                case VAR_STRING:
-                  comprobar_tipos($5, 2, CTE_STRING);
+            int tipo = $2 + 255;
+            switch(tipo) {
+                case STRING:
+                  comprobar_tipos($5, 1, CTE_STRING);
                   break;
-                case VAR_REAL:
+                case REAL:
                   comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
                   break;
-                case VAR_ENTERO:
+                case INT:
                   comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
                   break;
             }
-            strcpy (TS[$3].tipo, TS[$5].tipo); 
+            TS[$3].tipo = TS[$5].tipo; 
             strcpy (TS[$3].valor, TS[$5].valor); 
             if ($2 == STRING)
                 TS[$3].longitud = strlen(TS[$3].valor);
@@ -347,9 +353,9 @@ seleccion: IF condicion_logica {
            }
          ;
 
-tipo: INT {$$ = VAR_ENTERO;}
-    | REAL {$$ = VAR_REAL;}
-    | STRING {$$ = VAR_STRING;}
+tipo: INT {$$ = INT - 255;}
+    | REAL {$$ = REAL - 255;}
+    | STRING {$$ = STRING - 255;}
     ;
 cte : CTE_STRING 
     | CTE_ENTERO 
@@ -497,19 +503,15 @@ concatenacion: ID OP_CONCATENAR ID {
                }
              | ID OP_CONCATENAR CTE_STRING {
                    if (variable_declarada($1) &&
-                       comprobar_tipos ($1, 1, STRING) &&
-                       comprobar_tipos ($3, 1, STRING))
+                       comprobar_tipos ($1, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].nombre, TS[$3].valor);
                }
              | CTE_STRING OP_CONCATENAR ID {
                    if (variable_declarada($3) && 
-                       comprobar_tipos ($1, 1, STRING) &&
                        comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].valor, TS[$3].nombre);
                }
              | CTE_STRING OP_CONCATENAR CTE_STRING {
-                   if (comprobar_tipos ($1, 1, STRING) &&
-                       comprobar_tipos ($3, 1, STRING))
                     $$ = crear_terceto("++", TS[$1].valor, TS[$3].valor);
                }
              ;
@@ -1211,11 +1213,14 @@ void a_minuscula (char *palabra)
 void guardarTS()
 {
     int i;
-    fprintf(tos,"%-4s|%-20s|%-10s|%-35s|%-10s\n","Nro","Nombre","Tipo","Valor",
+    char tipo[MAX_LONG];
+    fprintf(tos,"%-4s|%-20s|%-20s|%-25s|%-4s\n","Nro","Nombre","Tipo","Valor",
                                                 "Longitud");
     for (i=0; i<TStop; i++){
-        fprintf(tos,"%-4d|%-20s|%-10s|%-35s|%-10d\n",
-                i,TS[i].nombre, TS[i].tipo, TS[i].valor, TS[i].longitud);
+        // obtengo string del tipo
+        string_tipo(tipo, TS[i].tipo);
+        fprintf(tos,"%-4d|%-20s|%-20s|%-25s|%-4d\n",
+                i,TS[i].nombre, tipo, TS[i].valor, TS[i].longitud);
     }
 }
 
@@ -1242,24 +1247,24 @@ int insertarTS()
 
         case ID:
             strcpy(TS[TStop].nombre,token);
-            strcpy(TS[TStop].tipo,"ID" );
+            TS[TStop].tipo = ID;
             TStop++;
         break;
         case CTE_ENTERO:
             strcpy(TS[TStop].nombre, "");
-            strcpy(TS[TStop].tipo,"ENTERO");
+            TS[TStop].tipo = CTE_ENTERO;
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
         case CTE_REAL:
             strcpy(TS[TStop].nombre,"");
-            strcpy(TS[TStop].tipo,"REAL");
+            TS[TStop].tipo = CTE_REAL;
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
        	case CTE_STRING:
             strcpy(TS[TStop].nombre, "");
-            strcpy(TS[TStop].tipo,"STRING" );
+            TS[TStop].tipo = CTE_STRING;
             strcpy(TS[TStop].valor, token);
             TS[TStop].longitud = (strlen(token));
             TStop++;
@@ -1377,7 +1382,7 @@ void destruir_pila(t_nodo* pila) {
 int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
     int i;
     /* defino tipos esperados */
-    char esperados[cantidad_tipos][LARGOMAX];
+    int esperados[cantidad_tipos];
     // valores de los parametros
     int val; 
     // lista de parametros
@@ -1388,30 +1393,8 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
     for (i = 0; i < cantidad_tipos; i++) {
         // obtengo proximo parametro de tipo entero
         val = va_arg (vl, int);
-        // armo el string del tipo
-        switch (val) {
-            case STRING:
-                strcpy (esperados[i], "VAR_STRING");
-                break;
-            case CTE_STRING:
-                strcpy (esperados[i], "STRING");
-                break;
-            case INT:
-                strcpy (esperados[i], "VAR_ENTERO");
-                break;
-            case CTE_ENTERO:
-                strcpy (esperados[i], "ENTERO");
-                break;
-            case REAL:
-                strcpy (esperados[i], "VAR_REAL");
-                break;
-            case CTE_REAL:
-                strcpy (esperados[i], "REAL");
-                break;
-            default:
-                return 0;
-        }
-        if (strcmp(TS[posicion].tipo, esperados[i]) == 0){
+        esperados[i] = val;
+        if (TS[posicion].tipo == esperados[i]){
             /* termino de leer parametros variables */
             va_end(vl);
             /* devuelvo 1 porque encontre el tipo en la lista*/
@@ -1420,18 +1403,21 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
    }
    /* si llegue aca no encontre el tipo en la lista */
    /* --------------------------------------------- */
-   char espera[255];
-   char error[255];
+   char espera [255];
+   char aux [255];
+   char error [255];
+   *espera = '\0';
    for (i = 0; i < cantidad_tipos; i++) {
+       string_tipo(aux, esperados[i]);
        if (i > 0) 
            /* agrego coma */
-           strcat (espera, ", ");
-       strcat (espera, esperados[i]);
+           strcat (espera, " o ");
+       strcat (espera, aux);
    }
    /* Muestro mensaje de error */
    sprintf(error, "Error. Tipo incompatible en variable %s - Tipo esperado %s", 
-                TS[posicion].nombre,
-                espera);
+                  TS[posicion].nombre,
+                  espera);
    yyerror(error);
    /* termino de leer parametros variables */
    va_end(vl);
@@ -1441,7 +1427,7 @@ int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
 /** Verifica que una variable haya sido declarada antes de su uso */
 int variable_declarada (int posicion) {
     char error[255];
-    if (strcmp(TS[posicion].tipo, "ID") != 0)
+    if (TS[posicion].tipo != ID)
         return 1;
     else {
         sprintf(error, "Intentando usar variable %s no declarada", 
@@ -1449,4 +1435,32 @@ int variable_declarada (int posicion) {
         yyerror(error);
         return 0;
     }
+}
+
+/* Devuelve nombre del tipo en base a su numero */
+void string_tipo(char *destino, int tipo) {
+
+    // armo el string del tipo
+   switch (tipo) {
+       case STRING:
+           strcpy (destino, "variable string");
+           break;
+       case CTE_STRING:
+           strcpy (destino, "constante string");
+           break;
+       case INT:
+           strcpy (destino, "variable entera");
+           break;
+       case CTE_ENTERO:
+           strcpy (destino, "constante entera");
+           break;
+       case REAL:
+           strcpy (destino, "variable real");
+           break;
+       case CTE_REAL:
+           strcpy (destino, "constante real");
+           break;
+       default:
+           strcpy (destino, "");
+   }
 }
