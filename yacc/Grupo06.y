@@ -50,7 +50,7 @@
 #define CMP_MENOR_IGUAL 1
 #define CMP_MAYOR 2
 #define CMP_MAYOR_IGUAL 3
-#define CMP_DISTINTO 4
+#define CMP_DISTENTEROO 4
 #define CMP_IGUAL 5
 
 #define VAR_ENTERO 1
@@ -62,7 +62,7 @@
 #define CANTPR 15 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define MAX_LONG 30 //largo maximo de los string y nombre de id
-#define MAX_INT 65535 //largo maximo de los enteros de 16 bit
+#define MAX_ENTERO 65535 //largo maximo de los enteros de 16 bit
 #define MAX_REAL FLT_MAX  //largo maximo de los reales de 32 bit
 #define TAMMAX 100
 #define MAX_TERCETOS 1024 // cantidad maxima de tercetos
@@ -198,7 +198,7 @@ void destruir_pila(t_nodo*);
 * comprobar_tipos(POSICION_TABLA_SIMBOLOS, CANTIDAD_DE_TIPOS_ADMITIDOS, TIPO1, 
 *                 TIPO2, TIPON);
 * Ejemplo de uso:
-*   comprobar_tipos(1, 2, INT, REAL);
+*   comprobar_tipos(1, 2, ENTERO, REAL);
 */
 int comprobar_tipos(int, int,...);
 
@@ -214,10 +214,10 @@ void string_tipo(char *destino, int tipo);
 /* ------------------------------------------------------------------------- */
 /* operadores */
 %token OP_ASIG
-%token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTINTO
+%token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTENTEROO
 %token OP_CONCATENAR 
 /* palabras reservadas */
-%token WHILE IF CONST DECLARE ENDDECLARE REAL INT STRING MAIN ELSE PUT GET
+%token WHILE IF CONST DECLARE ENDDECLARE REAL ENTERO STRING MAIN ELSE PUT GET
 %token AND OR NEGAR
 /* operandos */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
@@ -247,7 +247,7 @@ declaracion : ID ':' tipo {
                       case STRING:
                         $$ = crear_terceto("STRING", id, NULL);
                         break;
-                      case INT:
+                      case ENTERO:
                         $$ = crear_terceto("ENTERO", id, NULL);
                         break;
                       case REAL:
@@ -313,7 +313,7 @@ sentencia: seleccion
                 case REAL:
                   comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
                   break;
-                case INT:
+                case ENTERO:
                   comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
                   break;
             }
@@ -353,7 +353,7 @@ seleccion: IF condicion_logica {
            }
          ;
 
-tipo: INT {$$ = INT - 255;}
+tipo: ENTERO {$$ = ENTERO - 255;}
     | REAL {$$ = REAL - 255;}
     | STRING {$$ = STRING - 255;}
     ;
@@ -406,12 +406,12 @@ condicion: expresion OP_MENOR expresion {
             iCmp = CMP_IGUAL;
             $$ = crear_terceto("CMP", e1, e2); 
            }
-         | expresion OP_DISTINTO expresion {
+         | expresion OP_DISTENTEROO expresion {
             char e1[7], e2[7];
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_DISTINTO;
+            iCmp = CMP_DISTENTEROO;
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_MAYOR expresion {
@@ -434,7 +434,7 @@ condicion: expresion OP_MENOR expresion {
 
 asignacion: ID OP_ASIG expresion {
                 if (variable_declarada($1) &&
-                    comprobar_tipos ($1, 2, INT, REAL)) {
+                    comprobar_tipos ($1, 2, ENTERO, REAL)) {
                     char e[7];
                     sprintf(e, "[%d]", $3);
                     $$ = crear_terceto("=", TS[$1].nombre, e); 
@@ -481,7 +481,7 @@ termino: termino '*' factor {
 
 factor: ID { 
           if (variable_declarada($1) &&
-              comprobar_tipos ($1, 4, INT, REAL, CTE_ENTERO, CTE_REAL)) {
+              comprobar_tipos ($1, 4, ENTERO, REAL, CTE_ENTERO, CTE_REAL)) {
             char id[MAX_LONG];
             obtener_nombre_o_valor ($1, id);
             $$ = crear_terceto(id, NULL, NULL); 
@@ -565,7 +565,7 @@ int NroPalabrasRes[CANTPR]={
     DECLARE,
     ENDDECLARE,
     REAL,
-    INT,
+    ENTERO,
     STRING,
     MAIN,
     ELSE,
@@ -987,7 +987,7 @@ void cont_cte()
 void fin_cte()
 {
     int cte = atoi(token);
-    if(cte > MAX_INT) {
+    if(cte > MAX_ENTERO) {
         fprintf(stderr, "Entero sobrepasa limite maximo en linea: %d\n",linea);
 		*token='\0';
         tipo_token =  0;
@@ -1064,7 +1064,7 @@ void op_igualdad()
 void op_distinto()
 {
     limpiar_token();
-    tipo_token =  OP_DISTINTO;
+    tipo_token =  OP_DISTENTEROO;
 }
 void nada()
 {
@@ -1387,7 +1387,7 @@ void destruir_pila(t_nodo* pila) {
 *                 TIPO2, TIPON);
 *
 * Ejemplo de uso:
-*   comprobar_tipos($1, 2 , INT, REAL);
+*   comprobar_tipos($1, 2 , ENTERO, REAL);
 */
 int comprobar_tipos(int posicion, int cantidad_tipos, ...) {
     int i;
@@ -1458,7 +1458,7 @@ void string_tipo(char *destino, int tipo) {
        case CTE_STRING:
            strcpy (destino, "constante string");
            break;
-       case INT:
+       case ENTERO:
            strcpy (destino, "variable entera");
            break;
        case CTE_ENTERO:

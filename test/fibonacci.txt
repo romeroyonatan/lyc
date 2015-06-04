@@ -19,6 +19,7 @@ GET cantidad
 if cantidad < 0 {
     cantidad = default
 }
+
 --/ muestro en pantalla el primer numero de la serie /--
 PUT a
 

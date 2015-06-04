@@ -1,11 +1,15 @@
 DECLARE
 	i : int,
-	t : real
+	a : int,
+	f : int,
+	b : int,
+	t : real,
+    g : string
 ENDDECLARE
-i = 4 + 5/2
-g= "p"++"w"
+a = 4 + 5/2
+g = "p"++"w"
 CONST real h=14
-if a<9-2*8 
+if a<9-2*h 
 {
 	f=f+1
 }
