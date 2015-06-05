@@ -1367,7 +1367,7 @@ void insertar_pila (int valor) {
 }
 
 /** obtiene un entero de la pila */
-int sacar_pila(t_nodo* pila) {
+int sacar_pila(t_nodo* p) {
     int valor;
     t_nodo *aux;
     if (pila != NULL) {
