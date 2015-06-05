@@ -59,7 +59,7 @@
 
 #define CANT_ESTADOS 39 //filas de la matriz de estados
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
-#define CANTPR 15 //cantidad de palabras reservadas
+#define CANTPR 18 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define MAX_LONG 30 //largo maximo de los string y nombre de id
 #define MAX_ENTERO 65535 //largo maximo de los enteros de 16 bit
@@ -217,7 +217,7 @@ void string_tipo(char *destino, int tipo);
 %token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTENTEROO
 %token OP_CONCATENAR 
 /* palabras reservadas */
-%token WHILE IF CONST DECLARE ENDDECLARE REAL ENTERO STRING MAIN ELSE PUT GET
+%token WHILE IF CONST DECLARE ENDDECLARE REAL ENTERO STRING MAIN ELSE PUT GET CASE ESAC OF
 %token AND OR NEGAR
 /* operandos */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
@@ -322,7 +322,12 @@ sentencia: seleccion
             if ($2 == STRING)
                 TS[$3].longitud = strlen(TS[$3].valor);
            }
+         | CASE expresion OF lista_case ESAC
          ;
+         
+lista_case: lista_case case;
+lista_case: case;
+case : ID OP_ASIG OP_MAYOR lista_sentencias ';';
 
 seleccion: IF condicion_logica {
                // creo un terceto temporal donde colocare el salto
@@ -552,7 +557,10 @@ const char palabrasRes[CANTPR][LARGOMAX]={
     {"and"},
     {"or"},
     {"put"},
-    {"get"}
+    {"get"},
+    {"case"},
+    {"esac"},
+    {"of"}
 };
 
 
@@ -572,7 +580,10 @@ int NroPalabrasRes[CANTPR]={
     AND,
     OR,
     PUT,
-    GET
+    GET,
+    CASE,
+    ESAC,
+    OF
 };
 
 int main(int argc, char **argv)
