@@ -322,12 +322,32 @@ sentencia: seleccion
             if ($2 == STRING)
                 TS[$3].longitud = strlen(TS[$3].valor);
            }
-         | CASE expresion OF lista_case ESAC
+         | CASE expresion {auxCase=$2;} OF lista_case ESAC
          ;
          
 lista_case: lista_case case;
 lista_case: case;
-case : ID OP_ASIG OP_MAYOR lista_sentencias ';';
+case : ID 
+	{
+		char id[MAX_LONG];
+		char terc_ant[MAX_LONG];
+		char aux[MAX_LONG];
+        	obtener_nombre_o_valor ($1, id);
+		sprintf(aux, "[%d]", auxCase);
+		sprintf(terc_ant, "[%d]", crear_terceto(id,NULL,NULL));
+		crear_terceto("CMP",terc_ant,aux);
+		insertar_pila (crear_terceto("Temporal",NULL,NULL));
+	}
+	OP_ASIG OP_MAYOR lista_sentencias ';'
+	{
+		char terc_act[MAX_LONG];
+		char salto[MAX_LONG];
+		sprintf(terc_act, "[%d]", cant_tercetos);
+		int proximo=sacar_pila (pila);
+		sprintf(salto, "[%d]", proximo-1);
+		tercetos[proximo] = _crear_terceto("BNE",salto,terc_act);
+	}
+	;
 
 seleccion: IF condicion_logica {
                // creo un terceto temporal donde colocare el salto
@@ -543,6 +563,7 @@ int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
+int auxCase;
 const char palabrasRes[CANTPR][LARGOMAX]={
     {"while"},
     {"if"},
