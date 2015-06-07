@@ -207,6 +207,8 @@ int variable_declarada (int);
 
 /* Devuelve nombre del tipo en base a su numero */
 void string_tipo(char *destino, int tipo);
+
+int auxCase;
 %}
 
 
@@ -563,7 +565,6 @@ int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
-int auxCase;
 const char palabrasRes[CANTPR][LARGOMAX]={
     {"while"},
     {"if"},
