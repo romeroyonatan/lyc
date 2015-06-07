@@ -1,0 +1,19 @@
+--/ declaracion de variables /--
+DECLARE
+    a : int, 
+    b : int,
+    c : int
+ENDDECLARE
+
+--/ asigno valores iniciales /--
+a = 1
+b = 3
+GET c
+
+case c of
+	a => PUT "variable 'c' es igual a 'a'";
+	b => PUT "variable 'c' es igual a 'b'";
+esac
+
+PUT "El valor de la variable c es: "
+PUT c
