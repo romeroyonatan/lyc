@@ -227,8 +227,8 @@ int auxCase;
 /* REGLAS SEMANTICAS */
 /* ------------------------------------------------------------------------- */
 %%
-programa: declaraciones lista_sentencias
-        | lista_sentencias 
+programa: declaraciones lista_sentencias { crear_terceto ("FIN", NULL, NULL); }
+        | lista_sentencias { crear_terceto ("FIN", NULL, NULL); }
         ;
 
 declaraciones: DECLARE lista_declaraciones ENDDECLARE { $$ = $2; }
