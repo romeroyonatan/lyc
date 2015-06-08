@@ -371,19 +371,19 @@ seleccion: IF condicion_logica {
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
-               $$ = $4;
+               $$ = $5;
            }
          | seleccion ELSE {
                // creo un terceto temporal donde colocare el salto del then
                insertar_pila (crear_terceto("Temporal",NULL,NULL));
            }
-           '{' lista_sentencias '}'{
+           '{' lista_sentencias '}' {
                // creo el salto al ultimo terceto del else
                int fin_then = sacar_pila (pila);
                char  destino[7];
-               sprintf(destino, "[%d]", $4 + 1);
+               sprintf(destino, "[%d]", $5 + 1);
                tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
-               $$ = $4;
+               $$ = $5;
            }
          ;
 

@@ -1,0 +1,18 @@
+declare
+    a: int,
+    b: int
+enddeclare
+
+const int c = 20
+
+if a < b {
+    if a < c {
+        while a > b {
+            while a < c {
+                put "Hola mundo"
+            }
+        }
+    }
+} else {
+    put "chau"
+}
