@@ -313,21 +313,26 @@ sentencia: seleccion
          | asignacion
 		 | CONST tipo ID OP_ASIG cte {
             int tipo = $2 + 255;
-            switch(tipo) {
-                case STRING:
-                  comprobar_tipos($5, 1, CTE_STRING);
-                  break;
-                case REAL:
-                  comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
-                  break;
-                case ENTERO:
-                  comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
-                  break;
+            if (TS[$3].tipo == ID) {
+                switch(tipo) {
+                    case STRING:
+                      comprobar_tipos($5, 1, CTE_STRING);
+                      break;
+                    case REAL:
+                      comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
+                      break;
+                    case ENTERO:
+                      comprobar_tipos($5, 2, CTE_REAL, CTE_ENTERO);
+                      break;
+                }
+                TS[$3].tipo = TS[$5].tipo; 
+                strcpy (TS[$3].valor, TS[$5].valor); 
+                if ($2 == STRING)
+                    TS[$3].longitud = strlen(TS[$3].valor);
+            } else {
+                yyerror("No puede usar como nombre de constante el nombre de \
+constante el nombre de una variable ya declarada \n");
             }
-            TS[$3].tipo = TS[$5].tipo; 
-            strcpy (TS[$3].valor, TS[$5].valor); 
-            if ($2 == STRING)
-                TS[$3].longitud = strlen(TS[$3].valor);
            }
          | CASE expresion {auxCase=$2;} OF lista_case ESAC
 		 | LET lista_let DEFAULT expresion {
