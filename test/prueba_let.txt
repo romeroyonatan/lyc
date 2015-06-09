@@ -1,0 +1,7 @@
+DECLARE
+	a : int,
+	b : int,
+	c : real,
+	d : real
+ENDDECLARE
+LET a:2+3, b:1-a, c, d DEFAULT 0 
