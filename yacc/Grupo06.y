@@ -207,6 +207,8 @@ int variable_declarada (int);
 
 /* Devuelve nombre del tipo en base a su numero */
 void string_tipo(char *destino, int tipo);
+
+int contador, auxCase;
 %}
 
 
@@ -225,8 +227,8 @@ void string_tipo(char *destino, int tipo);
 /* REGLAS SEMANTICAS */
 /* ------------------------------------------------------------------------- */
 %%
-programa: declaraciones lista_sentencias
-        | lista_sentencias 
+programa: declaraciones lista_sentencias { crear_terceto ("FIN", NULL, NULL); }
+        | lista_sentencias { crear_terceto ("FIN", NULL, NULL); }
         ;
 
 declaraciones: DECLARE lista_declaraciones ENDDECLARE { $$ = $2; }
@@ -254,7 +256,6 @@ declaracion : ID ':' tipo {
                         $$ = crear_terceto("REAL", id, NULL);
                         break;
                   }
-                  // creo terceto
               }
             ;
 lista_sentencias: sentencia 
@@ -263,24 +264,30 @@ lista_sentencias: sentencia
                   }
                 ;
 sentencia: seleccion
-         | WHILE condicion_logica {
+         | WHILE {
+               // inicio condicion
+               insertar_pila (cant_tercetos);
+           } condicion_logica {
                // creo un terceto temporal donde colocare el salto
                insertar_pila (crear_terceto("Temporal",NULL,NULL));
-           } '{' lista_sentencias '}'{
-               // creo el salto incondicional a la comparacion 
-               int comparacion = sacar_pila (pila);
+           } '{' lista_sentencias '}' {
+               /* obtengo terceto de fin de condicion */
+               int fin_condicion = sacar_pila (pila);
+               /* obtengo terceto de inicio de condicion */
+               int inicio_condicion= sacar_pila (pila);
                int fin_while;
-               char cmp[7], destino[7];
-               sprintf(cmp, "[%d]", $2);
-               // fin del while, creo salto incondicional
-               fin_while = crear_terceto("BI", cmp, NULL);
-               sprintf(destino, "[%d]", fin_while + 1);
+               char tmp0[7], tmp1[7];
+               // fin del while, creo salto incondicional al inicio condicion
+               sprintf(tmp0, "[%d]", inicio_condicion);
+               fin_while = crear_terceto("BI", tmp0, NULL);
                /*
                * creo terceto para saltar a la siguiente sentencia despues del
                * while
                */
-               tercetos[comparacion] = _crear_terceto(salto[iCmp], cmp, destino); 
-               $$ = $4;
+               sprintf(tmp0, "[%d]", fin_while + 1);
+               sprintf(tmp1, "[%d]", $3);
+               tercetos[fin_condicion]= _crear_terceto(salto[iCmp], tmp1, tmp0); 
+               $$ = fin_while;
            } 
          | PUT ID {
             //XXX ¿solo puedo escribir strings?
@@ -391,7 +398,7 @@ seleccion: IF condicion_logica {
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
-               $$ = $4;
+               $$ = $5;
            }
          | seleccion ELSE {
                // creo un terceto temporal donde colocare el salto del then
@@ -401,9 +408,9 @@ seleccion: IF condicion_logica {
                // creo el salto al ultimo terceto del else
                int fin_then = sacar_pila (pila);
                char  destino[7];
-               sprintf(destino, "[%d]", $4 + 1);
+               sprintf(destino, "[%d]", $5 + 1);
                tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
-               $$ = $4;
+               $$ = $5;
            }
          ;
 
