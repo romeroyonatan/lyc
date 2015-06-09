@@ -59,7 +59,7 @@
 
 #define CANT_ESTADOS 39 //filas de la matriz de estados
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
-#define CANTPR 18 //cantidad de palabras reservadas
+#define CANTPR 20 //cantidad de palabras reservadas
 #define LARGOMAX 15//largo maximo de las palabras reservadas
 #define MAX_LONG 30 //largo maximo de los string y nombre de id
 #define MAX_ENTERO 65535 //largo maximo de los enteros de 16 bit
@@ -207,8 +207,6 @@ int variable_declarada (int);
 
 /* Devuelve nombre del tipo en base a su numero */
 void string_tipo(char *destino, int tipo);
-
-int auxCase;
 %}
 
 
@@ -219,7 +217,7 @@ int auxCase;
 %token OP_IGUAL OP_MENOR OP_MAYOR OP_MAYOR_IGUAL OP_MENOR_IGUAL OP_DISTENTEROO
 %token OP_CONCATENAR 
 /* palabras reservadas */
-%token WHILE IF CONST DECLARE ENDDECLARE REAL ENTERO STRING MAIN ELSE PUT GET CASE ESAC OF
+%token WHILE IF CONST DECLARE ENDDECLARE REAL ENTERO STRING MAIN ELSE PUT GET CASE ESAC OF LET DEFAULT
 %token AND OR NEGAR
 /* operandos */
 %token ID CTE_ENTERO CTE_STRING CTE_REAL
@@ -227,8 +225,8 @@ int auxCase;
 /* REGLAS SEMANTICAS */
 /* ------------------------------------------------------------------------- */
 %%
-programa: declaraciones lista_sentencias { crear_terceto ("FIN", NULL, NULL); }
-        | lista_sentencias { crear_terceto ("FIN", NULL, NULL); }
+programa: declaraciones lista_sentencias
+        | lista_sentencias 
         ;
 
 declaraciones: DECLARE lista_declaraciones ENDDECLARE { $$ = $2; }
@@ -256,6 +254,7 @@ declaracion : ID ':' tipo {
                         $$ = crear_terceto("REAL", id, NULL);
                         break;
                   }
+                  // creo terceto
               }
             ;
 lista_sentencias: sentencia 
@@ -264,32 +263,24 @@ lista_sentencias: sentencia
                   }
                 ;
 sentencia: seleccion
-         | WHILE {
-             // inicio condicion
-             insertar_pila (cant_tercetos);
-           } condicion_logica {
+         | WHILE condicion_logica {
                // creo un terceto temporal donde colocare el salto
                insertar_pila (crear_terceto("Temporal",NULL,NULL));
-           } '{' lista_sentencias '}' {
-               /* obtengo terceto de fin de condicion */
-               int fin_condicion = sacar_pila (pila);
-               /* obtengo terceto de inicio de condicion */
-               int inicio_condicion= sacar_pila (pila);
+           } '{' lista_sentencias '}'{
+               // creo el salto incondicional a la comparacion 
+               int comparacion = sacar_pila (pila);
                int fin_while;
-               char tmp0[7], tmp1[7];
-
-               // fin del while, creo salto incondicional al inicio condicion
-               sprintf(tmp0, "[%d]", inicio_condicion);
-               fin_while = crear_terceto("BI", tmp0, NULL);
-               
+               char cmp[7], destino[7];
+               sprintf(cmp, "[%d]", $2);
+               // fin del while, creo salto incondicional
+               fin_while = crear_terceto("BI", cmp, NULL);
+               sprintf(destino, "[%d]", fin_while + 1);
                /*
                * creo terceto para saltar a la siguiente sentencia despues del
                * while
                */
-               sprintf(tmp0, "[%d]", fin_while + 1);
-               sprintf(tmp1, "[%d]", $3);
-               tercetos[fin_condicion]= _crear_terceto(salto[iCmp], tmp1, tmp0); 
-               $$ = fin_while;
+               tercetos[comparacion] = _crear_terceto(salto[iCmp], cmp, destino); 
+               $$ = $4;
            } 
          | PUT ID {
             //XXX ¿solo puedo escribir strings?
@@ -332,8 +323,37 @@ sentencia: seleccion
                 TS[$3].longitud = strlen(TS[$3].valor);
            }
          | CASE expresion {auxCase=$2;} OF lista_case ESAC
-         ;
+		 | LET lista_let DEFAULT expresion {
+			 char e[7];
+			 sprintf(e, "[%d]", $4);
+			 int i, posicion_ts;
+			 for (i=0; i<contador; i++) {
+				 posicion_ts=sacar_pila (pila);
+				 $$ = crear_terceto("=", TS[posicion_ts].nombre, e); 
+			 }
+		 }
+		 ; 
          
+lista_let: lista_let ',' asignacion_let;
+lista_let: asignacion_let;
+asignacion_let: ID ':' expresion {
+					if (variable_declarada($1) &&
+						comprobar_tipos ($1, 2, ENTERO, REAL)) {
+						char e[7];
+						sprintf(e, "[%d]", $3);
+						$$ = crear_terceto("=", TS[$1].nombre, e); 
+					}
+				}
+				;
+asignacion_let: ID { 
+					if (variable_declarada($1) &&
+						comprobar_tipos ($1, 2, ENTERO, REAL)) {
+						insertar_pila ($1);
+						contador++;
+					}
+				}
+				;
+		 
 lista_case: lista_case case;
 lista_case: case;
 case : ID 
@@ -357,7 +377,7 @@ case : ID
 		tercetos[proximo] = _crear_terceto("BNE",salto,terc_act);
 	}
 	;
-
+	
 seleccion: IF condicion_logica {
                // creo un terceto temporal donde colocare el salto
                insertar_pila (crear_terceto("Temporal",NULL,NULL));
@@ -371,19 +391,19 @@ seleccion: IF condicion_logica {
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
-               $$ = $5;
+               $$ = $4;
            }
          | seleccion ELSE {
                // creo un terceto temporal donde colocare el salto del then
                insertar_pila (crear_terceto("Temporal",NULL,NULL));
            }
-           '{' lista_sentencias '}' {
+           '{' lista_sentencias '}'{
                // creo el salto al ultimo terceto del else
                int fin_then = sacar_pila (pila);
                char  destino[7];
-               sprintf(destino, "[%d]", $5 + 1);
+               sprintf(destino, "[%d]", $4 + 1);
                tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
-               $$ = $5;
+               $$ = $4;
            }
          ;
 
@@ -482,7 +502,7 @@ asignacion: ID OP_ASIG expresion {
                 }
             }
           ;
-
+		  
 expresion: expresion '+' termino {
                 char e[7], t[7];
                 sprintf(e, "[%d]", $1);
@@ -572,6 +592,8 @@ int estado = 0; // estado actual
 int longitud; //longitud del string, id o cte
 char token[200]; //Nombre del token identificado
 char caracter; //caracter que se lee del archivo
+int auxCase;
+int contador = 0;
 const char palabrasRes[CANTPR][LARGOMAX]={
     {"while"},
     {"if"},
@@ -589,7 +611,9 @@ const char palabrasRes[CANTPR][LARGOMAX]={
     {"get"},
     {"case"},
     {"esac"},
-    {"of"}
+    {"of"},
+	{"let"},
+    {"default"}
 };
 
 
@@ -612,7 +636,9 @@ int NroPalabrasRes[CANTPR]={
     GET,
     CASE,
     ESAC,
-    OF
+    OF,
+	LET,
+	DEFAULT
 };
 
 int main(int argc, char **argv)
