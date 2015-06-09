@@ -322,7 +322,7 @@ sentencia: seleccion
             if ($2 == STRING)
                 TS[$3].longitud = strlen(TS[$3].valor);
            }
-         | CASE expresion {auxCase=$2;} OF lista_case ESAC
+         | CASE expresion {insertar_pila($2);} OF lista_case ESAC {sacar_pila (pila);}
 		 | LET lista_let DEFAULT expresion {
 			 char e[7];
 			 sprintf(e, "[%d]", $4);
@@ -358,6 +358,7 @@ lista_case: lista_case case;
 lista_case: case;
 case : ID 
 	{
+		auxCase = sacar_pila (pila);
 		char id[MAX_LONG];
 		char terc_ant[MAX_LONG];
 		char aux[MAX_LONG];
@@ -375,6 +376,7 @@ case : ID
 		int proximo=sacar_pila (pila);
 		sprintf(salto, "[%d]", proximo-1);
 		tercetos[proximo] = _crear_terceto("BNE",salto,terc_act);
+		insertar_pila(auxCase);
 	}
 	;
 	
