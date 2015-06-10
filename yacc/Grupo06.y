@@ -367,9 +367,11 @@ case : ID
 		sprintf(terc_ant, "[%d]", crear_terceto(id,NULL,NULL));
 		crear_terceto("CMP",terc_ant,aux);
 		insertar_pila (crear_terceto("Temporal",NULL,NULL));
+		insertar_pila(auxCase);
 	}
 	OP_ASIG OP_MAYOR lista_sentencias ';'
 	{
+		auxCase = sacar_pila (pila);
 		char terc_act[MAX_LONG];
 		char salto[MAX_LONG];
 		sprintf(terc_act, "[%d]", cant_tercetos);
