@@ -322,7 +322,30 @@ sentencia: seleccion
             if ($2 == STRING)
                 TS[$3].longitud = strlen(TS[$3].valor);
            }
-         | CASE expresion {insertar_pila($2);} OF lista_case ESAC {sacar_pila (pila);}
+         | CASE expresion {insertar_pila($2);} OF lista_case ESAC
+         {
+			char aux[MAX_LONG];
+			char aux2[MAX_LONG];
+			int salto;
+			sacar_pila (pila);
+			salto=sacar_pila (pila);
+			printf("Salto: %d\n",salto);
+			printf("t1: %s\n",tercetos[salto]->t1);
+			strcpy(aux,"Temporal_CASE");
+			while(strcmp(tercetos[salto]->t1,aux)==0)
+			{
+				sprintf(aux2,"[%d]",cant_tercetos);
+				tercetos[salto] = _crear_terceto("BI",aux2,NULL);
+				salto=sacar_pila (pila);
+				printf("SALTO: %d\n",salto);
+				printf("t1: %s\n",tercetos[salto]->t1);
+				if(salto==-1)
+					break;
+			}
+			insertar_pila(salto);
+			printf("Inserto: %d\n",salto);
+			
+	 }
 		 | LET lista_let DEFAULT expresion {
 			 char e[7];
 			 sprintf(e, "[%d]", $4);
@@ -374,10 +397,11 @@ case : ID
 		auxCase = sacar_pila (pila);
 		char terc_act[MAX_LONG];
 		char salto[MAX_LONG];
-		sprintf(terc_act, "[%d]", cant_tercetos);
+		sprintf(terc_act, "[%d]", cant_tercetos+1);
 		int proximo=sacar_pila (pila);
 		sprintf(salto, "[%d]", proximo-1);
 		tercetos[proximo] = _crear_terceto("BNE",salto,terc_act);
+		insertar_pila (crear_terceto("Temporal_CASE",NULL,NULL));
 		insertar_pila(auxCase);
 	}
 	;
