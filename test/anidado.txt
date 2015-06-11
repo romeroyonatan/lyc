@@ -6,10 +6,17 @@ enddeclare
 const int c = 20
 
 if a < b {
-    if a < c {
-        while a > b {
-            while a < c {
-                put "Hola mundo"
+    if a <= c {
+        while a == b {
+            while a > c {
+                if a >= b {
+                    if a != c {
+                        put "Hola mundo"
+                    }
+                }
+                else { 
+                    put "a menor b"
+                }
             }
         }
     }
