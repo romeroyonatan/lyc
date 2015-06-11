@@ -341,21 +341,16 @@ una variable ya declarada");
 			int salto;
 			sacar_pila (&pila);
 			salto=sacar_pila (&pila);
-			printf("Salto: %d\n",salto);
-			printf("t1: %s\n",tercetos[salto]->t1);
 			strcpy(aux,"Temporal_CASE");
 			while(strcmp(tercetos[salto]->t1,aux)==0)
 			{
 				sprintf(aux2,"[%d]",cant_tercetos);
 				tercetos[salto] = _crear_terceto("BI",aux2,NULL);
 				salto=sacar_pila (&pila);
-				printf("SALTO: %d\n",salto);
-				printf("t1: %s\n",tercetos[salto]->t1);
 				if(salto==-1)
 					break;
 			}
 			insertar_pila(&pila, salto);
-			printf("Inserto: %d\n",salto);
 			
 	 }
 		 | LET lista_let DEFAULT expresion {
@@ -436,16 +431,8 @@ seleccion: IF condicion_logica {
                $$ = $5;
            }
          | seleccion ELSE {
-               char destino[7];
-               //int inicio_then = sacar_pila (&pila);
-
                // creo un terceto temporal donde colocare el salto del then
                int fin_then = crear_terceto("Temporal", NULL, NULL);
-
-               /* reemplazo salto del then */
-               //sprintf(destino, "[%d]", fin_then + 1);
-               //strcpy (tercetos[inicio_then]->t3, destino);
-
                insertar_pila (&pila, fin_then);
            }
            '{' lista_sentencias '}'{
