@@ -270,6 +270,7 @@ sentencia: seleccion
                // creo un terceto temporal donde colocare el salto
                insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
            } '{' lista_sentencias '}' {
+               int iCmp = sacar_pila (&comparacion);
                /* obtengo terceto de fin de condicion */
                int fin_condicion = sacar_pila (&pila);
                /* obtengo terceto de inicio de condicion */
@@ -423,6 +424,7 @@ seleccion: IF condicion_logica {
            }
            '{' lista_sentencias '}' {
                // creo el salto al ultimo terceto del then
+               int iCmp = sacar_pila (&comparacion);
                int inicio_then = sacar_pila (&pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
@@ -430,19 +432,19 @@ seleccion: IF condicion_logica {
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
-               insertar_pila(&pila, inicio_then); // guardo inicio para el else
+               //insertar_pila(&pila, inicio_then); // guardo inicio para el else
                $$ = $5;
            }
          | seleccion ELSE {
                char destino[7];
-               int inicio_then = sacar_pila (&pila);
+               //int inicio_then = sacar_pila (&pila);
 
                // creo un terceto temporal donde colocare el salto del then
                int fin_then = crear_terceto("Temporal", NULL, NULL);
 
                /* reemplazo salto del then */
-               sprintf(destino, "[%d]", fin_then + 1);
-               strcpy (tercetos[inicio_then]->t3, destino);
+               //sprintf(destino, "[%d]", fin_then + 1);
+               //strcpy (tercetos[inicio_then]->t3, destino);
 
                insertar_pila (&pila, fin_then);
            }
@@ -490,7 +492,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_MENOR;
+            insertar_pila(&comparacion, CMP_MENOR);
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_MENOR_IGUAL expresion {
@@ -498,7 +500,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_MENOR_IGUAL;
+            insertar_pila(&comparacion, CMP_MENOR_IGUAL);
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_IGUAL expresion {
@@ -506,7 +508,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_IGUAL;
+            insertar_pila(&comparacion, CMP_IGUAL);
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_DISTENTEROO expresion {
@@ -514,7 +516,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_DISTINTO;
+            insertar_pila(&comparacion, CMP_DISTINTO);
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_MAYOR expresion {
@@ -522,7 +524,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_MAYOR;
+            insertar_pila(&comparacion, CMP_MAYOR);
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_MAYOR_IGUAL expresion {
@@ -530,7 +532,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_MAYOR_IGUAL;
+            insertar_pila(&comparacion, CMP_MAYOR_IGUAL);
             $$ = crear_terceto("CMP", e1, e2); 
            }
          ;
@@ -965,6 +967,7 @@ void init () {
     
     cant_tercetos = 0;
     crear_pila(&pila);
+    crear_pila(&comparacion);
 }
 
 void limpiar_token()
