@@ -172,8 +172,6 @@ int crear_terceto(const char*, const char*, const char*);
 void escribir_tercetos(FILE *);
 /* libera memoria pedida para tercetos */
 void limpiar_tercetos();
-/* Indica que operador de comparacion se uso */
-int iCmp;
 
 /* Pila */ 
 typedef struct s_nodo {
@@ -182,14 +180,16 @@ typedef struct s_nodo {
 } t_nodo;
 /* apunta al ultimo elemento ingresado */
 t_nodo *pila;
+/* Indica que operador de comparacion se uso */
+t_nodo *comparacion;
 /** inserta un entero en la pila */
-void insertar_pila (int);
+void insertar_pila (t_nodo**, int);
 /** obtiene un entero de la pila */
-int sacar_pila(t_nodo*);
+int sacar_pila(t_nodo**);
 /** crea una estructura de pila */
-void crear_pila(t_nodo*);
+void crear_pila(t_nodo**);
 /** destruye pila */
-void destruir_pila(t_nodo*);
+void destruir_pila(t_nodo**);
 /** 
 * Comprueba que el elemento de la tabla de simbolos pertenece a alguno de los
 * tipos compatibles. Devuelve cero en caso que no cumpla con el tipo requerido
@@ -265,15 +265,15 @@ lista_sentencias: sentencia
 sentencia: seleccion
          | WHILE {
                // inicio condicion
-               insertar_pila (cant_tercetos);
+               insertar_pila (&pila, cant_tercetos);
            } condicion_logica {
                // creo un terceto temporal donde colocare el salto
-               insertar_pila (crear_terceto("Temporal",NULL,NULL));
+               insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
            } '{' lista_sentencias '}' {
                /* obtengo terceto de fin de condicion */
-               int fin_condicion = sacar_pila (pila);
+               int fin_condicion = sacar_pila (&pila);
                /* obtengo terceto de inicio de condicion */
-               int inicio_condicion= sacar_pila (pila);
+               int inicio_condicion= sacar_pila (&pila);
                int fin_while;
                char tmp0[7], tmp1[7];
                // fin del while, creo salto incondicional al inicio condicion
@@ -330,16 +330,16 @@ sentencia: seleccion
                     TS[$3].longitud = strlen(TS[$3].valor);
             } else {
                 yyerror("No puede usar como nombre de constante el nombre de \
-constante el nombre de una variable ya declarada \n");
+una variable ya declarada");
             }
            }
-         | CASE expresion {insertar_pila($2);} OF lista_case ESAC
+         | CASE expresion {insertar_pila(&pila, $2);} OF lista_case ESAC
          {
 			char aux[MAX_LONG];
 			char aux2[MAX_LONG];
 			int salto;
-			sacar_pila (pila);
-			salto=sacar_pila (pila);
+			sacar_pila (&pila);
+			salto=sacar_pila (&pila);
 			printf("Salto: %d\n",salto);
 			printf("t1: %s\n",tercetos[salto]->t1);
 			strcpy(aux,"Temporal_CASE");
@@ -347,13 +347,13 @@ constante el nombre de una variable ya declarada \n");
 			{
 				sprintf(aux2,"[%d]",cant_tercetos);
 				tercetos[salto] = _crear_terceto("BI",aux2,NULL);
-				salto=sacar_pila (pila);
+				salto=sacar_pila (&pila);
 				printf("SALTO: %d\n",salto);
 				printf("t1: %s\n",tercetos[salto]->t1);
 				if(salto==-1)
 					break;
 			}
-			insertar_pila(salto);
+			insertar_pila(&pila, salto);
 			printf("Inserto: %d\n",salto);
 			
 	 }
@@ -362,7 +362,7 @@ constante el nombre de una variable ya declarada \n");
 			 sprintf(e, "[%d]", $4);
 			 int i, posicion_ts;
 			 for (i=0; i<contador; i++) {
-				 posicion_ts=sacar_pila (pila);
+				 posicion_ts=sacar_pila (&pila);
 				 $$ = crear_terceto("=", TS[posicion_ts].nombre, e); 
 			 }
 		 }
@@ -382,7 +382,7 @@ asignacion_let: ID ':' expresion {
 asignacion_let: ID { 
 					if (variable_declarada($1) &&
 						comprobar_tipos ($1, 2, ENTERO, REAL)) {
-						insertar_pila ($1);
+						insertar_pila (&pila, $1);
 						contador++;
 					}
 				}
@@ -392,7 +392,7 @@ lista_case: lista_case case;
 lista_case: case;
 case : ID 
 	{
-		auxCase = sacar_pila (pila);
+		auxCase = sacar_pila (&pila);
 		char id[MAX_LONG];
 		char terc_ant[MAX_LONG];
 		char aux[MAX_LONG];
@@ -400,42 +400,42 @@ case : ID
 		sprintf(aux, "[%d]", auxCase);
 		sprintf(terc_ant, "[%d]", crear_terceto(id,NULL,NULL));
 		crear_terceto("CMP",terc_ant,aux);
-		insertar_pila (crear_terceto("Temporal",NULL,NULL));
-		insertar_pila(auxCase);
+		insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
+		insertar_pila (&pila, auxCase);
 	}
 	OP_ASIG OP_MAYOR lista_sentencias ';'
 	{
-		auxCase = sacar_pila (pila);
+		auxCase = sacar_pila (&pila);
 		char terc_act[MAX_LONG];
 		char salto[MAX_LONG];
 		sprintf(terc_act, "[%d]", cant_tercetos+1);
-		int proximo=sacar_pila (pila);
+		int proximo=sacar_pila (&pila);
 		sprintf(salto, "[%d]", proximo-1);
 		tercetos[proximo] = _crear_terceto("BNE",salto,terc_act);
-		insertar_pila (crear_terceto("Temporal_CASE",NULL,NULL));
-		insertar_pila(auxCase);
+		insertar_pila (&pila, crear_terceto("Temporal_CASE",NULL,NULL));
+		insertar_pila (&pila, auxCase);
 	}
 	;
 	
 seleccion: IF condicion_logica {
                // creo un terceto temporal donde colocare el salto
-               insertar_pila (crear_terceto("Temporal",NULL,NULL));
+               insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
            }
            '{' lista_sentencias '}' {
                // creo el salto al ultimo terceto del then
-               int inicio_then = sacar_pila (pila);
+               int inicio_then = sacar_pila (&pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
                sprintf(destino, "[%d]", $5 + 1);
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
-               insertar_pila(inicio_then); // guardo inicio para el else
+               insertar_pila(&pila, inicio_then); // guardo inicio para el else
                $$ = $5;
            }
          | seleccion ELSE {
                char destino[7];
-               int inicio_then = sacar_pila (pila);
+               int inicio_then = sacar_pila (&pila);
 
                // creo un terceto temporal donde colocare el salto del then
                int fin_then = crear_terceto("Temporal", NULL, NULL);
@@ -444,11 +444,11 @@ seleccion: IF condicion_logica {
                sprintf(destino, "[%d]", fin_then + 1);
                strcpy (tercetos[inicio_then]->t3, destino);
 
-               insertar_pila (fin_then);
+               insertar_pila (&pila, fin_then);
            }
            '{' lista_sentencias '}'{
                // creo el salto al ultimo terceto del else
-               int fin_then = sacar_pila (pila);
+               int fin_then = sacar_pila (&pila);
                char destino[7];
                sprintf(destino, "[%d]", $5 + 1);
                tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
@@ -964,7 +964,7 @@ void init () {
     terminal[T_corchete_cierra] =   "]";
     
     cant_tercetos = 0;
-    crear_pila(pila);
+    crear_pila(&pila);
 }
 
 void limpiar_token()
@@ -1459,39 +1459,38 @@ void obtener_nombre_o_valor(int posicion, char* destino) {
 }
 
 /** inserta un entero en la pila */
-void insertar_pila (int valor) {
+void insertar_pila (t_nodo** p, int valor) {
     // creo nodo
     t_nodo *nodo = (t_nodo*) malloc (sizeof(t_nodo));
     // asigno valor
     nodo->valor = valor;
     // apunto al elemento siguiente
-    nodo->sig = pila;
+    nodo->sig = *p;
     // apunto al tope de la pila
-    pila = nodo;
+    *p = nodo;
 }
 
 /** obtiene un entero de la pila */
-int sacar_pila(t_nodo* p) {
-    int valor;
+int sacar_pila(t_nodo **p) {
+    int valor = ERROR;
     t_nodo *aux;
-    if (pila != NULL) {
-       aux = pila;
+    if (*p != NULL) {
+       aux = *p;
        valor = aux->valor;
-       pila = aux->sig;
+       *p = aux->sig;
        free(aux);
-    } else
-       valor = ERROR;
+    }
     return valor;
 }
 
 /** crea una estructura de pila */
-void crear_pila(t_nodo* pila) {
-    pila = NULL;
+void crear_pila(t_nodo **p) {
+    *p = NULL;
 }
 
 /** destruye pila */
-void destruir_pila(t_nodo* pila) {
-    while ( ERROR != sacar_pila(pila));
+void destruir_pila(t_nodo** p) {
+    while ( ERROR != sacar_pila(p));
 }
 
 /** 
