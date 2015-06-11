@@ -434,7 +434,7 @@ seleccion: IF condicion_logica
                int inicio_then = sacar_pila (&pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
-               sprintf(destino, "[%d]", cant_tercetos);
+               sprintf(destino, "[%d]", $4+1);
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
