@@ -50,7 +50,7 @@
 #define CMP_MENOR_IGUAL 1
 #define CMP_MAYOR 2
 #define CMP_MAYOR_IGUAL 3
-#define CMP_DISTENTEROO 4
+#define CMP_DISTINTO 4
 #define CMP_IGUAL 5
 
 #define VAR_ENTERO 1
@@ -126,12 +126,11 @@ void guardarTS();
 int nuevo_estado[CANT_ESTADOS][CANT_TERMINALES];
 void (*proceso[CANT_ESTADOS][CANT_TERMINALES])();
 
-const char salto[7][4] = {
+const char salto[6][4] = {
     {"BGE"}, // menor
     {"BG"}, // menor igual
     {"BLE"}, //mayor
     {"BL"}, //mayor igual
-    {"BLE"}, // mayor
     {"EQ"}, // distinto
     {"NEQ"}, //igual
 };
@@ -431,16 +430,26 @@ seleccion: IF condicion_logica {
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
+               insertar_pila(inicio_then); // guardo inicio para el else
                $$ = $5;
            }
          | seleccion ELSE {
+               char destino[7];
+               int inicio_then = sacar_pila (pila);
+
                // creo un terceto temporal donde colocare el salto del then
-               insertar_pila (crear_terceto("Temporal",NULL,NULL));
+               int fin_then = crear_terceto("Temporal", NULL, NULL);
+
+               /* reemplazo salto del then */
+               sprintf(destino, "[%d]", fin_then + 1);
+               strcpy (tercetos[inicio_then]->t3, destino);
+
+               insertar_pila (fin_then);
            }
            '{' lista_sentencias '}'{
                // creo el salto al ultimo terceto del else
                int fin_then = sacar_pila (pila);
-               char  destino[7];
+               char destino[7];
                sprintf(destino, "[%d]", $5 + 1);
                tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
                $$ = $5;
@@ -505,7 +514,7 @@ condicion: expresion OP_MENOR expresion {
             sprintf(e1, "[%d]", $1);
             sprintf(e2, "[%d]", $3);
             /* aviso que operacion hay que hacer */
-            iCmp = CMP_DISTENTEROO;
+            iCmp = CMP_DISTINTO;
             $$ = crear_terceto("CMP", e1, e2); 
            }
          | expresion OP_MAYOR expresion {
