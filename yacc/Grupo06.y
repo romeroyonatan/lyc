@@ -268,7 +268,7 @@ sentencia: seleccion
                insertar_pila (&pila, cant_tercetos);
            } condicion_logica {
                // creo un terceto temporal donde colocare el salto
-               insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
+               //insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
            } '{' lista_sentencias '}' {
                int iCmp = sacar_pila (&comparacion);
                /* obtengo terceto de fin de condicion */
@@ -413,35 +413,46 @@ case : ID
 	}
 	;
 	
-seleccion: IF condicion_logica {
-               // creo un terceto temporal donde colocare el salto
-               insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
-           }
+seleccion: IF condicion_logica 
            '{' lista_sentencias '}' {
                // creo el salto al ultimo terceto del then
                int iCmp = sacar_pila (&comparacion);
                int inicio_then = sacar_pila (&pila);
                char condicion[7], destino[7];
                sprintf(condicion, "[%d]", $2);
-               sprintf(destino, "[%d]", $5 + 1);
+               sprintf(destino, "[%d]", $4 + 1);
                tercetos[inicio_then] = _crear_terceto(salto[iCmp],
                                                       condicion,
                                                       destino);
                //insertar_pila(&pila, inicio_then); // guardo inicio para el else
-               $$ = $5;
+               $$ = $4+1;
            }
-         | seleccion ELSE {
+         | IF condicion_logica 
+           '{' lista_sentencias '}' {
+               // creo el salto al ultimo terceto del then
+               int iCmp = sacar_pila (&comparacion);
+               int inicio_then = sacar_pila (&pila);
+               char condicion[7], destino[7];
+               sprintf(condicion, "[%d]", $2);
+               sprintf(destino, "[%d]", $4 + 1);
+               tercetos[inicio_then] = _crear_terceto(salto[iCmp],
+                                                      condicion,
+                                                      destino);
+               insertar_pila(&pila, crear_terceto("Temporal", NULL, NULL)); // guardo fin_then para el else
+               $$ = $4;
+           }
+		   ELSE {
                // creo un terceto temporal donde colocare el salto del then
-               int fin_then = crear_terceto("Temporal", NULL, NULL);
-               insertar_pila (&pila, fin_then);
+               //int fin_then = crear_terceto("Temporal", NULL, NULL);
+               //insertar_pila (&pila, fin_then);
            }
            '{' lista_sentencias '}'{
                // creo el salto al ultimo terceto del else
                int fin_then = sacar_pila (&pila);
                char destino[7];
-               sprintf(destino, "[%d]", $5 + 1);
+               sprintf(destino, "[%d]", $10 + 1);
                tercetos[fin_then] = _crear_terceto("BI", destino, NULL);
-               $$ = $5;
+               $$ = $10+1;
            }
          ;
 
@@ -472,6 +483,9 @@ condicion_logica: condicion AND condicion {
                     $$ = crear_terceto("NOT", c, NULL); 
                   }
                 | condicion
+                {
+                	insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
+                }
                 ;
 
 condicion: expresion OP_MENOR expresion {
