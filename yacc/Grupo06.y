@@ -599,7 +599,7 @@ factor: ID {
             obtener_nombre_o_valor ($1, cte);
             $$ = crear_terceto(cte, NULL, NULL);
         }
-      | '(' expresion ')'
+      | '(' expresion ')' { $$ = $2; }
       ;
 
 concatenacion: ID OP_CONCATENAR ID {
