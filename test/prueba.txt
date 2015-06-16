@@ -56,6 +56,22 @@ if a < b {
     if a <= c {
         a = b
 
+        --/ while anidados /--
+        while a == b  {
+            while a > c {
+                if a >= b  {
+                    if a != c {
+                        --/ expresiones simples /--
+                        a = c + b
+                    }
+                }
+                else { 
+                    --/ expresiones complejas con parentesis /--
+                    a = a * b / (a - c) + (a + b) * c
+                }
+            }
+        }
+--/ QUITAR COMENTARIO CUANDO ESTE LO DE AND OR Y NOT 
         --/ while anidados y uso de AND /--
         while a == b and b == a {
 
@@ -74,6 +90,7 @@ if a < b {
                 }
             }
         }
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX /--
     }
 } else {
     --/ otra forma de expresar reales /--
@@ -96,6 +113,6 @@ case c of
 		esac;
 	b => PUT "variable 'c' es igual a 'b'";
 esac
-
 --/ let /--
 LET a:2+3, b:1-a, e, d DEFAULT 0 
+
