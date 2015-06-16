@@ -178,18 +178,19 @@ typedef struct s_nodo {
     int valor;
     struct s_nodo *sig;
 } t_nodo;
+typedef t_nodo* t_pila;
 /* apunta al ultimo elemento ingresado */
-t_nodo *pila;
+t_pila pila;
 /* Indica que operador de comparacion se uso */
-t_nodo *comparacion;
+t_pila comparacion;
 /** inserta un entero en la pila */
-void insertar_pila (t_nodo**, int);
+void insertar_pila (t_pila*, int);
 /** obtiene un entero de la pila */
-int sacar_pila(t_nodo**);
+int sacar_pila(t_pila*);
 /** crea una estructura de pila */
-void crear_pila(t_nodo**);
+void crear_pila(t_pila*);
 /** destruye pila */
-void destruir_pila(t_nodo**);
+void destruir_pila(t_pila*);
 /** 
 * Comprueba que el elemento de la tabla de simbolos pertenece a alguno de los
 * tipos compatibles. Devuelve cero en caso que no cumpla con el tipo requerido
@@ -1463,7 +1464,7 @@ void obtener_nombre_o_valor(int posicion, char* destino) {
 }
 
 /** inserta un entero en la pila */
-void insertar_pila (t_nodo** p, int valor) {
+void insertar_pila (t_pila *p, int valor) {
     // creo nodo
     t_nodo *nodo = (t_nodo*) malloc (sizeof(t_nodo));
     // asigno valor
@@ -1475,7 +1476,7 @@ void insertar_pila (t_nodo** p, int valor) {
 }
 
 /** obtiene un entero de la pila */
-int sacar_pila(t_nodo **p) {
+int sacar_pila(t_pila *p) {
     int valor = ERROR;
     t_nodo *aux;
     if (*p != NULL) {
@@ -1488,12 +1489,12 @@ int sacar_pila(t_nodo **p) {
 }
 
 /** crea una estructura de pila */
-void crear_pila(t_nodo **p) {
+void crear_pila(t_pila *p) {
     *p = NULL;
 }
 
 /** destruye pila */
-void destruir_pila(t_nodo** p) {
+void destruir_pila(t_pila *p) {
     while ( ERROR != sacar_pila(p));
 }
 
