@@ -209,6 +209,9 @@ int variable_declarada (int);
 void string_tipo(char *destino, int tipo);
 
 int contador, auxCase;
+
+/*Genera codigo assembler para DOS x86 a partir de codigo intermedio tercetos*/
+void generar_assembler (FILE *intermedia, FILE *salida);
 %}
 
 
@@ -697,6 +700,7 @@ int NroPalabrasRes[CANTPR]={
 int main(int argc, char **argv)
 {
     FILE *intermedia;
+    FILE *final;
     // inicializo matriz de estados de automata finito
     init();
 
@@ -734,6 +738,27 @@ int main(int argc, char **argv)
     fclose(entrada);
     fclose(intermedia);
     fclose(tos);
+
+    /************************************/
+    /*  Generacion de codigo assembler  */
+    /************************************/
+
+    /* abro archivo de notacion intermedia para lectura */
+    if((intermedia = fopen("Intermedia.txt", "r")) == NULL){
+        printf("No se puede crear el archivo Final.asm\n");
+        exit(ERROR);
+    }
+    /* abro el archivo de salida en modo escritura */
+    if((final = fopen("Final.asm", "w")) == NULL){
+        printf("No se puede crear el archivo Intermedia.txt\n");
+        exit(ERROR);
+    }
+
+    /* genero assembler a partir de notacion intermedia */
+    generar_assembler(intermedia, final);
+    /* cierro archivos abiertos */
+    fclose(intermedia);
+    fclose(final);
     return 0;
 }
 
@@ -1592,4 +1617,45 @@ void string_tipo(char *destino, int tipo) {
        default:
            strcpy (destino, "");
    }
+}
+
+/** Genera el codigo assembler en base a la notacion intermedia tercetos */
+void generar_assembler (FILE *intermedia, FILE *salida) {
+    int numero, // numero terceto
+        declaracion_variables = 1; //flag indica bloque declaracion de variables
+    char t1[MAX_LONG], // primer componente del terceto
+         t2[MAX_LONG], // segundo componente del terceto
+         t3[MAX_LONG], // tercer componente del terceto
+         linea[TAMMAX]; // linea leida del archivo de cod. intermedio 
+
+    /* escribo cabecera del codigo assembler */
+    fprintf (salida, ".MODEL LARGE\n");
+    fprintf (salida, ".386\n");
+    fprintf (salida, ".STACK 200h\n");
+    fprintf (salida, ".DATA\n");
+              
+    /* leo lineas del archivo de codigo intermedio */
+    while (intermedia != NULL && !feof(intermedia)) {
+        /* leo componentes del terceto */
+        fgets(linea, TAMMAX, intermedia);
+        sscanf(linea, "%d (%30[^,],%30[^,],%30[^)])\n", &numero, t1, t2, t3);
+        /* escribo declaracion de variable entera */
+        if (strcmp (t1, "ENTERO") == 0) {
+            fprintf(salida, "%s dd ?\n", t2);
+        /* escribo declaracion de variable real */
+        } else if (strcmp (t1, "REAL") == 0) {
+            fprintf(salida, "%s dd ?\n", t2);
+        /* escribo declaracion de variable string */
+        } else if (strcmp (t1, "STRING") == 0) {
+            fprintf(salida, "%s db %d dup (?),'$'\n", t2, MAX_LONG);
+        } else {
+            /* inicio de bloque de codigo */
+            if (declaracion_variables) {
+                declaracion_variables = 0;
+                fprintf (salida, ".CODE\n");
+            }
+        }
+    }
+    /* finalizo codigo assembler */
+    fprintf (salida, "END\n");
 }
