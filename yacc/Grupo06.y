@@ -1660,7 +1660,8 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
     /* finalizo codigo assembler */
     fprintf (salida, "\tmov ax,@data\n");
     fprintf (salida, "\tmov ds,ax\n");
-    fprintf (salida, "\tmov DX,OFFSET __saludo ;mostramos mensaje para ver si corre bien\n");
+    fprintf (salida, "\tmov DX,OFFSET __saludo ;mostramos mensaje para ver si"\
+" corre bien\n");
     fprintf (salida, "\tmov AH,09h\n");
     fprintf (salida, "\tint 21h\n");
     fprintf (salida, "\tmov ah,4ch\n");
