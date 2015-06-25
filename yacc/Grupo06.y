@@ -1641,21 +1641,29 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
         sscanf(linea, "%d (%30[^,],%30[^,],%30[^)])\n", &numero, t1, t2, t3);
         /* escribo declaracion de variable entera */
         if (strcmp (t1, "ENTERO") == 0) {
-            fprintf(salida, "%s dd ?\n", t2);
+            fprintf(salida, "\t%s dd ?\n", t2);
         /* escribo declaracion de variable real */
         } else if (strcmp (t1, "REAL") == 0) {
-            fprintf(salida, "%s dd ?\n", t2);
+            fprintf(salida, "\t%s dd ?\n", t2);
         /* escribo declaracion de variable string */
         } else if (strcmp (t1, "STRING") == 0) {
-            fprintf(salida, "%s db %d dup (?),'$'\n", t2, MAX_LONG);
+            fprintf(salida, "\t%s db %d dup (?),'$'\n", t2, MAX_LONG);
         } else {
             /* inicio de bloque de codigo */
             if (declaracion_variables) {
                 declaracion_variables = 0;
+                fprintf (salida, "\t__saludo db \"Grupo06\",'$'\n");
                 fprintf (salida, ".CODE\n");
             }
         }
     }
     /* finalizo codigo assembler */
+    fprintf (salida, "\tmov ax,@data\n");
+    fprintf (salida, "\tmov ds,ax\n");
+    fprintf (salida, "\tmov DX,OFFSET __saludo ;mostramos mensaje para ver si corre bien\n");
+    fprintf (salida, "\tmov AH,09h\n");
+    fprintf (salida, "\tint 21h\n");
+    fprintf (salida, "\tmov ah,4ch\n");
+    fprintf (salida, "\tint 21h\n");
     fprintf (salida, "END\n");
 }
