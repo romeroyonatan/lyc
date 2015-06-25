@@ -41,6 +41,10 @@ test/prueba*_resultado.txt
 test/tabla_de_simbolos.txt
 yacc/*.tab.c
 yacc/*.output
+*.EXE
+*.LST
+*.MAP
+*.OBJ
 
 # archivos vim
 *.swp
