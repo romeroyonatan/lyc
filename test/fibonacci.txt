@@ -12,12 +12,12 @@ a = 1
 b = 1
 
 --/ defino cantidad de numeros de la serie que quiero mostrar /--
-CONST int default = 10
+CONST int z = 10
 PUT "Ingrese cantidad de numeros"
 PUT " a mostrar de la serie"
 GET cantidad
 if cantidad < 0 {
-    cantidad = default
+    cantidad = z
 }
 
 --/ muestro en pantalla el primer numero de la serie /--
