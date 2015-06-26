@@ -57,6 +57,11 @@
 #define VAR_REAL 2
 #define VAR_STRING 3
 
+#define COND_SIMPLE 0
+#define COND_NOT 1
+#define COND_OR 2
+#define COND_AND 3
+
 #define CANT_ESTADOS 39 //filas de la matriz de estados
 #define CANT_TERMINALES 25 //columnas de la matriz de estados
 #define CANTPR 20 //cantidad de palabras reservadas
@@ -135,6 +140,15 @@ const char salto[6][4] = {
     {"NEQ"}, //igual
 };
 
+const char salto_contrario[6][4] = {
+    {"BL"}, // menor
+    {"BLE"}, // menor igual
+    {"BG"}, //mayor
+    {"BGE"}, //mayor igual
+    {"NEQ"}, // distinto
+    {"EQ"}, //igual
+};
+
 int linea = 1; //linea por la que esta leyendo
 /* flag error de sintaxis */
 int sintaxis_error;
@@ -183,6 +197,8 @@ typedef t_nodo* t_pila;
 t_pila pila;
 /* Indica que operador de comparacion se uso */
 t_pila comparacion;
+/* Apila los tipos de condicion (and, or, not) cuando hay anidamiento */
+t_pila pila_condicion;
 /** inserta un entero en la pila */
 void insertar_pila (t_pila*, int);
 /** obtiene un entero de la pila */
@@ -270,27 +286,40 @@ sentencia: seleccion
          | WHILE {
                // inicio condicion
                insertar_pila (&pila, cant_tercetos);
-           } condicion_logica {
-               // creo un terceto temporal donde colocare el salto
-               //insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
-           } '{' lista_sentencias '}' {
-               int iCmp = sacar_pila (&comparacion);
-               /* obtengo terceto de fin de condicion */
-               int fin_condicion = sacar_pila (&pila);
+           } condicion_logica 
+           '{' lista_sentencias '}' {
+			   int i, iCmp, terceto_condicion, segunda_condicion, cant_condiciones=1;
+			   char condicion[7], destino[7];
+			   int tipo_condicion = sacar_pila (&pila_condicion);
+			   if ( tipo_condicion==COND_AND || tipo_condicion==COND_OR ){
+				   cant_condiciones = 2; /* Solo se permite comparacion entre dos condiciones simple */
+			   } 
+			   int fin_while = crear_terceto("BI", NULL, NULL); /* Terceto temporal para fin del while */
+		       /* Modifico los tercetos temporales de las condiciones */
+			   for (i=0; i<cant_condiciones; i++){
+				   iCmp = sacar_pila (&comparacion);
+				   terceto_condicion = sacar_pila (&pila);
+				   sprintf(condicion, "[%d]", terceto_condicion-1);
+				   sprintf(destino, "[%d]", fin_while + 1);
+				   /* Si es OR y la primera condicion se cumple debe saltar al inicio del then */
+				   if (tipo_condicion==COND_OR && i==1){
+					   sprintf(destino, "[%d]", segunda_condicion+1);
+					   tercetos[terceto_condicion] = _crear_terceto(salto_contrario[iCmp],condicion,destino);
+				   } else if (tipo_condicion==COND_NOT){
+					   /* Si es NOT, produce el salto cuando se cumple la condicion */
+					   tercetos[terceto_condicion] = _crear_terceto(salto_contrario[iCmp],condicion,destino);
+				   } else {
+					   segunda_condicion = terceto_condicion;
+					   tercetos[terceto_condicion] = _crear_terceto(salto[iCmp],condicion,destino);
+				   }
+		       }
+
                /* obtengo terceto de inicio de condicion */
                int inicio_condicion= sacar_pila (&pila);
-               int fin_while;
-               char tmp0[7], tmp1[7];
-               // fin del while, creo salto incondicional al inicio condicion
+               char tmp0[7];
+               // fin del while, completar salto incondicional al inicio condicion
                sprintf(tmp0, "[%d]", inicio_condicion);
-               fin_while = crear_terceto("BI", tmp0, NULL);
-               /*
-               * creo terceto para saltar a la siguiente sentencia despues del
-               * while
-               */
-               sprintf(tmp0, "[%d]", fin_while + 1);
-               sprintf(tmp1, "[%d]", $3);
-               tercetos[fin_condicion]= _crear_terceto(salto[iCmp], tmp1, tmp0); 
+			   tercetos[fin_while]= _crear_terceto("BI", tmp0, NULL);
                $$ = fin_while;
            } 
          | PUT ID {
@@ -419,30 +448,59 @@ case : ID
 	
 seleccion: IF condicion_logica 
            '{' lista_sentencias '}' {
-               // creo el salto al ultimo terceto del then
-               int iCmp = sacar_pila (&comparacion);
-               int inicio_then = sacar_pila (&pila);
-               char condicion[7], destino[7];
-               sprintf(condicion, "[%d]", $2);
-               sprintf(destino, "[%d]", cant_tercetos);
-               tercetos[inicio_then] = _crear_terceto(salto[iCmp],
-                                                      condicion,
-                                                      destino);
-               //insertar_pila(&pila, inicio_then); // guardo inicio para el else
+               int i, iCmp, terceto_condicion, segunda_condicion, cant_condiciones=1;
+			   char condicion[7], destino[7];
+			   int tipo_condicion = sacar_pila (&pila_condicion);
+			   if ( tipo_condicion==COND_AND || tipo_condicion==COND_OR ){
+				   cant_condiciones = 2;
+			   } 
+			   /* Modifico los tercetos temporales de las condiciones */
+			   for (i=0; i<cant_condiciones; i++){
+				   iCmp = sacar_pila (&comparacion);
+				   terceto_condicion = sacar_pila (&pila);
+				   sprintf(condicion, "[%d]", terceto_condicion-1);
+				   sprintf(destino, "[%d]", $4+1);
+				   /* Si es OR y la primera condicion se cumple debe saltar al inicio del then */
+				   if (tipo_condicion==COND_OR && i==1){
+					   sprintf(destino, "[%d]", segunda_condicion+1);
+					   tercetos[terceto_condicion] = _crear_terceto(salto_contrario[iCmp],condicion,destino);
+				   } else if (tipo_condicion==COND_NOT){
+					   /* Si es NOT, produce el salto cuando se cumple la condicion */
+					   tercetos[terceto_condicion] = _crear_terceto(salto_contrario[iCmp],condicion,destino);
+				   } else {
+					   segunda_condicion = terceto_condicion;
+					   tercetos[terceto_condicion] = _crear_terceto(salto[iCmp],condicion,destino);
+				   }
+			   }
                $$ = $4+1;
            }
          | IF condicion_logica 
            '{' lista_sentencias '}' {
-               // creo el salto al ultimo terceto del then
-               int iCmp = sacar_pila (&comparacion);
-               int inicio_then = sacar_pila (&pila);
-               char condicion[7], destino[7];
-               sprintf(condicion, "[%d]", $2);
-               sprintf(destino, "[%d]", $4+1);
-               tercetos[inicio_then] = _crear_terceto(salto[iCmp],
-                                                      condicion,
-                                                      destino);
-               insertar_pila(&pila, crear_terceto("Temporal", NULL, NULL)); // guardo fin_then para el else
+               int i, iCmp, terceto_condicion, segunda_condicion, cant_condiciones=1;
+			   char condicion[7], destino[7];
+			   int tipo_condicion = sacar_pila (&pila_condicion);
+			   if ( tipo_condicion==COND_AND || tipo_condicion==COND_OR ){
+				   cant_condiciones = 2;
+			   } 
+			   /* Modifico los tercetos temporales de las condiciones */
+			   for (i=0; i<cant_condiciones; i++){
+				   iCmp = sacar_pila (&comparacion);
+				   terceto_condicion = sacar_pila (&pila);
+				   sprintf(condicion, "[%d]", terceto_condicion-1);
+				   sprintf(destino, "[%d]", $4+2); /* Salto al primer terceto del else */
+				   /* Si es OR y la primera condicion se cumple debe saltar al inicio del then */
+				   if (tipo_condicion==COND_OR && i==1){
+					   sprintf(destino, "[%d]", segunda_condicion+1);
+					   tercetos[terceto_condicion] = _crear_terceto(salto_contrario[iCmp],condicion,destino);
+				   } else if (tipo_condicion==COND_NOT){
+					   /* Si es NOT, produce el salto cuando se cumple la condicion */
+					   tercetos[terceto_condicion] = _crear_terceto(salto_contrario[iCmp],condicion,destino);
+				   } else {
+					   segunda_condicion = terceto_condicion;
+					   tercetos[terceto_condicion] = _crear_terceto(salto[iCmp],condicion,destino);
+				   }
+			   }
+               insertar_pila(&pila, crear_terceto("Temporal", NULL, NULL)); /* guardo fin_then para el else */
                $$ = $4;
            }
 		   ELSE {
@@ -469,28 +527,31 @@ cte : CTE_STRING
     | CTE_REAL
     ;
 
-condicion_logica: condicion AND condicion {
-                    char c1[7], c2[7];
-                    sprintf(c1, "[%d]", $1);
-                    sprintf(c2, "[%d]", $3);
-                    $$ = crear_terceto("AND", c1, c2); 
-                  }
-                | condicion OR condicion {
-                    char c1[7], c2[7];
-                    sprintf(c1, "[%d]", $1);
-                    sprintf(c2, "[%d]", $3);
-                    $$ = crear_terceto("OR", c1, c2); 
-                  }
-                | NEGAR condicion  {
-                    char c[7];
-                    sprintf(c, "[%d]", $2);
-                    $$ = crear_terceto("NOT", c, NULL); 
-                  }
-                | condicion
-                {
-                	insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
-                }
-                ;
+condicion_logica: condicion {
+				insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL)); 
+			  } AND condicion {
+				insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL)); 
+				insertar_pila (&pila_condicion, COND_AND);
+				//$$ = crear_terceto("AND", c1, c2);
+			  }
+			| condicion {
+				insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL)); 
+			  } OR condicion {
+				insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL)); 
+				insertar_pila (&pila_condicion, COND_OR);
+				//$$ = crear_terceto("OR", c1, c2); 
+			  }
+			| NEGAR condicion  {
+				insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
+				insertar_pila (&pila_condicion, COND_NOT);
+				//$$ = crear_terceto("NOT", c, NULL); 
+			  }
+			| condicion {
+				insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
+				insertar_pila (&pila_condicion, COND_SIMPLE);
+				//insertar_pila (&pila, crear_terceto("Temporal",NULL,NULL));
+			}
+			;
 
 condicion: expresion OP_MENOR expresion {
             char e1[7], e2[7];
@@ -995,6 +1056,7 @@ void init () {
     cant_tercetos = 0;
     crear_pila(&pila);
     crear_pila(&comparacion);
+	crear_pila(&pila_condicion);
 }
 
 void limpiar_token()
@@ -1652,7 +1714,7 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
             /* inicio de bloque de codigo */
             if (declaracion_variables) {
                 declaracion_variables = 0;
-                fprintf (salida, "\t__saludo db \"Grupo06\",'$'\n");
+		fprintf (salida, "\t__saludo db \"Grupo06\",'$'\n");
                 fprintf (salida, ".CODE\n");
             }
         }
