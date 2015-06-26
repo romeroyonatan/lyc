@@ -689,7 +689,7 @@ concatenacion: ID OP_CONCATENAR ID {
                    if (variable_declarada($3) && 
                        comprobar_tipos ($3, 2, STRING, CTE_STRING)) {
                     sprintf(cte, "\"%s\"", TS[$1].valor);
-                    $$ = crear_terceto("++", cte, TS[$1].valor);
+                    $$ = crear_terceto("++", cte, TS[$3].nombre);
                    }
                }
              | CTE_STRING OP_CONCATENAR CTE_STRING {
