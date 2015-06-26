@@ -1714,7 +1714,8 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
             /* inicio de bloque de codigo */
             if (declaracion_variables) {
                 declaracion_variables = 0;
-		fprintf (salida, "\t__saludo db \"Grupo06\",'$'\n");
+                /* mensaje para demostrar que compila y corre bien */
+		        fprintf (salida, "\t__saludo db \"LyC 2015. Grupo06.\",'$'\n");
                 fprintf (salida, ".CODE\n");
             }
         }
