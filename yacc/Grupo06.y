@@ -226,8 +226,12 @@ void string_tipo(char *destino, int tipo);
 
 int contador, auxCase;
 
-/*Genera codigo assembler para DOS x86 a partir de codigo intermedio tercetos*/
+/* Genera codigo assembler para DOS x86 a partir de codigo intermedio tercetos*/
 void generar_assembler (FILE *intermedia, FILE *salida);
+/* Verifica si un string representa a una constante numerica entera o real*/
+int es_constante_numerica(char *str);
+/* Verifica si un string representa a una constante string entre comillas*/
+int es_constante_string(const char *str);
 %}
 
 
@@ -1684,50 +1688,106 @@ void string_tipo(char *destino, int tipo) {
 /** Genera el codigo assembler en base a la notacion intermedia tercetos */
 void generar_assembler (FILE *intermedia, FILE *salida) {
     int numero, // numero terceto
-        declaracion_variables = 1; //flag indica bloque declaracion de variables
-    char t1[MAX_LONG], // primer componente del terceto
-         t2[MAX_LONG], // segundo componente del terceto
-         t3[MAX_LONG], // tercer componente del terceto
-         linea[TAMMAX]; // linea leida del archivo de cod. intermedio 
+        cant_datos = 0, // cantidad lineas bloque datos
+        cant_codigo = 0, // cantidad lineas bloque codigo
+        i;
+    char t1 [MAX_LONG], // primer componente del terceto
+         t2 [MAX_LONG], // segundo componente del terceto
+         t3 [MAX_LONG], // tercer componente del terceto
+         linea [TAMMAX], // linea leida del archivo de cod. intermedio 
+         datos [MAX_TERCETOS][TAMMAX], // seccion de datos
+         codigo [MAX_TERCETOS][TAMMAX]; // seccion de codigo
 
-    /* escribo cabecera del codigo assembler */
-    fprintf (salida, ".MODEL LARGE\n");
-    fprintf (salida, ".386\n");
-    fprintf (salida, ".STACK 200h\n");
-    fprintf (salida, ".DATA\n");
+    /* inicializo seccion de datos */
+    sprintf (datos[cant_datos++], ".DATA");
+    /* mensaje para demostrar que compila y corre bien */
+	sprintf (datos[cant_datos++], "\t__saludo db \"LyC 2015. Grupo06.\",'$'");
+    /* inicializo seccion de codigo */
+    sprintf (codigo[cant_codigo++], ".CODE");
               
     /* leo lineas del archivo de codigo intermedio */
     while (intermedia != NULL && !feof(intermedia)) {
         /* leo componentes del terceto */
-        fgets(linea, TAMMAX, intermedia);
-        sscanf(linea, "%d (%30[^,],%30[^,],%30[^)])\n", &numero, t1, t2, t3);
+        fgets (linea, TAMMAX, intermedia);
+        sscanf (linea, "%d (%30[^,], %30[^,], %30[^)])", &numero, t1, t2, t3);
         /* escribo declaracion de variable entera */
         if (strcmp (t1, "ENTERO") == 0) {
-            fprintf(salida, "\t%s dd ?\n", t2);
+            sprintf (datos[cant_datos], "\t%s dd ?", t2);
+            cant_datos++;
         /* escribo declaracion de variable real */
         } else if (strcmp (t1, "REAL") == 0) {
-            fprintf(salida, "\t%s dd ?\n", t2);
+            sprintf(datos[cant_datos], "\t%s dd ?", t2);
+            cant_datos++;
         /* escribo declaracion de variable string */
         } else if (strcmp (t1, "STRING") == 0) {
-            fprintf(salida, "\t%s db %d dup (?),'$'\n", t2, MAX_LONG);
-        } else {
-            /* inicio de bloque de codigo */
-            if (declaracion_variables) {
-                declaracion_variables = 0;
-                /* mensaje para demostrar que compila y corre bien */
-		        fprintf (salida, "\t__saludo db \"LyC 2015. Grupo06.\",'$'\n");
-                fprintf (salida, ".CODE\n");
-            }
+            sprintf (datos[cant_datos],"\t%s db %d dup (?),'$'", t2, MAX_LONG);
+            cant_datos++;
+        /* escribo definicion de constantes numericas */
+        } else if (es_constante_numerica(t1)) {
+            sprintf (datos[cant_datos], "\t_%s dd %s", t1, t1);
+            cant_datos++;
+        } else if (es_constante_numerica(t2)) {
+            sprintf (datos[cant_datos], "\t_%s dd %s", t2, t2);
+            cant_datos++;
+        } else if (es_constante_numerica(t3)) {
+            sprintf (datos[cant_datos], "\t_%s dd %s", t3, t3);
+            cant_datos++;
+        /* escribo definicion de constantes string */
+        } else if (es_constante_string(t1)) {
+            sprintf (datos[cant_datos], "\t_%s db %s,'$'", t1, t1);
+            cant_datos++;
+        } else if (es_constante_string(t2)) {
+            sprintf (datos[cant_datos], "\t_%s db %s,'$'", t2, t2);
+            cant_datos++;
+        } else if (es_constante_string(t3)) {
+            sprintf (datos[cant_datos], "\t_%s db %s,'$'", t3, t3);
+            cant_datos++;
         }
     }
+
     /* finalizo codigo assembler */
-    fprintf (salida, "\tmov ax,@data\n");
-    fprintf (salida, "\tmov ds,ax\n");
-    fprintf (salida, "\tmov DX,OFFSET __saludo ;mostramos mensaje para ver si"\
-" corre bien\n");
-    fprintf (salida, "\tmov AH,09h\n");
-    fprintf (salida, "\tint 21h\n");
-    fprintf (salida, "\tmov ah,4ch\n");
-    fprintf (salida, "\tint 21h\n");
-    fprintf (salida, "END\n");
+    sprintf (codigo[cant_codigo++], "\tmov ax,@data");
+    sprintf (codigo[cant_codigo++], "\tmov ds,ax");
+    sprintf (codigo[cant_codigo++], "\tmov DX,OFFSET __saludo ;mostramos "\
+                                    "mensaje para ver si corre bien");
+    sprintf (codigo[cant_codigo++], "\tmov AH,09h");
+    sprintf (codigo[cant_codigo++], "\tint 21h");
+    sprintf (codigo[cant_codigo++], "\tmov ah,4ch");
+    sprintf (codigo[cant_codigo++], "\tint 21h");
+    sprintf (codigo[cant_codigo++], "END");
+
+    /* escribo cabecera del codigo assembler en archivo de salida */
+    fprintf (salida, ".MODEL LARGE\n");
+    fprintf (salida, ".386\n");
+    fprintf (salida, ".STACK 200h\n");
+    /* escribo seccion de datos en el archivo de salida */
+    for (i = 0; i < cant_datos; i++) 
+        fprintf (salida, "%s\n", datos[i]);
+    /* escribo seccion de codigo en el archivo de salida */
+    for (i = 0; i < cant_codigo; i++) 
+        fprintf (salida, "%s\n", codigo[i]);
+}
+
+/* indica si un string representa a una constante numerica entera o real */
+int es_constante_numerica(char *str) {
+    char *c = str;
+    while (*c) {
+        /* si es un numero o punto */
+        if ((*c > '0' && *c < '9') || *c == '.')
+            c++;
+        else
+            return 0;
+    }
+    return 1;
+}
+
+/* indica si un string representa a una constante string */
+int es_constante_string (const char *str) {
+    char *primer_comilla = strchr(str, '"');
+    char *ultima_comilla = strrchr(str, '"');
+
+    return primer_comilla && 
+           ultima_comilla && 
+           primer_comilla != ultima_comilla;
+        
 }
