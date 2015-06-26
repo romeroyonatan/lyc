@@ -766,10 +766,10 @@ int main(int argc, char **argv)
     init();
 
     //Apertura del archivo con el lote de pruebas
-    entrada = argc == 2 ? fopen(argv[1], "r") : fopen("prueba.txt", "r"); 
+    entrada = argc == 2 ? fopen(argv[1], "r") : fopen("pruebagral.txt", "r"); 
     if(entrada == NULL){
         printf("No se puede abrir el archivo %s\n", argc == 2 ? argv[1] : 
-                                                    "prueba.txt");
+                                                    "pruebagral.txt");
         exit(ERROR);
     }
 
