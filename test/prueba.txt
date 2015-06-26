@@ -71,7 +71,7 @@ if a < b {
                 }
             }
         }
---/ QUITAR COMENTARIO CUANDO ESTE LO DE AND OR Y NOT 
+
         --/ while anidados y uso de AND /--
         while a == b and b == a {
 
@@ -90,7 +90,6 @@ if a < b {
                 }
             }
         }
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX /--
     }
 } else {
     --/ otra forma de expresar reales /--
