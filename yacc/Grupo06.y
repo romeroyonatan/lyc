@@ -1773,7 +1773,7 @@ int es_constante_numerica(char *str) {
     char *c = str;
     while (*c) {
         /* si es un numero o punto */
-        if ((*c > '0' && *c < '9') || *c == '.')
+        if ((*c >= '0' && *c <= '9') || *c == '.')
             c++;
         else
             return 0;
