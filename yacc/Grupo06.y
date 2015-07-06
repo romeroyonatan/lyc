@@ -228,6 +228,8 @@ int contador, auxCase;
 
 /*Genera codigo assembler para DOS x86 a partir de codigo intermedio tercetos*/
 void generar_assembler (FILE *intermedia, FILE *salida);
+
+void eliminarCaracteresInvalidos(char *aux);
 %}
 
 
@@ -1458,7 +1460,7 @@ int insertarTS()
                 return i;
         }
     }
-
+	char aux[MAX_LONG];
     // Inserto en la TS
   	switch (tipo_token) {
 
@@ -1468,19 +1470,24 @@ int insertarTS()
             TStop++;
         break;
         case CTE_ENTERO:
-            strcpy(TS[TStop].nombre, "");
+			sprintf(aux,"_%s",token);
+            strcpy(TS[TStop].nombre, aux);
             TS[TStop].tipo = CTE_ENTERO;
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
         case CTE_REAL:
-            strcpy(TS[TStop].nombre,"");
+			sprintf(aux,"_%s",token);
+			eliminarCaracteresInvalidos(aux);
+            strcpy(TS[TStop].nombre,aux);
             TS[TStop].tipo = CTE_REAL;
             strcpy(TS[TStop].valor, token);
    			TStop++;
 		break;
        	case CTE_STRING:
-            strcpy(TS[TStop].nombre, "");
+			sprintf(aux,"_%s",token);
+			eliminarCaracteresInvalidos(aux);
+            strcpy(TS[TStop].nombre, aux);
             TS[TStop].tipo = CTE_STRING;
             strcpy(TS[TStop].valor, token);
             TS[TStop].longitud = (strlen(token));
@@ -1695,6 +1702,22 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
     fprintf (salida, ".386\n");
     fprintf (salida, ".STACK 200h\n");
     fprintf (salida, ".DATA\n");
+	
+	/*Leo tabla de simbolos por las ctes*/
+	int i;
+	for(i=0;i<TStop;i++)
+	{
+		if(TS[i].tipo == CTE_ENTERO||TS[i].tipo == CTE_REAL)
+		{
+			fprintf(salida, "\t%s dd %s\n", TS[i].nombre,TS[i].valor);
+		}
+		if(TS[i].tipo == CTE_STRING)
+		{
+			fprintf(salida, "\t%s db \"%s\" ,'$'\n", TS[i].nombre, TS[i].valor);
+		}
+		
+	}
+	
               
     /* leo lineas del archivo de codigo intermedio */
     while (intermedia != NULL && !feof(intermedia)) {
@@ -1730,4 +1753,17 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
     fprintf (salida, "\tmov ah,4ch\n");
     fprintf (salida, "\tint 21h\n");
     fprintf (salida, "END\n");
+}
+
+/*Busco los caracteres que no pueden ponerse en una variable en assembler y los cambio por '_'*/
+void eliminarCaracteresInvalidos(char *aux)
+{
+	int i=0;
+	for(i=0;i<strlen(aux);i++)
+	{
+		if(!((aux[i]>='a'&&aux[i]<='z')||(aux[i]>='A'&&aux[i]<='Z')||(aux[i]>='0'&&aux[i]<='9')))
+		{
+			aux[i]='_';
+		}
+	}
 }
