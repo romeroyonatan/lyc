@@ -230,6 +230,8 @@ int contador, auxCase;
 void generar_assembler (FILE *intermedia, FILE *salida);
 
 void eliminarCaracteresInvalidos(char *aux);
+
+void crearVarAux(int);
 %}
 
 
@@ -627,12 +629,14 @@ expresion: expresion '+' termino {
                 sprintf(e, "[%d]", $1);
                 sprintf(t, "[%d]", $3);
                 $$ = crear_terceto("+", e, t); 
+                crearVarAux(REAL);
            }
 		 | expresion '-' termino {
                 char e[7], t[7];
                 sprintf(e, "[%d]", $1);
                 sprintf(t, "[%d]", $3);
                 $$ = crear_terceto("-", e, t); 
+                crearVarAux(REAL);
            }
          | termino
          ;
@@ -642,12 +646,14 @@ termino: termino '*' factor {
            sprintf(t, "[%d]", $1);
            sprintf(f, "[%d]", $3);
            $$ = crear_terceto("*", t, f); 
+           crearVarAux(REAL);
          }
        | termino '/' factor { 
            char t[7], f[7];
            sprintf(t, "[%d]", $1);
            sprintf(f, "[%d]", $3);
            $$ = crear_terceto("/", t, f); 
+           crearVarAux(REAL);
          }
        | factor
        ;
@@ -673,6 +679,7 @@ concatenacion: ID OP_CONCATENAR ID {
                        comprobar_tipos ($1, 2, STRING, CTE_STRING) &&
                        comprobar_tipos ($3, 2, STRING, CTE_STRING))
                        $$ = crear_terceto("++", TS[$1].nombre, TS[$3].nombre);
+                       crearVarAux(STRING);
                }
              | ID OP_CONCATENAR CTE_STRING {
                    char cte[MAX_LONG];
@@ -680,6 +687,7 @@ concatenacion: ID OP_CONCATENAR ID {
                        comprobar_tipos ($1, 2, STRING, CTE_STRING)) {
                     sprintf(cte, "\"%s\"", TS[$3].valor);
                     $$ = crear_terceto("++", TS[$1].nombre, cte);
+                    crearVarAux(STRING);
                    }
                }
              | CTE_STRING OP_CONCATENAR ID {
@@ -688,6 +696,7 @@ concatenacion: ID OP_CONCATENAR ID {
                        comprobar_tipos ($3, 2, STRING, CTE_STRING)) {
                     sprintf(cte, "\"%s\"", TS[$1].valor);
                     $$ = crear_terceto("++", cte, TS[$1].valor);
+                    crearVarAux(STRING);
                    }
                }
              | CTE_STRING OP_CONCATENAR CTE_STRING {
@@ -696,6 +705,7 @@ concatenacion: ID OP_CONCATENAR ID {
                    sprintf(cte1, "\"%s\"", TS[$1].valor);
                    sprintf(cte2, "\"%s\"", TS[$3].valor);
                    $$ = crear_terceto("++", cte1, cte2);
+                   crearVarAux(STRING);
                }
              ;
 %%
@@ -1715,7 +1725,14 @@ void generar_assembler (FILE *intermedia, FILE *salida) {
 		{
 			fprintf(salida, "\t%s db \"%s\" ,'$'\n", TS[i].nombre, TS[i].valor);
 		}
-		
+		//Si el nombre empieza con @ es una variable auxiliar
+		if(TS[i].nombre[0]=='@')
+		{
+			if(TS[i].tipo==STRING)
+				fprintf(salida, "\t%s db %d dup (?),'$'\n", TS[i].nombre, MAX_LONG);
+			if(TS[i].tipo==REAL)
+				fprintf(salida, "\t%s dd ?\n", TS[i].nombre);
+		}
 	}
 	
               
@@ -1766,4 +1783,18 @@ void eliminarCaracteresInvalidos(char *aux)
 			aux[i]='_';
 		}
 	}
+}
+//Inserta en la tabla de simbolos una variable auxiliar
+void crearVarAux(int tipo)
+{
+	char aux[TAMMAX];
+	strcpy(TS[TStop].nombre,"@aux");
+	sprintf(aux,"%d",cant_tercetos-1);
+	strcat(TS[TStop].nombre,aux);
+	if(tipo==REAL)
+		TS[TStop].tipo = REAL;
+	else
+		TS[TStop].tipo = STRING;
+    TStop++;
+	
 }
