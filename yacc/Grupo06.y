@@ -1237,6 +1237,7 @@ void fin_real()
         tipo_token =  0;
     } else {
         tipo_token = CTE_REAL;
+        sprintf (token, "%f", cte);
         yylval = insertarTS();
     }
 
